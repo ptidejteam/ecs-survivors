@@ -14,16 +14,16 @@
 #include "flecs.h"
 
 template <typename T>
-class Module {
+class BaseModule {
 public:
-    Module(flecs::world &world) {
+    BaseModule(flecs::world &world) {
         std::cout << "Creating Module " << typeid(T).name() << std::endl;
         world.module<T>();
         static_cast<T*>(this)->register_components(world);
         static_cast<T*>(this)->register_pipeline(world);
         static_cast<T*>(this)->register_systems(world);
     };
-    virtual ~Module() = default;
+    virtual ~BaseModule() = default;
 
     void print() {
         std::cout << "Base" << std::endl;
