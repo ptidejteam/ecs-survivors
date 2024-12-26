@@ -11,17 +11,16 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Web Configurations
 if (EMSCRIPTEN)
-    set(CMAKE_C_FLAGS "\
-        ${CMAKE_C_FLAGS} \
+    set(CMAKE_EXE_LINKER_FLAGS  "\
+        ${CMAKE_EXE_LINKER_FLAGS} \
         -s USE_GLFW=3 \
         -s ASSERTIONS=1 \
         -s WASM=1 \
         -s ASYNCIFY \
         -s GL_ENABLE_GET_PROC_ADDRESS=1 \
         -s ALLOW_MEMORY_GROWTH=1 \
-        -s STACK_SIZE=1048576 \
-        -s EXPORTED_RUNTIME_METHODS='[\"cwrap\"]' \
-        -s MODULARIZE=1")
+        -s STACK_SIZE=131072 \
+        -s EXPORTED_RUNTIME_METHODS=cwrap")
     set(CMAKE_EXECUTABLE_SUFFIX ".html") # This line is used to set your executable to build with the emscripten html template so taht you can directly open it.
 endif ()
 
@@ -65,5 +64,7 @@ endif()
 add_subdirectory("src")
 add_subdirectory("app")
 
-
+target_link_libraries(${LIBRARY_NAME} PUBLIC
+        raylib
+        flecs::flecs_static)
 

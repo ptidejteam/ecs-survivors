@@ -8,16 +8,16 @@
 
 #include <memory>
 
-#include "modules/module.h"
+#include "modules/base_module.h"
 #include "components.h"
 
 namespace core {
 
-    class CoreModule : public Module<CoreModule> {
-        friend class Module;
+    class CoreModule : public BaseModule<CoreModule> {
+        friend class BaseModule;
     public:
         // do not add anything to the constructor, instead change the base class
-        CoreModule(flecs::world& world): Module(world) {}
+        CoreModule(flecs::world& world): BaseModule(world) {}
     private:
         void register_components(flecs::world &world);
         void register_systems(flecs::world &world);

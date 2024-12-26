@@ -11,10 +11,10 @@
 #endif
 
 #include "raylib.h"
-// #include "modules/core/core_module.h"
-// #include "modules/core/components.h"
-// #include "modules/physics/components.h"
-// #include "modules/physics/physics_module.h"
+#include "modules/core/core_module.h"
+#include "modules/core/components.h"
+#include "modules/physics/components.h"
+#include "modules/physics/physics_module.h"
 
 Game::Game(const char* windowName, int windowWidth, int windowHeight):
     m_windowName(windowName),
@@ -24,33 +24,38 @@ Game::Game(const char* windowName, int windowWidth, int windowHeight):
     std::cout << "Hello 0" << std::endl;
     InitWindow(m_windowWidth, m_windowHeight, m_windowName.c_str());
 
-    // std::cout << "Hello" << std::endl;
-    // //m_world.import<core::CoreModule>();
-    // std::cout << "Hello 2" << std::endl;
-    //
-    // //m_world.import<physics::PhysicsModule>();
-    // std::cout << "Hello 3" << std::endl;
-    //
-    // m_world.entity("player")
-    //     .set<core::Position2D>({0,0})
-    //     .set<physics::Velocity2D>({1,1});
-    // std::cout << "Hello 4" << std::endl;
+    std::cout << "Hello" << std::endl;
+    m_world.import<core::CoreModule>();
+    std::cout << "Hello 2" << std::endl;
+
+    m_world.import<physics::PhysicsModule>();
+    std::cout << "Hello 3" << std::endl;
+
+    m_world.entity("player")
+        .set<core::Position2D>({0,0})
+        .set<physics::Velocity2D>({1,1});
+    std::cout << "Hello 4" << std::endl;
 }
 
 void Game::run() {
 
-#if defined(EMSCRIPTEN)
-    emscripten_set_main_loop(UpdateDrawFrame, 0, true);
-#else
+
     SetTargetFPS(60);   // Set our game to run at 60 frames-per-second
     //--------------------------------------------------------------------------------------
 
     // Main game loop
     while (!WindowShouldClose())    // Detect window close button or ESC key
     {
-        UpdateDrawFrame();
+        BeginDrawing();
+
+        ClearBackground(RAYWHITE);
+
+        m_world.progress(GetFrameTime());
+
+        DrawText("Congrats! You created your first window!", 190, 200, 20, LIGHTGRAY);
+
+        EndDrawing();
     }
-#endif
 
     // De-Initialization
     //--------------------------------------------------------------------------------------
@@ -59,13 +64,7 @@ void Game::run() {
 }
 
 void Game::UpdateDrawFrame() {
-    BeginDrawing();
 
-    ClearBackground(RAYWHITE);
-
-    DrawText("Congrats! You created your first window!", 190, 200, 20, LIGHTGRAY);
-
-    EndDrawing();
 }
 
 

@@ -11,8 +11,6 @@ namespace core {
         world.component<Position2D>();
     }
 
-
-
     void CoreModule::register_systems(flecs::world& world)  {
         std::cout << "Registering core systems" << std::endl;
         world.system<const Position2D>()
