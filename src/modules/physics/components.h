@@ -1,5 +1,5 @@
 //
-// Created by laure on 12/22/2024.
+// Created by Laurent Voisard on 12/22/2024.
 //
 
 #ifndef COMPONENTS_H

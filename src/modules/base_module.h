@@ -1,12 +1,11 @@
 //
-// Created by laure on 12/20/2024.
+// Created by Laurent Voisard on 12/20/2024.
 //
 
 // ReSharper disable CppMemberFunctionMayBeStatic
 // ReSharper disable CppHiddenFunction
 #ifndef MODULE_H
 #define MODULE_H
-#define quote(x) #x
 #include <format>
 #include <iostream>
 #include <ostream>
@@ -22,7 +21,7 @@ public:
         static_cast<T*>(this)->register_components(world);
         static_cast<T*>(this)->register_pipeline(world);
         static_cast<T*>(this)->register_systems(world);
-    };
+    }
     virtual ~BaseModule() = default;
 
     void print() {
@@ -38,14 +37,12 @@ private:
     void register_systems(flecs::world &world) {
         std::cout << "Base systems" << std::endl;
         throw std::runtime_error("Undefined System Registration: Module does not define \"register_systems\"");
-    };
+    }
 
     void register_pipeline(flecs::world &world) {
         std::cout << "No pipeline registration implemented" << std::endl;
-    };
+    }
 };
-
-
 
 
 #endif //MODULE_H

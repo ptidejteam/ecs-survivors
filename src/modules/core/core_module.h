@@ -6,10 +6,7 @@
 #ifndef CORE_MODULE_H
 #define CORE_MODULE_H
 
-#include <memory>
-
 #include "modules/base_module.h"
-#include "components.h"
 
 namespace core {
 
