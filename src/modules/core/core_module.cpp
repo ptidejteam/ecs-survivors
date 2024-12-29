@@ -1,9 +1,11 @@
 //
-// Created by laure on 12/21/2024.
+// Created by Laurent Voisardnt Voisard on 12/21/2024.
 //
 
 // ReSharper disable CppMemberFunctionMayBeStatic
 #include "core_module.h"
+#include "components.h"
+
 #include "flecs.h"
 
 namespace core {
