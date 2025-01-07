@@ -14,8 +14,6 @@ public:
     Game(const char* windowName, int windowWidth, int windowHeight);
     void run();
 
-    static void UpdateDrawFrame();
-
 private:
     flecs::world m_world;
     std::string m_windowName;
