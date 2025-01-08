@@ -38,8 +38,6 @@ Game::Game(const char* windowName, int windowWidth, int windowHeight):
         .add<input::PlayerController>()
         .add<input::InputHorizontal>()
         .add<input::InputVertical>();
-
-    std::cout << "Hello 4" << std::endl;
 }
 
 void Game::run() {
