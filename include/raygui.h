@@ -3956,7 +3956,8 @@ void GuiSetTooltip(const char *tooltip) { guiTooltipPtr = tooltip; }
 //----------------------------------------------------------------------------------
 // Styles loading functions
 //----------------------------------------------------------------------------------
-
+#include <dirent.h>
+#include <stdio.h>
 // Load raygui style file (.rgs)
 // NOTE: By default a binary file is expected, that file could contain a custom font,
 // in that case, custom font image atlas is GRAY+ALPHA and pixel data can be compressed (DEFLATE)
@@ -3965,6 +3966,21 @@ void GuiLoadStyle(const char *fileName)
     #define MAX_LINE_BUFFER_SIZE    256
 
     bool tryBinary = false;
+
+    const char* PATH = "../resources/";
+
+    DIR *dir = opendir(PATH);
+
+    struct dirent *entry = readdir(dir);
+
+    while (entry != NULL)
+    {
+        printf("%s\n", entry->d_name);
+
+        entry = readdir(dir);
+    }
+
+    closedir(dir);
 
     // Try reading the files as text file first
     FILE *rgsFile = fopen(fileName, "rt");

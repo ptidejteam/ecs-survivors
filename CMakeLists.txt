@@ -41,6 +41,22 @@ if (NOT raylib_FOUND) # If there's none, fetch and build raylib
     endif()
 endif()
 
+set(RAYGUI_VERSION 4.0)
+find_package(raygui ${RAYGUI_VERSION} QUIET) # QUIET or REQUIRED
+if (NOT raygui_FOUND) # If there's none, fetch and build raylib
+    include(FetchContent)
+    FetchContent_Declare(
+            raygui
+            DOWNLOAD_EXTRACT_TIMESTAMP OFF
+            URL https://github.com/raysan5/raygui/archive/refs/tags/${RAYGUI_VERSION}.tar.gz
+    )
+    FetchContent_GetProperties(raygui)
+    if (NOT raygui_POPULATED) # Have we downloaded raylib yet?
+        set(FETCHCONTENT_QUIET NO)
+        FetchContent_MakeAvailable(raygui)
+    endif()
+endif()
+
 set(FLECS_VERSION 4.0.3)
 find_package(flecs ${FLECS_VERSION} QUIET) # QUIET or REQUIRED
 if (NOT flecs_FOUND) # If there's none, fetch and build flecs
@@ -62,6 +78,8 @@ endif()
 
 # Our Project
 add_subdirectory("src")
+add_subdirectory("include")
+add_subdirectory("resources")
 add_subdirectory("app")
 
 target_link_libraries(${LIBRARY_NAME} PUBLIC
