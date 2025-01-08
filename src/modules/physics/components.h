@@ -2,8 +2,8 @@
 // Created by Laurent Voisard on 12/22/2024.
 //
 
-#ifndef COMPONENTS_H
-#define COMPONENTS_H
+#ifndef PHYSICS_COMPONENTS_H
+#define PHYSICS_COMPONENTS_H
 #include <raylib.h>
 
 namespace physics {
@@ -12,4 +12,4 @@ namespace physics {
     };
 }
 
-#endif //COMPONENTS_H
+#endif //PHYSICS_COMPONENTS_H

@@ -41,14 +41,14 @@ if (NOT raylib_FOUND) # If there's none, fetch and build raylib
     endif()
 endif()
 
-set(FLECS_VERSION v4.0.3)
+set(FLECS_VERSION 4.0.3)
 find_package(flecs ${FLECS_VERSION} QUIET) # QUIET or REQUIRED
 if (NOT flecs_FOUND) # If there's none, fetch and build flecs
     include(FetchContent)
     FetchContent_Declare(
             flecs
             DOWNLOAD_EXTRACT_TIMESTAMP OFF
-            URL https://github.com/SanderMertens/flecs/archive/refs/tags/${FLECS_VERSION}.tar.gz
+            URL https://github.com/SanderMertens/flecs/archive/refs/tags/v${FLECS_VERSION}.tar.gz
     )
     FetchContent_GetProperties(flecs)
     if (NOT flecs_POPULATED) # Have we downloaded raylib yet?

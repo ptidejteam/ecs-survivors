@@ -2,8 +2,8 @@
 // Created by Laurent Voisard on 12/20/2024.
 //
 
-#ifndef POSITION2D_H
-#define POSITION2D_H
+#ifndef CORE_COMPONENTS_H
+#define CORE_COMPONENTS_H
 #include <raylib.h>
 
 namespace core {
@@ -12,4 +12,4 @@ namespace core {
     };
 }
 
-#endif //POSITION2D_H
+#endif //CORE_COMPONENTS_H

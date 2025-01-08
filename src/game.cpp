@@ -13,6 +13,8 @@
 #include "raylib.h"
 #include "modules/core/core_module.h"
 #include "modules/core/components.h"
+#include "modules/input/components.h"
+#include "modules/input/input_module.h"
 #include "modules/physics/components.h"
 #include "modules/physics/physics_module.h"
 
@@ -31,9 +33,15 @@ Game::Game(const char* windowName, int windowWidth, int windowHeight):
     m_world.import<physics::PhysicsModule>();
     std::cout << "Hello 3" << std::endl;
 
+    m_world.import<input::InputModule>();
+
     m_world.entity("player")
         .set<core::Position2D>({0,0})
-        .set<physics::Velocity2D>({1,1});
+        .add<physics::Velocity2D>()
+        .add<input::PlayerController>()
+        .add<input::InputHorizontal>()
+        .add<input::InputVertical>();
+
     std::cout << "Hello 4" << std::endl;
 }
 
@@ -61,10 +69,6 @@ void Game::run() {
     //--------------------------------------------------------------------------------------
     CloseWindow();        // Close window and OpenGL context
     //--------------------------------------------------------------------------------------
-}
-
-void Game::UpdateDrawFrame() {
-
 }
 
 
