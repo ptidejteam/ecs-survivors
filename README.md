@@ -21,3 +21,5 @@ I wanted to make sure that building for web would be easy, that way I can have a
 Thankfully Raylib and Flecs can both be compiled to web assembly and Raylib provides a comprehensive [guide](https://github.com/raysan5/raylib/wiki/Working-for-Web-(HTML5)) to do so. I suggest you follow it yourself before attempting to build this repository. Once you have all the pre-required tools installed simply add the following arguments to the cmake command: 
 
 -DPLATFORM="Web" -DCMAKE_TOOLCHAIN_FILE=<path_to_emsdk>/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake
+
+When the build is complete, navigate to the .html file and run this command: ```python -m http.server 8080```
