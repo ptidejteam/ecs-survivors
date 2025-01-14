@@ -10,6 +10,11 @@ namespace core {
     struct Position2D {
         Vector2 value;
     };
+
+    struct Speed {
+        float value;
+    };
+
 }
 
 #endif //CORE_COMPONENTS_H
