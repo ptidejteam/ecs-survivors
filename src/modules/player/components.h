@@ -4,13 +4,9 @@
 
 #ifndef PLAYER_COMPONENTS_H
 #define PLAYER_COMPONENTS_H
-#include <raylib.h>
 
 namespace player {
     struct PlayerControlled {
-    };
-    struct MovementInputDirection {
-        Vector2 dir;
     };
 }
 #endif //PLAYER_COMPONENTS_H

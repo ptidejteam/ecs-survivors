@@ -54,10 +54,8 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight): m_windowN
             .set<core::Position2D>({0, 0})
             .set<core::Speed>({300})
             .set<physics::Velocity2D>({0, 0})
-            .set<physics::DesiredVelocity2D>({0,0})
-            .set<physics::AccelerationSpeed>({5.0})
-            .add<player::PlayerControlled>()
-            .add<player::MovementInputDirection>();
+            .set<physics::DesiredVelocity2D>({0, 0})
+            .set<physics::AccelerationSpeed>({5.0});
 
     m_world.entity("player_horizontal_input").child_of(player)
             .set<input::InputHorizontal>({})
@@ -78,21 +76,14 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight): m_windowN
             .set<core::Position2D>({800, 400})
             .set<core::Speed>({150})
             .set<physics::Velocity2D>({0, 0})
-            .set<physics::DesiredVelocity2D>({0,0})
+            .set<physics::DesiredVelocity2D>({0, 0})
             .set<physics::AccelerationSpeed>({5.0})
-            .set<ai::Target>({
-                "player"
-            })
+            .set<ai::Target>({"player"})
             .add<ai::FollowTarget>()
-            .set<ai::StoppingDistance>({
-                50.0
-            });
+            .set<ai::StoppingDistance>({50.0});
 }
 
 void Game::run() {
-    SetTargetFPS(100); // Set our game to run at 60 frames-per-second
-    //--------------------------------------------------------------------------------------
-
     // Main game loop
     while (!WindowShouldClose()) // Detect window close button or ESC key
     {
