@@ -1,5 +1,5 @@
 //
-// Created by laure on 1/10/2025.
+// Created by Laurent Voisard on 1/10/2025.
 //
 
 #include "ai_module.h"
@@ -19,30 +19,33 @@ namespace ai {
     }
 
     void AIModule::register_systems(flecs::world world) {
-
-        world.system<const Target, const core::Position2D, const core::Speed>()
+        world.system<const Target, const core::Position2D, const core::Speed, physics::DesiredVelocity2D>()
                 .with<FollowTarget>()
-                .each([world](flecs::entity self, const Target &target, const core::Position2D &position,
-                              const core::Speed &speed) {
+                .each([world](const Target &target,
+                              const core::Position2D &position,
+                              const core::Speed &speed,
+                              physics::DesiredVelocity2D &velocity) {
                     const flecs::entity e = world.entity(target.name.c_str());
                     if (e != world.lookup(target.name.c_str())) return;
                     const Vector2 dir = Vector2Normalize(e.get<core::Position2D>()->value - position.value);
-                    self.set<physics::DesiredVelocity2D>({dir * speed.value});
+                    velocity.value = dir * speed.value;
                 });
 
-        world.system<const StoppingDistance, const Target, const core::Position2D>()
-                .each([world](flecs::entity self, const StoppingDistance &distance, const Target &target,
-                              const core::Position2D &pos) {
+        world.system<const StoppingDistance, const Target, const core::Position2D, physics::DesiredVelocity2D>()
+                .each([world](const StoppingDistance &distance,
+                              const Target &target,
+                              const core::Position2D &pos,
+                              physics::DesiredVelocity2D &velocity) {
                     const flecs::entity e = world.entity(target.name.c_str());
                     if (e != world.lookup(target.name.c_str())) return;
                     const Vector2 ab = e.get<core::Position2D>()->value - pos.value;
 
                     // using the squared length is faster computationally
-                    const float dist = Vector2LengthSqr(ab);
+                    const float distSquared = Vector2LengthSqr(ab);
 
                     // square the distance
-                    if (dist < distance.value * distance.value) {
-                        self.set<physics::DesiredVelocity2D>({0, 0});
+                    if (distSquared < distance.value * distance.value) {
+                        velocity.value = {0, 0};
                     }
                 });
     }

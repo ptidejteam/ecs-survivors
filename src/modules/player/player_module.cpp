@@ -1,5 +1,5 @@
 //
-// Created by laure on 1/10/2025.
+// Created by Laurent Voisard on 1/10/2025.
 //
 
 #include "player_module.h"
@@ -16,7 +16,6 @@
 
 namespace player {
     void PlayerModule::register_components(flecs::world world) {
-        world.component<PlayerControlled>();
     }
 
     void PlayerModule::register_systems(flecs::world world) {

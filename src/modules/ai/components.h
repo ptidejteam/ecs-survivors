@@ -1,5 +1,5 @@
 //
-// Created by laure on 1/10/2025.
+// Created by Laurent Voisard on 1/10/2025.
 //
 
 #ifndef AI_COMPONENTS_H
@@ -9,11 +9,11 @@
 
 namespace ai {
 
-    struct FollowTarget {};
-
     struct Target {
         std::string name;
     };
+
+    struct FollowTarget {};
 
     struct StoppingDistance {
         float value;

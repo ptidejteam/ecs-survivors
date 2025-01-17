@@ -41,15 +41,6 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight): m_windowN
     m_world.set<flecs::Rest>({});
 #endif
 
-    flecs::entity keybind_horizontal1 = m_world.entity("keybind_horizontal1").set<input::KeyBinding>({KEY_A, -1});
-    flecs::entity keybind_horizontal2 = m_world.entity("keybind_horizontal2").set<input::KeyBinding>({KEY_D, 1});
-    flecs::entity keybind_horizontal3 = m_world.entity("keybind_horizontal3").set<input::KeyBinding>({KEY_LEFT, -1});
-    flecs::entity keybind_horizontal4 = m_world.entity("keybind_horizontal4").set<input::KeyBinding>({KEY_RIGHT, 1});
-    flecs::entity keybind_vertical1 = m_world.entity("keybind_vertical1").set<input::KeyBinding>({KEY_W, -1});
-    flecs::entity keybind_vertical2 = m_world.entity("keybind_vertical2").set<input::KeyBinding>({KEY_S, 1});
-    flecs::entity keybind_vertical3 = m_world.entity("keybind_vertical3").set<input::KeyBinding>({KEY_UP, -1});
-    flecs::entity keybind_vertical4 = m_world.entity("keybind_vertical4").set<input::KeyBinding>({KEY_DOWN, 1});
-
     flecs::entity player = m_world.entity("player")
             .set<core::Position2D>({0, 0})
             .set<core::Speed>({300})
@@ -57,19 +48,27 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight): m_windowN
             .set<physics::DesiredVelocity2D>({0, 0})
             .set<physics::AccelerationSpeed>({5.0});
 
-    m_world.entity("player_horizontal_input").child_of(player)
-            .set<input::InputHorizontal>({})
-            .add<input::BindingSlot1>(keybind_horizontal1)
-            .add<input::BindingSlot2>(keybind_horizontal2)
-            .add<input::BindingSlot3>(keybind_horizontal3)
-            .add<input::BindingSlot4>(keybind_horizontal4);
+    auto hori = m_world.entity("player_horizontal_input").child_of(player)
+            .set<input::InputHorizontal>({});
+    m_world.entity().child_of(hori)
+        .set<input::KeyBinding>({KEY_A, -1});
+    m_world.entity().child_of(hori)
+        .set<input::KeyBinding>({KEY_D, 1});
+    m_world.entity().child_of(hori)
+        .set<input::KeyBinding>({KEY_LEFT, -1});
+    m_world.entity().child_of(hori)
+        .set<input::KeyBinding>({KEY_RIGHT, 1});
 
-    m_world.entity("player_vertical_input").child_of(player)
-            .set<input::InputVertical>({})
-            .add<input::BindingSlot1>(keybind_vertical1)
-            .add<input::BindingSlot2>(keybind_vertical2)
-            .add<input::BindingSlot3>(keybind_vertical3)
-            .add<input::BindingSlot4>(keybind_vertical4);
+    auto vert = m_world.entity("player_vertical_input").child_of(player)
+            .set<input::InputVertical>({});
+    m_world.entity().child_of(vert)
+        .set<input::KeyBinding>({KEY_W, -1});
+    m_world.entity().child_of(vert)
+        .set<input::KeyBinding>({KEY_S, 1});
+    m_world.entity().child_of(vert)
+        .set<input::KeyBinding>({KEY_UP, -1});
+    m_world.entity().child_of(vert)
+        .set<input::KeyBinding>({KEY_DOWN, 1});
 
 
     m_world.entity("enemy")
@@ -96,6 +95,7 @@ void Game::run() {
             m_world.entity("enemy").get<core::Position2D>()->value.y,
             25.0,
             RED);
+
         DrawCircle(
             m_world.entity("player").get<core::Position2D>()->value.x,
             m_world.entity("player").get<core::Position2D>()->value.y,

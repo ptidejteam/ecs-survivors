@@ -1,5 +1,5 @@
 //
-// Created by laure on 1/10/2025.
+// Created by Laurent Voisard on 1/10/2025.
 //
 
 #ifndef AI_MODULE_H

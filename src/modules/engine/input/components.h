@@ -6,8 +6,6 @@
 #ifndef INPUT_COMPONENTS_H
 #define INPUT_COMPONENTS_H
 
-#include <optional>
-
 namespace input {
     struct InputHorizontal {
       float value;
@@ -18,8 +16,8 @@ namespace input {
     };
 
     struct KeyBinding {
-        int key = -1;
-        float value = 1;
+        int key;
+        float value;
     };
 
     struct BindingSlot1 {};

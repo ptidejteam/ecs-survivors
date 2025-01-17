@@ -15,31 +15,22 @@ namespace input {
 
     void InputModule::register_systems(flecs::world &world) {
 
-
-        world.system<InputHorizontal>("set horizontal input")
+        world.system<const KeyBinding, InputHorizontal>("set horizontal input")
+                .term_at(1).cascade()
                 .kind(flecs::PreUpdate)
-                .each([](flecs::entity e, InputHorizontal &horizontal) {
-                    e.each([&horizontal](flecs::id id) {
-                        if (id.is_pair() && id.second().has<KeyBinding>()) {
-                            const auto* binding = id.second().get<KeyBinding>();
-                            if (IsKeyDown(binding->key)) {
-                                horizontal.value += binding->value;
-                            }
-                        }
-                    });
+                .each([](const KeyBinding &binding, InputHorizontal &horizontal) {
+                    if (IsKeyDown(binding.key)) {
+                        horizontal.value += binding.value;
+                    }
                 });
 
-        world.system<InputVertical>("set vertical input")
+        world.system<const KeyBinding, InputVertical>("set vertical input")
+                .term_at(1).cascade()
                 .kind(flecs::PreUpdate)
-                .each([](flecs::entity e, InputVertical &vertical) {
-                    e.each([&vertical](flecs::id id) {
-                        if (id.is_pair() && id.second().has<KeyBinding>()) {
-                            const auto* binding = id.second().get<KeyBinding>();
-                            if (IsKeyDown(binding->key)) {
-                                vertical.value += binding->value;
-                            }
-                        }
-                    });
+                .each([](const KeyBinding &binding, InputVertical &vertical) {
+                    if (IsKeyDown(binding.key)) {
+                        vertical.value += binding.value;
+                    }
                 });
 
         world.system<InputHorizontal>("Reset Input Horizontal")
