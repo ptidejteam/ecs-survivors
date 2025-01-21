@@ -6,6 +6,8 @@ I am taking this opportunity to learn myself about game development with ECS, ta
 
 While developing this game, I will document most of the work through [blog-posts](https://blog.ptidej.net/). Every blog will be contained in separate branches, and the main one will have the most recent changes.
 
+You can also play the latest build on [Itch.io](https://laurent-voisard.itch.io/ecs-survivors)
+
 # Building with CMake for Desktop
 
 I'm not proficient with c++ build systems so I will not explain in detail how to build this repository. I myself am using CLion on Windows. I'm fairly certain that using the command line
@@ -21,3 +23,5 @@ I wanted to make sure that building for web would be easy, that way I can have a
 Thankfully Raylib and Flecs can both be compiled to web assembly and Raylib provides a comprehensive [guide](https://github.com/raysan5/raylib/wiki/Working-for-Web-(HTML5)) to do so. I suggest you follow it yourself before attempting to build this repository. Once you have all the pre-required tools installed simply add the following arguments to the cmake command: 
 
 -DPLATFORM="Web" -DCMAKE_TOOLCHAIN_FILE=<path_to_emsdk>/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake
+
+When the build is complete, navigate to the .html file and run this command: ```python -m http.server 8080```

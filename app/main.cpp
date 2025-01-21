@@ -6,9 +6,7 @@ int main() {
     const int screenWidth = 960;
     const int screenHeight = 450;
 
-    std::cout << "Hello" << std::endl;
-    Game game = Game("ECS-Survivors", screenWidth, screenHeight);
-    game.run();
+    Game("ECS-Survivors", screenWidth, screenHeight).run();
 
     return 0;
 }
