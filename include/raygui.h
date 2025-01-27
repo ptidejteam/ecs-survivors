@@ -3967,21 +3967,6 @@ void GuiLoadStyle(const char *fileName)
 
     bool tryBinary = false;
 
-    const char* PATH = "../resources/";
-
-    DIR *dir = opendir(PATH);
-
-    struct dirent *entry = readdir(dir);
-
-    while (entry != NULL)
-    {
-        printf("%s\n", entry->d_name);
-
-        entry = readdir(dir);
-    }
-
-    closedir(dir);
-
     // Try reading the files as text file first
     FILE *rgsFile = fopen(fileName, "rt");
 

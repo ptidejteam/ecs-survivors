@@ -10,19 +10,22 @@
 #include <emscripten/emscripten.h>
 #endif
 
-#define RAYGUI_IMPLEMENTATION
-#include "raygui.h"
 #include "raylib.h"
 #include "modules/ai/ai_module.h"
 #include "modules/ai/components.h"
 #include "modules/engine/core/core_module.h"
 #include "modules/engine/core/components.h"
+#include "modules/engine/rendering/gui/components.h"
+#include "modules/engine/rendering/gui/gui_module.h"
 #include "modules/engine/input/components.h"
 #include "modules/engine/input/input_module.h"
 #include "modules/engine/physics/components.h"
 #include "modules/engine/physics/physics_module.h"
-#include "modules/player/components.h"
 #include "modules/player/player_module.h"
+
+#include "raygui.h"
+#include "modules/engine/rendering/components.h"
+#include "modules/engine/rendering/rendering_module.h"
 
 Game::Game(const char *windowName, int windowWidth, int windowHeight): m_windowName(windowName),
                                                                        m_windowWidth(windowWidth),
@@ -30,14 +33,14 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight): m_windowN
                                                                        m_world(flecs::world()) {
     //Raylib window
     InitWindow(m_windowWidth, m_windowHeight, m_windowName.c_str());
-
-    GuiLoadStyle("../resources/styles/dark/style_dark.rgs");
+SetTargetFPS(60);
 
     m_world.import<input::InputModule>();
     m_world.import<core::CoreModule>();
     m_world.import<physics::PhysicsModule>();
     m_world.import<player::PlayerModule>();
     m_world.import<ai::AIModule>();
+    m_world.import<rendering::RenderingModule>();
 
 #if not defined(EMSCRIPTEN)
     // use the flecs explorer when not on browser
@@ -50,7 +53,9 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight): m_windowN
             .set<core::Speed>({300})
             .set<physics::Velocity2D>({0, 0})
             .set<physics::DesiredVelocity2D>({0, 0})
-            .set<physics::AccelerationSpeed>({5.0});
+            .set<physics::AccelerationSpeed>({5.0})
+            .set<rendering::Circle>({25})
+            .set<Color>({GREEN});;
 
     auto hori = m_world.entity("player_horizontal_input").child_of(player)
             .set<input::InputHorizontal>({});
@@ -74,7 +79,6 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight): m_windowN
     m_world.entity().child_of(vert)
             .set<input::KeyBinding>({KEY_DOWN, 1});
 
-
     m_world.entity("enemy")
             .set<core::Position2D>({800, 400})
             .set<core::Speed>({150})
@@ -83,43 +87,40 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight): m_windowN
             .set<physics::AccelerationSpeed>({5.0})
             .set<ai::Target>({"player"})
             .add<ai::FollowTarget>()
-            .set<ai::StoppingDistance>({50.0});
+            .set<ai::StoppingDistance>({50.0})
+            .set<rendering::Circle>({25})
+            .set<Color>({RED});
+
+
+    m_world.entity("button 1")
+            .set<rendering::gui::Button>({
+                "Hello World",
+                {200, 200, 300, 100},
+                {
+                    m_world.system<const core::Position2D>()
+                    .kind(0)
+                    .each([](flecs::entity e, const core::Position2D &position) {
+                        std::printf("Button Clicked\n");
+                        std::printf("Entity name: %s \n", e.name().c_str());
+                        std::printf("Position: (%f, %f) \n", position.value.x, position.value.y);
+                    })
+                }
+            });
+
+    m_world.entity("text 1")
+            .set<rendering::gui::Text>({
+                "Hello World",
+                {m_windowWidth / 2.f, 0, 300, 100},
+            });
 }
 
 void Game::run() {
     // Main game loop
+    m_world.progress();
     while (!WindowShouldClose()) // Detect window close button or ESC key
     {
-        BeginDrawing();
-        ClearBackground(GetColor(GuiGetStyle(DEFAULT, BACKGROUND_COLOR)));
-
-        GuiDrawText(
-            "Congrats! You created your first window!",
-            {100, 100, 300, 100},
-            TEXT_ALIGN_TOP,
-            GetColor(GuiGetStyle(DEFAULT, TEXT_COLOR_NORMAL)));
-        if (GuiButton({200, 200, 300, 100}, "Hello World"))
-            std::printf("Hello World\n");
-
-        DrawCircle(
-            m_world.entity("enemy").get<core::Position2D>()->value.x,
-            m_world.entity("enemy").get<core::Position2D>()->value.y,
-            25.0,
-            RED);
-
-        DrawCircle(
-            m_world.entity("player").get<core::Position2D>()->value.x,
-            m_world.entity("player").get<core::Position2D>()->value.y,
-            25.0,
-            GREEN);
-
         m_world.progress(GetFrameTime());
-        DrawFPS(10, 10);
-
-
-        EndDrawing();
     }
-
     // De-Initialization
     //--------------------------------------------------------------------------------------
     CloseWindow(); // Close window and OpenGL context

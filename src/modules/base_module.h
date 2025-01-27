@@ -18,6 +18,7 @@ public:
     BaseModule(flecs::world &world) {
         std::cout << "Creating Module " << typeid(T).name() << std::endl;
         world.module<T>();
+        static_cast<T*>(this)->register_submodules(world);
         static_cast<T*>(this)->register_components(world);
         static_cast<T*>(this)->register_pipeline(world);
         static_cast<T*>(this)->register_systems(world);
@@ -41,6 +42,10 @@ private:
 
     void register_pipeline(flecs::world &world) {
         std::cout << "No pipeline registration implemented" << std::endl;
+    }
+
+    void register_submodules(flecs::world &world) {
+        std::cout << "No sub module registration implemented" << std::endl;
     }
 };
 
