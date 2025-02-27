@@ -5,6 +5,8 @@
 #ifndef GUI_MODULE_H
 #define GUI_MODULE_H
 
+#include <unordered_map>
+
 #include "modules/base_module.h"
 #include "flecs.h"
 namespace rendering::gui {
@@ -13,13 +15,18 @@ namespace rendering::gui {
   public:
     // do not add implementation to the constructor
     GUIModule(flecs::world& world): BaseModule(world) {};
+
+	static void init_prefabs(flecs::world& world);
   private:
 
     void register_components(flecs::world& world);
-    //void register_pipeline(flecs::world& world) = delete;
-    void register_systems(flecs::world& world);
+    void register_systems(flecs::world &world);
 
   };
+
+  static const char* DECORATOR_TEXT_ALIGN_CENTER = "decorator_text_align_left";
+  static const char* DECORATOR_TEXT_ALIGN_RIGHT = "decorator_text_align_right";
+  static const char* DECORATOR_OUTLINED = "decorator_outlined";
 }
 
-#endif //PHYSICS_MODULE_H
+#endif //GUI_MODULE_H

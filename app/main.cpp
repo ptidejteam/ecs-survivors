@@ -3,8 +3,8 @@
 #include "game.h"
 
 int main() {
-    const int screenWidth = 960;
-    const int screenHeight = 450;
+    const int screenWidth = 1920;
+    const int screenHeight = 1080;
 
     Game("ECS-Survivors", screenWidth, screenHeight).run();
 

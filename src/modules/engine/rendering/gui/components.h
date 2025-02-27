@@ -10,24 +10,33 @@
 #include "modules/engine/core/components.h"
 
 namespace rendering::gui {
+
+
     struct Button {
         std::string text;
-        Rectangle rect;
         flecs::system onclick_system;
     };
 
     struct Text {
         std::string text;
-        Rectangle rect;
     };
 
-    struct CenteredTextDecorator {};
-
-    struct OutlineDecorator {
+    struct Decorator {
+        flecs::system add_decoration_system;
+        flecs::system remove_decoration_system;
     };
 
-    struct CenteredDecorator {
-    };
+	struct Decorated {
+		flecs::entity& entity;
+	};
+
+	struct Outline {
+		int border_size;
+		Color border_color;
+		Color fill_color;
+	};
+	struct GuiElement{};
+	struct Decoration {};
 }
 
 #endif //GUI_COMPONENTS_H
