@@ -49,7 +49,7 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) :
 
 #if not defined(EMSCRIPTEN)
 	// use the flecs explorer when not on browser
-	m_world.import <flecs::stats>();
+	m_world.import<flecs::stats>();
 	m_world.set<flecs::Rest>({});
 #endif
 
@@ -61,7 +61,6 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) :
 							   .set<physics::AccelerationSpeed>({5.0})
 							   .set<rendering::Circle>({25})
 							   .set<Color>({GREEN});
-	;
 
 	auto hori = m_world.entity("player_horizontal_input").child_of(player).set<input::InputHorizontal>({});
 	m_world.entity().child_of(hori).set<input::KeyBinding>({KEY_A, -1});

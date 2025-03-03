@@ -18,13 +18,7 @@ class BaseModule {
 public:
     BaseModule(flecs::world &world) {
         std::cout << "Creating Module " << typeid(T).name() << std::endl;
-
-        if (instances().count(typeid(T).name()) > 0) {
-            throw std::runtime_error("Module already exists!");
-        }
-
         // Register the instance
-        instances()[typeid(T).name()] = this;
         world.module<T>();
         static_cast<T *>(this)->register_submodules(world);
         static_cast<T *>(this)->register_components(world);
@@ -34,25 +28,11 @@ public:
 
     ~BaseModule() = default;
 
-    static T *getInstance() {
-        auto it = instances().find(typeid(T).name());
-        if (it != instances().end()) {
-            return static_cast<T *>(it->second);
-        }
-        return nullptr;
-    }
-
     void print() {
         std::cout << "Base" << std::endl;
     }
 
 private:
-    // A map to store instances of each module type (singleton instances)
-    static std::unordered_map<std::string, BaseModule *> &instances() {
-        static std::unordered_map<std::string, BaseModule *> instance_map;
-        return instance_map;
-    }
-
     BaseModule() = delete;
 
     void register_components(flecs::world &world) {
