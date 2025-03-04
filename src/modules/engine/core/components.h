@@ -15,6 +15,12 @@ namespace core {
         float value;
     };
 
+    struct GameSettings {
+        std::string windowName;
+        int windowWidth;
+        int windowHeight;
+    };
+
 }
 
 #endif //CORE_COMPONENTS_H

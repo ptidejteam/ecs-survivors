@@ -20,10 +20,10 @@ public:
         std::cout << "Creating Module " << typeid(T).name() << std::endl;
         // Register the instance
         world.module<T>();
-        static_cast<T *>(this)->register_submodules(world);
         static_cast<T *>(this)->register_components(world);
         static_cast<T *>(this)->register_pipeline(world);
         static_cast<T *>(this)->register_systems(world);
+        static_cast<T *>(this)->register_submodules(world);
     }
 
     ~BaseModule() = default;

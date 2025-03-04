@@ -5,8 +5,9 @@
 #ifndef RENDERING_MODULE_H
 #define RENDERING_MODULE_H
 
+#include <raygui.h>
+
 #include "modules/base_module.h"
-#include "gui/gui_module.h"
 
 namespace rendering {
     class RenderingModule: public BaseModule<RenderingModule> {

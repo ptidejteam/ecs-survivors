@@ -1,5 +1,5 @@
 set(GUI_LIBRARY_SOURCES "gui_module.cpp")
-set(GUI_LIBRARY_HEADERS "gui_module.h" "components.h")
+set(GUI_LIBRARY_HEADERS "components.h" "gui_module.h")
 
 target_sources(${LIBRARY_NAME} PUBLIC
         ${GUI_LIBRARY_SOURCES}

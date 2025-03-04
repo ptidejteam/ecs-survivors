@@ -11,6 +11,17 @@
 
 namespace rendering::gui {
 
+    enum HORIZONTAL_ANCHOR {
+        LEFT,
+        CENTER,
+        RIGHT
+    };
+
+    enum VERTICAL_ANCHOR {
+        TOP,
+        MIDDLE,
+        BOTTOM
+    };
 
     struct Button {
         std::string text;
@@ -19,24 +30,23 @@ namespace rendering::gui {
 
     struct Text {
         std::string text;
+        int alignment;
     };
-
-    struct Decorator {
-        flecs::system add_decoration_system;
-        flecs::system remove_decoration_system;
-    };
-
-	struct Decorated {
-		flecs::entity& entity;
-	};
 
 	struct Outline {
 		int border_size;
 		Color border_color;
 		Color fill_color;
 	};
-	struct GuiElement{};
-	struct Decoration {};
+
+    struct Anchor {
+        HORIZONTAL_ANCHOR horizontal_anchor;
+        VERTICAL_ANCHOR vertical_anchor;
+    };
+
+    struct Panel {
+
+    };
 }
 
 #endif //GUI_COMPONENTS_H
