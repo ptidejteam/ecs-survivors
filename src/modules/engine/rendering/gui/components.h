@@ -6,7 +6,7 @@
 #define GUI_COMPONENTS_H
 #include <raylib.h>
 #include <string>
-
+#include <flecs.h>
 #include "modules/engine/core/components.h"
 
 namespace rendering::gui {
@@ -40,6 +40,7 @@ namespace rendering::gui {
 	};
 
     struct Anchor {
+        Rectangle rectangle;
         HORIZONTAL_ANCHOR horizontal_anchor;
         VERTICAL_ANCHOR vertical_anchor;
     };

@@ -16,7 +16,7 @@
 template<typename T>
 class BaseModule {
 public:
-    BaseModule(flecs::world &world) {
+    BaseModule(flecs::world &world) :m_world(world) {
         std::cout << "Creating Module " << typeid(T).name() << std::endl;
         // Register the instance
         world.module<T>();
@@ -31,6 +31,9 @@ public:
     void print() {
         std::cout << "Base" << std::endl;
     }
+
+protected:
+    flecs::world &m_world;
 
 private:
     BaseModule() = delete;

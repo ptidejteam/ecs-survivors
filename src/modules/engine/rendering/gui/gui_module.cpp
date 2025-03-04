@@ -11,6 +11,7 @@
 #include <unordered_set>
 
 #include "raygui.h"
+#include "modules/engine/core/core_module.h"
 
 namespace rendering::gui {
     void GUIModule::register_components(flecs::world &world) {
@@ -21,64 +22,8 @@ namespace rendering::gui {
 
     void GUIModule::register_systems(flecs::world &world) {
         world.system().kind(flecs::OnStart).run([](flecs::iter &iter) {
-            GuiLoadStyle("../resources/styles/dark/style_dark.rgs");
+            GuiLoadStyle("../resources/styles/amber/style_amber.rgs");
         });
-
-        world.system<const Anchor, Rectangle, const Rectangle>("Add anchored position")
-                .term_at(2).cascade()
-                .kind(flecs::OnStart)
-                .each([](flecs::entity e, const Anchor &anchor, Rectangle &rectangle, const Rectangle &parent) {
-                    switch (anchor.horizontal_anchor) {
-                        case HORIZONTAL_ANCHOR::CENTER:
-                            rectangle.x = rectangle.x + parent.x + parent.width / 2;
-                            break;
-                        case HORIZONTAL_ANCHOR::RIGHT:
-                            rectangle.x = rectangle.x + parent.x + parent.width;
-                            break;
-                        default:
-                            rectangle.x = rectangle.x + parent.x;
-                            break;
-                    }
-                    switch (anchor.vertical_anchor) {
-                        case VERTICAL_ANCHOR::MIDDLE:
-                            rectangle.y = rectangle.y + parent.y + parent.height / 2;
-                            break;
-                        case VERTICAL_ANCHOR::BOTTOM:
-                            rectangle.y = rectangle.y + parent.y + parent.height;
-                            break;
-                        default:
-                            rectangle.y = rectangle.y + parent.y;
-                            break;
-                    }
-                });
-
-        world.observer<const Anchor, Rectangle, const Rectangle>("reset on window changed anchored position")
-                .term_at(2).cascade()
-                .event(flecs::OnSet)
-                .each([](flecs::entity e, const Anchor &anchor, Rectangle &rectangle, const Rectangle &parent) {
-                    switch (anchor.horizontal_anchor) {
-                        case HORIZONTAL_ANCHOR::CENTER:
-                            rectangle.x = rectangle.x + parent.x + parent.width / 2;
-                            break;
-                        case HORIZONTAL_ANCHOR::RIGHT:
-                            rectangle.x = rectangle.x + parent.x + parent.width;
-                            break;
-                        default:
-                            rectangle.x = rectangle.x + parent.x;
-                            break;
-                    }
-                    switch (anchor.vertical_anchor) {
-                        case VERTICAL_ANCHOR::MIDDLE:
-                            rectangle.y = rectangle.y + parent.y + parent.height / 2;
-                            break;
-                        case VERTICAL_ANCHOR::BOTTOM:
-                            rectangle.y = rectangle.y + parent.y + parent.height;
-                            break;
-                        default:
-                            rectangle.y = rectangle.y + parent.y;
-                            break;
-                    }
-                });
 
         world.system<const Button, const Rectangle>("Draw Button")
                 .kind<RenderGUI>()
