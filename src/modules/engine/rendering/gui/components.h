@@ -25,7 +25,7 @@ namespace rendering::gui {
 
     struct Button {
         std::string text;
-        flecs::system onclick_system;
+        flecs::system on_click_system;
     };
 
     struct Text {
@@ -40,13 +40,25 @@ namespace rendering::gui {
 	};
 
     struct Anchor {
-        Rectangle rectangle;
+        Vector2 position;
         HORIZONTAL_ANCHOR horizontal_anchor;
         VERTICAL_ANCHOR vertical_anchor;
+
+        Anchor() {
+            position = {};
+            this->horizontal_anchor = HORIZONTAL_ANCHOR::LEFT;
+            this->vertical_anchor = VERTICAL_ANCHOR::TOP;
+        };
+
+        Anchor(HORIZONTAL_ANCHOR horizontal_anchor, VERTICAL_ANCHOR vertical_anchor) {
+            position = {};
+            this->horizontal_anchor = horizontal_anchor;
+            this->vertical_anchor = vertical_anchor;
+        };
     };
 
     struct Panel {
-
+        std::string name;
     };
 }
 

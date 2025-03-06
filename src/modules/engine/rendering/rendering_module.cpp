@@ -19,29 +19,6 @@ void rendering::RenderingModule::register_components(flecs::world world) {
 }
 
 void rendering::RenderingModule::register_systems(flecs::world world) {
-    world.system("On start set anchored positions")
-            .kind(flecs::OnStart)
-            .run([world](flecs::iter &iter) {
-                auto entity = world.lookup("gui_canvas");
-                entity.children([](flecs::entity child) {
-                    child.emit<core::WindowResizedEvent>();
-                });
-            });
-
-    world.system("Window Resized")
-            .kind<PreRender>()
-            .run([world](flecs::iter &iter) {
-                if (IsWindowResized()) {
-                    auto entity = world.lookup("gui_canvas");
-                    entity.set<Rectangle>({
-                        0, 0, static_cast<float>(GetScreenWidth()), static_cast<float>(GetScreenHeight())
-                    });
-
-                    entity.children([](flecs::entity child) {
-                        child.emit<core::WindowResizedEvent>();
-                    });
-                }
-            });
 
     world.system("Before Draw")
             .kind<PreRender>()

@@ -58,9 +58,8 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_window
 #endif
 
     m_world.entity("gui_canvas").set<Rectangle>({
-                0, 0, static_cast<float>(m_windowWidth), static_cast<float>(m_windowHeight)
-            })
-            .observe<core::WindowResizedEvent>(rendering::gui::GUIModule::update_gui_anchored_position());
+        0, 0, static_cast<float>(m_windowWidth), static_cast<float>(m_windowHeight)
+    });
     m_world.set<core::GameSettings>({m_windowName, m_windowWidth, m_windowHeight});
 
     flecs::entity player = m_world.entity("player")
@@ -99,7 +98,7 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_window
 
     m_world.entity("button 1").child_of(m_world.lookup("gui_canvas"))
             .set<rendering::gui::Button>({
-                "Hello World",
+                "A button",
                 {
                     m_world.system<const core::Position2D>().kind(0).each(
                         [](flecs::entity e, const core::Position2D &position) {
@@ -110,38 +109,37 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_window
                         })
                 }
             })
-            .set<Rectangle>({-150, -50, 300, 100})
+            .set<Rectangle>({-150, -300, 300, 100})
             .set<rendering::gui::Anchor>({
-                {-150, -50, 300, 100},
-                rendering::gui::HORIZONTAL_ANCHOR::CENTER, rendering::gui::VERTICAL_ANCHOR::MIDDLE
-            })
-            .observe<core::WindowResizedEvent>(rendering::gui::GUIModule::update_gui_anchored_position());
+                rendering::gui::HORIZONTAL_ANCHOR::CENTER,
+                rendering::gui::VERTICAL_ANCHOR::BOTTOM
+            });
 
     m_world.entity("text 0").child_of(m_world.lookup("gui_canvas"))
-            .set<rendering::gui::Text>({"Hello World", TEXT_ALIGN_LEFT})
+            .set<rendering::gui::Text>({"A text 0", TEXT_ALIGN_LEFT})
             .set<Rectangle>({-300, 0, 600, 300})
             .set<rendering::gui::Outline>({
-                2, GetColor(GuiGetStyle(LABEL, BORDER_COLOR_NORMAL)),
+                2,
+                GetColor(GuiGetStyle(LABEL, BORDER_COLOR_NORMAL)),
                 GetColor(GuiGetStyle(LABEL, BACKGROUND_COLOR))
             })
             .set<rendering::gui::Anchor>({
-                {-300, 0, 600, 300},
-                rendering::gui::HORIZONTAL_ANCHOR::CENTER, rendering::gui::VERTICAL_ANCHOR::TOP
-            })
-            .observe<core::WindowResizedEvent>(rendering::gui::GUIModule::update_gui_anchored_position());
+                rendering::gui::HORIZONTAL_ANCHOR::CENTER,
+                rendering::gui::VERTICAL_ANCHOR::TOP
+            });
 
     m_world.entity("text 1").child_of(m_world.lookup("gui_canvas"))
-            .set<rendering::gui::Text>({"Hello World", TEXT_ALIGN_CENTER})
+            .set<rendering::gui::Text>({"A text 1", TEXT_ALIGN_CENTER})
             .set<Rectangle>({0, 0, 200, 300})
             .set<rendering::gui::Outline>({
-                2, GetColor(GuiGetStyle(LABEL, BORDER_COLOR_NORMAL)),
+                2,
+                GetColor(GuiGetStyle(LABEL, BORDER_COLOR_NORMAL)),
                 GetColor(GuiGetStyle(LABEL, BACKGROUND_COLOR))
             })
-            .set<rendering::gui::Anchor>({{0, 0, 200, 300}})
-            .observe<core::WindowResizedEvent>(rendering::gui::GUIModule::update_gui_anchored_position());
+            .set<rendering::gui::Anchor>({});
 
     m_world.entity("text 2").child_of(m_world.lookup("gui_canvas"))
-            .set<rendering::gui::Text>({"Hello World", TEXT_ALIGN_RIGHT})
+            .set<rendering::gui::Text>({"A text 2", TEXT_ALIGN_RIGHT})
             .set<Rectangle>({-200, -300, 200, 300})
             .set<rendering::gui::Outline>({
                 2,
@@ -149,96 +147,30 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_window
                 GetColor(GuiGetStyle(LABEL, BACKGROUND_COLOR))
             })
             .set<rendering::gui::Anchor>({
-                {-200, -300, 200, 300},
-                rendering::gui::HORIZONTAL_ANCHOR::RIGHT, rendering::gui::VERTICAL_ANCHOR::BOTTOM
-            })
-            .observe<core::WindowResizedEvent>(rendering::gui::GUIModule::update_gui_anchored_position());
+                rendering::gui::HORIZONTAL_ANCHOR::RIGHT,
+                rendering::gui::VERTICAL_ANCHOR::BOTTOM
+            });
 
     m_world.entity("panel").child_of(m_world.lookup("gui_canvas"))
             .set<Rectangle>({-387.5f, -150, 775, 150})
-            .set<rendering::gui::Outline>({
-                2,
-                GetColor(GuiGetStyle(LABEL, BORDER_COLOR_NORMAL)),
-                GetColor(GuiGetStyle(LABEL, BACKGROUND_COLOR))
-            })
             .set<rendering::gui::Anchor>({
-                {-387.5f, -150, 775, 150},
                 rendering::gui::HORIZONTAL_ANCHOR::CENTER, rendering::gui::VERTICAL_ANCHOR::BOTTOM
             })
-            .observe<core::WindowResizedEvent>(rendering::gui::GUIModule::update_gui_anchored_position());
+            .set<rendering::gui::Panel>({"A Panel"});
 
-    m_world.entity("item").child_of(m_world.lookup("gui_canvas::panel"))
-            .set<Rectangle>({25, -50, 100, 100})
-            .set<rendering::gui::Anchor>({
-                {25, -50, 100, 100},
-                rendering::gui::HORIZONTAL_ANCHOR::LEFT, rendering::gui::VERTICAL_ANCHOR::MIDDLE
-            })
-            .set<rendering::gui::Outline>({
-                2,
-                GetColor(GuiGetStyle(LABEL, BORDER_COLOR_NORMAL)),
-                GetColor(GuiGetStyle(LABEL, BACKGROUND_COLOR))
-            })
-            .observe<core::WindowResizedEvent>(rendering::gui::GUIModule::update_gui_anchored_position());
-    m_world.entity("item 1").child_of(m_world.lookup("gui_canvas::panel"))
-            .set<Rectangle>({150, -50, 100, 100})
-            .set<rendering::gui::Anchor>({
-                {150, -50, 100, 100},
-                rendering::gui::HORIZONTAL_ANCHOR::LEFT, rendering::gui::VERTICAL_ANCHOR::MIDDLE
-            })
-            .set<rendering::gui::Outline>({
-                2,
-                GetColor(GuiGetStyle(LABEL, BORDER_COLOR_NORMAL)),
-                GetColor(GuiGetStyle(LABEL, BACKGROUND_COLOR))
-            })
-            .observe<core::WindowResizedEvent>(rendering::gui::GUIModule::update_gui_anchored_position());
-    m_world.entity("item 2").child_of(m_world.lookup("gui_canvas::panel"))
-            .set<Rectangle>({275, -50, 100, 100})
-            .set<rendering::gui::Anchor>({
-                {275, -50, 100, 100},
-                rendering::gui::HORIZONTAL_ANCHOR::LEFT, rendering::gui::VERTICAL_ANCHOR::MIDDLE
-            })
-            .set<rendering::gui::Outline>({
-                2,
-                GetColor(GuiGetStyle(LABEL, BORDER_COLOR_NORMAL)),
-                GetColor(GuiGetStyle(LABEL, BACKGROUND_COLOR))
-            })
-            .observe<core::WindowResizedEvent>(rendering::gui::GUIModule::update_gui_anchored_position());
-    m_world.entity("item 3").child_of(m_world.lookup("gui_canvas::panel"))
-            .set<Rectangle>({400, -50, 100, 100})
-            .set<rendering::gui::Anchor>({
-                {400, -50, 100, 100},
-                rendering::gui::HORIZONTAL_ANCHOR::LEFT, rendering::gui::VERTICAL_ANCHOR::MIDDLE
-            })
-            .set<rendering::gui::Outline>({
-                2,
-                GetColor(GuiGetStyle(LABEL, BORDER_COLOR_NORMAL)),
-                GetColor(GuiGetStyle(LABEL, BACKGROUND_COLOR))
-            })
-            .observe<core::WindowResizedEvent>(rendering::gui::GUIModule::update_gui_anchored_position());
-    m_world.entity("item 4").child_of(m_world.lookup("gui_canvas::panel"))
-            .set<Rectangle>({525, -50, 100, 100})
-            .set<rendering::gui::Anchor>({
-                {525, -50, 100, 100},
-                rendering::gui::HORIZONTAL_ANCHOR::LEFT, rendering::gui::VERTICAL_ANCHOR::MIDDLE
-            })
-            .set<rendering::gui::Outline>({
-                2,
-                GetColor(GuiGetStyle(LABEL, BORDER_COLOR_NORMAL)),
-                GetColor(GuiGetStyle(LABEL, BACKGROUND_COLOR))
-            })
-            .observe<core::WindowResizedEvent>(rendering::gui::GUIModule::update_gui_anchored_position());
-    m_world.entity("item 5").child_of(m_world.lookup("gui_canvas::panel"))
-            .set<Rectangle>({650, -50, 100, 100})
-            .set<rendering::gui::Anchor>({
-                {650, -50, 100, 100},
-                rendering::gui::HORIZONTAL_ANCHOR::LEFT, rendering::gui::VERTICAL_ANCHOR::MIDDLE
-            })
-            .set<rendering::gui::Outline>({
-                2,
-                GetColor(GuiGetStyle(LABEL, BORDER_COLOR_NORMAL)),
-                GetColor(GuiGetStyle(LABEL, BACKGROUND_COLOR))
-            })
-            .observe<core::WindowResizedEvent>(rendering::gui::GUIModule::update_gui_anchored_position());
+    for (int i = 0; i < 6; i++) {
+        m_world.entity().child_of(m_world.lookup("gui_canvas::panel"))
+                .set<Rectangle>({25 + i * 125.f, -40, 100, 100})
+                .set<rendering::gui::Anchor>({
+                    rendering::gui::HORIZONTAL_ANCHOR::LEFT,
+                    rendering::gui::VERTICAL_ANCHOR::MIDDLE
+                })
+                .set<rendering::gui::Outline>({
+                    2,
+                    GetColor(GuiGetStyle(LABEL, BORDER_COLOR_NORMAL)),
+                    GetColor(GuiGetStyle(LABEL, BACKGROUND_COLOR))
+                });
+    }
 }
 
 void Game::run() {
