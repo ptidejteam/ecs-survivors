@@ -57,9 +57,7 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_window
     m_world.set<flecs::Rest>({});
 #endif
 
-    m_world.entity("gui_canvas").set<Rectangle>({
-        0, 0, static_cast<float>(m_windowWidth), static_cast<float>(m_windowHeight)
-    });
+
     m_world.set<core::GameSettings>({m_windowName, m_windowWidth, m_windowHeight});
 
     flecs::entity player = m_world.entity("player")
@@ -69,7 +67,8 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_window
             .set<physics::DesiredVelocity2D>({0, 0})
             .set<physics::AccelerationSpeed>({5.0})
             .set<rendering::Circle>({25})
-            .set<Color>({GREEN});
+            .set<Color>({GREEN})
+            .add<rendering::Priority>(1);
 
     auto hori = m_world.entity("player_horizontal_input").child_of(player).set<input::InputHorizontal>({});
     m_world.entity().child_of(hori).set<input::KeyBinding>({KEY_A, -1});
@@ -95,19 +94,20 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_window
             .set<rendering::Circle>({25})
             .set<Color>({RED});
 
+    m_world.entity("gui_canvas").set<Rectangle>({
+        0, 0, static_cast<float>(m_windowWidth), static_cast<float>(m_windowHeight)
+    });
 
     m_world.entity("button 1").child_of(m_world.lookup("gui_canvas"))
             .set<rendering::gui::Button>({
-                "A button",
-                {
-                    m_world.system<const core::Position2D>().kind(0).each(
-                        [](flecs::entity e, const core::Position2D &position) {
-                            std::printf("Button Clicked\n");
-                            std::printf("Entity name: %s \n", e.name().c_str());
-                            std::printf("Position: (%f, %f) \n", position.value.x,
-                                        position.value.y);
-                        })
-                }
+                "A Button",
+                m_world.system<const core::Position2D>().kind(0).each(
+                    [](flecs::entity e, const core::Position2D &position) {
+                        std::printf("Button Clicked\n");
+                        std::printf("Entity name: %s \n", e.name().c_str());
+                        std::printf("Position: (%f, %f) \n", position.value.x,
+                                    position.value.y);
+                    })
             })
             .set<Rectangle>({-150, -300, 300, 100})
             .set<rendering::gui::Anchor>({

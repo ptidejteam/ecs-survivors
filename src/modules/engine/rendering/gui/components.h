@@ -11,20 +11,11 @@
 
 namespace rendering::gui {
 
-    enum HORIZONTAL_ANCHOR {
-        LEFT,
-        CENTER,
-        RIGHT
-    };
 
-    enum VERTICAL_ANCHOR {
-        TOP,
-        MIDDLE,
-        BOTTOM
-    };
 
     struct Button {
         std::string text;
+        // not sure this is the best thing to store
         flecs::system on_click_system;
     };
 
@@ -38,6 +29,22 @@ namespace rendering::gui {
 		Color border_color;
 		Color fill_color;
 	};
+
+    struct Panel {
+        std::string name;
+    };
+
+    enum HORIZONTAL_ANCHOR {
+        LEFT,
+        CENTER,
+        RIGHT
+    };
+
+    enum VERTICAL_ANCHOR {
+        TOP,
+        MIDDLE,
+        BOTTOM
+    };
 
     struct Anchor {
         Vector2 position;
@@ -57,9 +64,6 @@ namespace rendering::gui {
         };
     };
 
-    struct Panel {
-        std::string name;
-    };
 }
 
 #endif //GUI_COMPONENTS_H

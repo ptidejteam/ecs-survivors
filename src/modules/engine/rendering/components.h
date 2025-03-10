@@ -10,6 +10,7 @@ namespace rendering {
         float radius;
     };
 
+    struct Priority {};
 }
 
 #endif //RENDERING_COMPONENTS_H

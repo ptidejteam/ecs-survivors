@@ -12,7 +12,7 @@
 
 #include "raygui.h"
 #include "modules/engine/core/core_module.h"
-
+#define RAYGUI_IMPLEMENTATION
 namespace rendering::gui {
     void GUIModule::register_components(flecs::world &world) {
         world.component<Button>();
@@ -112,7 +112,10 @@ namespace rendering::gui {
                     GuiDrawRectangle(rect, outline.border_size, outline.border_color, outline.fill_color);
                 });
 
-
-        world.system("Draw FPS").kind<RenderGUI>().run([](flecs::iter &iter) { DrawFPS(10, 10); });
+        world.system("Draw FPS")
+            .kind<RenderGUI>()
+            .run([](flecs::iter &iter) {
+                DrawFPS(10, 10);
+            });
     }
 } // namespace rendering::gui

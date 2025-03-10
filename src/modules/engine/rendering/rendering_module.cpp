@@ -16,6 +16,7 @@ using namespace rendering::gui;
 
 void rendering::RenderingModule::register_components(flecs::world world) {
     world.component<Circle>();
+    world.component<Priority>();
 }
 
 void rendering::RenderingModule::register_systems(flecs::world world) {
@@ -29,13 +30,14 @@ void rendering::RenderingModule::register_systems(flecs::world world) {
 
     world.system<const Circle, const core::Position2D, const Color>()
             .kind<Render>()
+            .group_by<Priority>()
             .each([](const Circle &circle, const core::Position2D &position, const Color &color) {
                 DrawCircle(position.value.x, position.value.y, circle.radius, color);
             });
 
     world.system("After Draw")
             .kind<PostRender>()
-            .run([world](flecs::iter &iter) {
+            .run([](flecs::iter &iter) {
                 EndDrawing();
             });
 }
