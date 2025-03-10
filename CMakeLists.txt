@@ -41,7 +41,7 @@ if (NOT raylib_FOUND) # If there's none, fetch and build raylib
     endif()
 endif()
 
-set(FLECS_VERSION 4.0.3)
+set(FLECS_VERSION 4.0.4)
 find_package(flecs ${FLECS_VERSION} QUIET) # QUIET or REQUIRED
 if (NOT flecs_FOUND) # If there's none, fetch and build flecs
     include(FetchContent)
@@ -62,6 +62,8 @@ endif()
 
 # Our Project
 add_subdirectory("src")
+add_subdirectory("include")
+add_subdirectory("resources")
 add_subdirectory("app")
 
 target_link_libraries(${LIBRARY_NAME} PUBLIC

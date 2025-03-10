@@ -15,5 +15,5 @@ target_include_directories(${LIBRARY_NAME} PUBLIC
         ${LIBRARY_INCLUDES})
 
 target_link_libraries(${LIBRARY_NAME} PUBLIC
-    raylib
-    flecs::flecs_static)
+        raylib
+        flecs::flecs_static)

@@ -4,6 +4,8 @@
 
 #include "physics_module.h"
 
+#include <raygui.h>
+
 #include "components.h"
 #include "modules/engine/core/components.h"
 #include <raymath.h>
@@ -14,9 +16,15 @@ namespace physics {
     void PhysicsModule::register_components(flecs::world &world) {
         world.component<Velocity2D>();
         world.component<AccelerationSpeed>();
+
     }
 
+
+
     void PhysicsModule::register_systems(flecs::world &world) {
+
+
+
         world.system<const Velocity2D, DesiredVelocity2D>("reset desired vel")
                 .kind(flecs::PreUpdate)
                 .each([](const Velocity2D &vel, DesiredVelocity2D &desiredVel) {
