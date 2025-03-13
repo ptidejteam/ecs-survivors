@@ -18,6 +18,11 @@ namespace physics {
     };
 
     struct CollidedWith {};
+
+    struct CollisionRecord {
+        flecs::entity a;
+        flecs::entity b;
+    };
 }
 
 #endif //PHYSICS_COMPONENTS_H

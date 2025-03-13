@@ -13,7 +13,6 @@
 #include <raygui.h>
 
 
-
 #include "modules/ai/ai_module.h"
 #include "modules/ai/components.h"
 #include "modules/engine/core/components.h"
@@ -32,7 +31,6 @@
 #include "modules/engine/rendering/gui/gui_module.h"
 #include "modules/gameplay/components.h"
 #include "modules/gameplay/gameplay_module.h"
-
 
 Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_windowName(windowName),
                                                                         m_windowWidth(windowWidth),
@@ -67,7 +65,7 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_window
 
     flecs::entity player = m_world.entity("player")
             .set<core::Position2D>({800, 400})
-            .set<core::Speed>({300})
+            .set<core::Speed>({1000})
             .set<physics::Velocity2D>({0, 0})
             .set<physics::DesiredVelocity2D>({0, 0})
             .set<physics::AccelerationSpeed>({5.0})
@@ -88,6 +86,8 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_window
     m_world.entity().child_of(vert).set<input::KeyBinding>({KEY_UP, -1});
     m_world.entity().child_of(vert).set<input::KeyBinding>({KEY_DOWN, 1});
 
+    m_world.entity("collision_records_container");
+
     m_world.prefab("enemy")
             .set<core::Position2D>({800, 400})
             .set<core::Speed>({100})
@@ -104,85 +104,83 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_window
         0, 0, static_cast<float>(m_windowWidth), static_cast<float>(m_windowHeight)
     });
 
-    // m_world.entity("button 1").child_of(m_world.lookup("gui_canvas"))
-    //         .set<rendering::gui::Button>({
-    //             "A Button",
-    //             m_world.system<const core::Position2D>().kind(0).each(
-    //                 [](flecs::entity e, const core::Position2D &position) {
-    //                     std::printf("Button Clicked\n");
-    //                     std::printf("Entity name: %s \n", e.name().c_str());
-    //                     std::printf("Position: (%f, %f) \n", position.value.x,
-    //                                 position.value.y);
-    //                 })
-    //         })
-    //         .set<Rectangle>({-150, -300, 300, 100})
-    //         .set<rendering::gui::Anchor>({
-    //             rendering::gui::HORIZONTAL_ANCHOR::CENTER,
-    //             rendering::gui::VERTICAL_ANCHOR::BOTTOM
-    //         });
-    //
-    // m_world.entity("text 0").child_of(m_world.lookup("gui_canvas"))
-    //         .set<rendering::gui::Text>({"A text 0", TEXT_ALIGN_LEFT})
-    //         .set<Rectangle>({-300, 0, 600, 300})
-    //         .set<rendering::gui::Outline>({
-    //             2,
-    //             GetColor(GuiGetStyle(LABEL, BORDER_COLOR_NORMAL)),
-    //             GetColor(GuiGetStyle(LABEL, BACKGROUND_COLOR))
-    //         })
-    //         .set<rendering::gui::Anchor>({
-    //             rendering::gui::HORIZONTAL_ANCHOR::CENTER,
-    //             rendering::gui::VERTICAL_ANCHOR::TOP
-    //         });
-    //
-    // m_world.entity("text 1").child_of(m_world.lookup("gui_canvas"))
-    //         .set<rendering::gui::Text>({"A text 1", TEXT_ALIGN_CENTER})
-    //         .set<Rectangle>({0, 0, 200, 300})
-    //         .set<rendering::gui::Outline>({
-    //             2,
-    //             GetColor(GuiGetStyle(LABEL, BORDER_COLOR_NORMAL)),
-    //             GetColor(GuiGetStyle(LABEL, BACKGROUND_COLOR))
-    //         })
-    //         .set<rendering::gui::Anchor>({});
-    //
-    // m_world.entity("text 2").child_of(m_world.lookup("gui_canvas"))
-    //         .set<rendering::gui::Text>({"A text 2", TEXT_ALIGN_RIGHT})
-    //         .set<Rectangle>({-200, -300, 200, 300})
-    //         .set<rendering::gui::Outline>({
-    //             2,
-    //             GetColor(GuiGetStyle(LABEL, BORDER_COLOR_NORMAL)),
-    //             GetColor(GuiGetStyle(LABEL, BACKGROUND_COLOR))
-    //         })
-    //         .set<rendering::gui::Anchor>({
-    //             rendering::gui::HORIZONTAL_ANCHOR::RIGHT,
-    //             rendering::gui::VERTICAL_ANCHOR::BOTTOM
-    //         });
-    //
     m_world.entity("panel").child_of(m_world.lookup("gui_canvas"))
-            .set<Rectangle>({0, -25, 300, 100})
+            .set<Rectangle>({0, -25, 300, 475})
             .set<rendering::gui::Anchor>({
                 rendering::gui::HORIZONTAL_ANCHOR::LEFT, rendering::gui::VERTICAL_ANCHOR::TOP
             })
             .set<rendering::gui::Panel>({"A Panel"});
-    //
-    // for (int i = 0; i < 6; i++) {
-    //     m_world.entity().child_of(m_world.lookup("gui_canvas::panel"))
-    //             .set<Rectangle>({25 + i * 125.f, -40, 100, 100})
-    //             .set<rendering::gui::Anchor>({
-    //                 rendering::gui::HORIZONTAL_ANCHOR::LEFT,
-    //                 rendering::gui::VERTICAL_ANCHOR::MIDDLE
-    //             })
-    //             .set<rendering::gui::Outline>({
-    //                 2,
-    //                 GetColor(GuiGetStyle(LABEL, BORDER_COLOR_NORMAL)),
-    //                 GetColor(GuiGetStyle(LABEL, BACKGROUND_COLOR))
-    //             });
-    // }
+
+    m_world.entity("naive_ecs_add_relationship_button").child_of(m_world.lookup("gui_canvas::panel"))
+            .set<rendering::gui::Anchor>({
+                rendering::gui::HORIZONTAL_ANCHOR::LEFT, rendering::gui::VERTICAL_ANCHOR::TOP
+            })
+            .set<Rectangle>({25, 100, 250, 100})
+            .set<rendering::gui::Button>({
+                "Enable Naive ECS Collision Systems (Relationships)",
+                m_world.system().kind(0).run([&](flecs::iter &it) {
+                    physics::PhysicsModule::s1.enable();
+                    physics::PhysicsModule::s2.enable();
+
+                    physics::PhysicsModule::s3.disable();
+                    physics::PhysicsModule::s4.disable();
+                    physics::PhysicsModule::s5.disable();
+
+                    physics::PhysicsModule::s6.disable();
+                    physics::PhysicsModule::s7.disable();
+                    physics::PhysicsModule::s8.disable();
+                    physics::PhysicsModule::s9.disable();
+                })
+            });
+
+    m_world.entity("naive_ecs_add_entity_button").child_of(m_world.lookup("gui_canvas::panel"))
+            .set<rendering::gui::Anchor>({
+                rendering::gui::HORIZONTAL_ANCHOR::LEFT, rendering::gui::VERTICAL_ANCHOR::TOP
+            })
+            .set<Rectangle>({25, 225, 250, 100})
+            .set<rendering::gui::Button>({
+                "Enable Naive ECS Collision Systems (Entities)",
+                m_world.system().kind(0).run([&](flecs::iter &it) {
+                    physics::PhysicsModule::s1.disable();
+                    physics::PhysicsModule::s2.disable();
+
+                    physics::PhysicsModule::s3.enable();
+                    physics::PhysicsModule::s4.enable();
+                    physics::PhysicsModule::s5.enable();
+
+                    physics::PhysicsModule::s6.disable();
+                    physics::PhysicsModule::s7.disable();
+                    physics::PhysicsModule::s8.disable();
+                    physics::PhysicsModule::s9.disable();
+                })
+            });
+
+    m_world.entity("non_ecs_accelerated_button").child_of(m_world.lookup("gui_canvas::panel"))
+            .set<rendering::gui::Anchor>({
+                rendering::gui::HORIZONTAL_ANCHOR::LEFT, rendering::gui::VERTICAL_ANCHOR::TOP
+            })
+            .set<Rectangle>({25, 350, 250, 100})
+            .set<rendering::gui::Button>({
+                "Enable External Collision Systems (Entities)",
+                m_world.system().kind(0).run([&](flecs::iter &it) {
+                    physics::PhysicsModule::s1.disable();
+                    physics::PhysicsModule::s2.disable();
+
+                    physics::PhysicsModule::s3.disable();
+                    physics::PhysicsModule::s4.disable();
+                    physics::PhysicsModule::s5.disable();
+
+                    physics::PhysicsModule::s6.enable();
+                    physics::PhysicsModule::s7.enable();
+                    physics::PhysicsModule::s8.enable();
+                    physics::PhysicsModule::s9.enable();
+                })
+            });
 
 
     m_world.entity("enemy_spawner")
-        .set<gameplay::Spawner>({"enemy"});
+            .set<gameplay::Spawner>({"enemy"});
 }
-
 
 
 void Game::run() {

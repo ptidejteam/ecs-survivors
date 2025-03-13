@@ -67,7 +67,7 @@ void rendering::RenderingModule::register_systems(flecs::world world) {
 }
 
 void rendering::RenderingModule::register_pipeline(flecs::world world) {
-    world.component<PreRender>().add(flecs::Phase).depends_on(flecs::PostUpdate);
+    world.component<PreRender>().add(flecs::Phase).depends_on(flecs::OnStore);
     world.component<Render>().add(flecs::Phase).depends_on<PreRender>();
     world.component<RenderGUI>().add(flecs::Phase).depends_on<Render>();
     world.component<PostRender>().add(flecs::Phase).depends_on<RenderGUI>();

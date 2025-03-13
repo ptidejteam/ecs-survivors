@@ -89,18 +89,20 @@ namespace rendering::gui {
                     }
                 });
 
-        world.system<const Button, const Rectangle>("Draw Button")
-                .kind<RenderGUI>()
-                .each([](const Button &button, const Rectangle &rect) {
-                    if (GuiButton(rect, button.text.c_str())) {
-                        button.on_click_system.run();
-                    }
-                });
-
         world.system<const Panel, const Rectangle>("Draw Panel")
                 .kind<RenderGUI>()
                 .each([](const Panel &panel, const Rectangle &rect) {
                     GuiPanel(rect, panel.name.c_str());
+                });
+
+        world.system<const Button, const Rectangle>("Draw Button")
+                .kind<RenderGUI>()
+                .each([](const Button &button, const Rectangle &rect) {
+                    GuiSetStyle(BUTTON, TEXT_WRAP_MODE, TEXT_WRAP_WORD);
+                    if (GuiButton(rect, button.text.c_str())) {
+                        button.on_click_system.run();
+                    }
+                    GuiSetStyle(BUTTON, TEXT_WRAP_MODE, DEFAULT);
                 });
 
         world.system<const Text, const Rectangle>("Draw Text")

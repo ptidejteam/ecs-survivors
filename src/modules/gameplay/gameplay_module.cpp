@@ -19,7 +19,7 @@ namespace gameplay {
         world.system<const Spawner, const core::GameSettings>("Spawn Enemies")
                 .tick_source(m_spawner_tick)
                 .term_at(1).singleton()
-                .each([&,world](const Spawner &spawner, const core::GameSettings &settings) {
+                .each([&,world](flecs::entity self, const Spawner &spawner, const core::GameSettings &settings) {
                     const flecs::entity e = world.lookup(spawner.enemy_prefab_name.c_str());
 
                     if (0 == e) return;
@@ -33,7 +33,7 @@ namespace gameplay {
                                       ? rand() % settings.windowHeight
                                       : neg * factor * settings.windowHeight;
 
-                    world.entity().is_a(e)
+                    world.entity().is_a(e).child_of(self)
                             .set<core::Position2D>({randX, randY});
 
                     outside_side_switch = !outside_side_switch;

@@ -56,6 +56,8 @@ namespace physics {
             }
         };
 
+        inline static flecs::entity s1, s2, s3, s4, s5, s6, s7, s8, s9;
+
     private:
         std::unordered_map<std::pair<int, int>, std::vector<flecs::entity>, pair_hash> m_collision_cells;
         std::unordered_map<flecs::entity, std::pair<int, int>, entity_hash> m_collision_cells_lookup;
@@ -64,7 +66,7 @@ namespace physics {
         flecs::entity m_physicsTick;
         int m_screenWidth = 1920;
         int m_screenHeight = 1080;
-        int m_cellSize = 100;
+        int m_cellSize = 60;
 
         void register_components(flecs::world &world);
 
@@ -79,14 +81,14 @@ namespace physics {
         }
 
         // Add an entity to the hash map
-        void addEntity(flecs::entity entity, std::pair<int, int> cell) {
+        void add_entity(flecs::entity &entity, std::pair<int, int> cell) {
             //if(m_collision_cells.find(cell) == m_collision_cells.end()) return;
             m_collision_cells[cell].push_back(entity);
             m_collision_cells_lookup[entity] = cell;
         }
 
         // Remove an entity from the hash map
-        void removeEntity(flecs::entity entity, std::pair<int, int> cell) {
+        void remove_entity(flecs::entity &entity, std::pair<int, int> cell) {
             //if(m_collision_cells.find(cell) == m_collision_cells.end()) return;
             auto &cellEntities = m_collision_cells[cell];
             m_collision_cells_lookup.erase(entity);
@@ -99,26 +101,26 @@ namespace physics {
             }
         }
 
-        void remove_entity_from_grid(flecs::entity entity) {
-            removeEntity(entity, m_collision_cells_lookup[entity]);
+        void remove_entity_from_grid(flecs::entity &entity) {
+            remove_entity(entity, m_collision_cells_lookup[entity]);
         }
 
         int added_count = 0;
 
-        void add_entity_to_grid(flecs::entity entity) {
+        void add_entity_to_grid(flecs::entity &entity) {
             added_count++;
-            addEntity(entity, hash(entity.get<core::Position2D>()->value));
+            add_entity(entity, hash(entity.get<core::Position2D>()->value));
             std::cout << "added count " << added_count << std::endl;
         }
 
         // Update the position of an entity and rehash if necessary
-        void update_entity_position(flecs::entity entity, core::Position2D curr) {
+        void update_entity_position(flecs::entity &entity, core::Position2D curr) {
             // Remove the entity from its current cell
 
             //if (hash(prev.value) == hash(curr.value)) return;
             //std::printf("%llu cells\n", m_collision_cells.size());
             if (m_collision_cells_lookup.find(entity) == m_collision_cells_lookup.end()) {
-                addEntity(entity, hash(curr.value));
+                add_entity(entity, hash(curr.value));
                 return;
             }
 
@@ -127,9 +129,9 @@ namespace physics {
             if (previous_cell == current_cell) return;
 
             //std::printf("%llu before ", m_collision_cells[previous_cell].size());
-            removeEntity(entity, previous_cell);
+            remove_entity(entity, previous_cell);
             //std::printf("%llu after\n", m_collision_cells[previous_cell].size());
-            addEntity(entity, current_cell);
+            add_entity(entity, current_cell);
 
             //std::printf("%llu cells\n", m_collision_cells.size());
 
@@ -147,7 +149,8 @@ namespace physics {
                 entityCount += entities.size();
                 for (size_t i = 0; i < entities.size(); ++i) {
                     for (size_t j = i + 1; j < entities.size(); ++j) {
-                        count += collide(entities[i], entities[j]);
+                        if (collide(entities[i], entities[j]))
+                            m_collision_pairs[entities[i]].push_back(entities[j]);
                     }
                 }
 
@@ -168,7 +171,7 @@ namespace physics {
             //std::printf("%d collisions detected with %d entities in %llu cells\n", count, entityCount, m_collision_cells.size());
         }
 
-        bool collide(flecs::entity self, flecs::entity other) {
+        bool collide(flecs::entity &self, flecs::entity &other) {
             Vector2 mypos = self.get<core::Position2D>()->value;
             Vector2 otherPos = other.get<core::Position2D>()->value;
             float combinedRadius = self.get<rendering::Circle>()->radius + other.get<rendering::Circle>()->
@@ -182,7 +185,7 @@ namespace physics {
             return (distanceSqr < std::pow(combinedRadius, 2));
         }
 
-        void resolve_collisions() {
+        void resolve_collisions(flecs::world world) {
             for (auto [self, others]: m_collision_pairs) {
                 for (auto other: others) {
                     Vector2 mypos = self.get<core::Position2D>()->value;
@@ -192,23 +195,20 @@ namespace physics {
 
                     // Find the distance and adjust to resolve the overlap
                     Vector2 direction = otherPos - mypos;
+                    Vector2 moveDirection = Vector2Normalize(direction);
+                    float overlap = combinedRadius - Vector2Length(direction);
 
-                    float distanceSqr = Vector2LengthSqr(direction);
+                    // Move the entities apart by the amount of overlap
+                    Vector2 move = moveDirection * overlap * 0.75f;
 
-                    //if (distanceSqr < std::pow(combinedRadius, 2)) {
-                        Vector2 moveDirection = Vector2Normalize(direction);
-                        float overlap = combinedRadius - Vector2Length(direction);
+                    self.set<Velocity2D>({self.get<Velocity2D>()->value - move * 2.f});
+                    other.set<Velocity2D>({other.get<Velocity2D>()->value + move * 2.f});
 
-                        // Move the entities apart by the amount of overlap
-                        Vector2 move = moveDirection * overlap * 0.5f;
+                    // Resolve by adjusting positions
+                    self.set<core::Position2D>({mypos - move / 2.f}); // Move the current entity
+                    other.set<core::Position2D>({otherPos + move / 2.f}); // Move the other entity
 
-                        self.set<Velocity2D>({self.get<Velocity2D>()->value - move * 2.f});
-                        other.set<Velocity2D>({other.get<Velocity2D>()->value + move * 2.f});
-
-                        // Resolve by adjusting positions
-                        self.set<core::Position2D>({mypos - move / 2.f}); // Move the current entity
-                        other.set<core::Position2D>({otherPos + move / 2.f}); // Move the other entity
-                    //}
+                    // world.entity().child_of(world.lookup("collision_records_container")).set<CollisionRecord>({self, other});
                 }
             }
             m_collision_pairs.clear();
