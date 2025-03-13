@@ -10,6 +10,8 @@
 #include "raygui.h"
 #include "gui/components.h"
 #include "gui/gui_module.h"
+#include "rlgl.h"
+#include "../../../../cmake-build-web-debug/_deps/raylib-src/src/raymath.h"
 #include "modules/engine/core/core_module.h"
 
 using namespace rendering::gui;
@@ -20,7 +22,6 @@ void rendering::RenderingModule::register_components(flecs::world world) {
 }
 
 void rendering::RenderingModule::register_systems(flecs::world world) {
-
     world.system("Before Draw")
             .kind<PreRender>()
             .run([](flecs::iter &iter) {
@@ -28,11 +29,34 @@ void rendering::RenderingModule::register_systems(flecs::world world) {
                 ClearBackground(GetColor(GuiGetStyle(DEFAULT, BACKGROUND_COLOR)));
             });
 
-    world.system<const Circle, const core::Position2D, const Color>()
+    world.system<const core::Position2D, const Circle>("Determine Visible Entities")
+            .immediate()
+            .kind<PreRender>()
+            .each([&](flecs::entity e, const core::Position2D &pos, const Circle& circle) {
+                //world.defer_begin();
+                if (pos.value.x > GetScreenWidth() + circle.radius || pos.value.x < -circle.radius ||
+                    pos.value.y > GetScreenHeight() + circle.radius || pos.value.y < -circle.radius) {
+                    e.remove<Visible>();
+                } else {
+                    e.add<Visible>();
+                }
+                //world.defer_end();
+            });
+
+    world.system<const Circle, const core::Position2D, const Color>("Draw Entities")
             .kind<Render>()
+            .with<Visible>()
             .group_by<Priority>()
             .each([](const Circle &circle, const core::Position2D &position, const Color &color) {
                 DrawCircle(position.value.x, position.value.y, circle.radius, color);
+            });
+
+    world.system<const Texture2D, const core::Position2D>("Draw Entities with Textures")
+            .kind<Render>()
+            .with<Visible>()
+            .group_by<Priority>()
+            .each([](const Texture2D &texture, const core::Position2D &position) {
+                DrawTextureEx(texture, Vector2Subtract(position.value ,Vector2{16,16} / 2 * 3), 0, 3.f, WHITE);
             });
 
     world.system("After Draw")

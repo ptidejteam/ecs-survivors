@@ -16,6 +16,8 @@ namespace physics {
     struct AccelerationSpeed {
         float value;
     };
+
+    struct CollidedWith {};
 }
 
 #endif //PHYSICS_COMPONENTS_H

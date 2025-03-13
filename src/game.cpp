@@ -13,6 +13,7 @@
 #include <raygui.h>
 
 
+
 #include "modules/ai/ai_module.h"
 #include "modules/ai/components.h"
 #include "modules/engine/core/components.h"
@@ -29,6 +30,9 @@
 #include "modules/engine/rendering/rendering_module.h"
 #include "raygui.h"
 #include "modules/engine/rendering/gui/gui_module.h"
+#include "modules/gameplay/components.h"
+#include "modules/gameplay/gameplay_module.h"
+
 
 Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_windowName(windowName),
                                                                         m_windowWidth(windowWidth),
@@ -49,6 +53,7 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_window
     m_world.import<player::PlayerModule>();
     m_world.import<ai::AIModule>();
     m_world.import<rendering::RenderingModule>();
+    m_world.import<gameplay::GameplayModule>();
 
 
 #if not defined(EMSCRIPTEN)
@@ -61,7 +66,7 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_window
     m_world.set<core::GameSettings>({m_windowName, m_windowWidth, m_windowHeight});
 
     flecs::entity player = m_world.entity("player")
-            .set<core::Position2D>({0, 0})
+            .set<core::Position2D>({800, 400})
             .set<core::Speed>({300})
             .set<physics::Velocity2D>({0, 0})
             .set<physics::DesiredVelocity2D>({0, 0})
@@ -69,6 +74,7 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_window
             .set<rendering::Circle>({25})
             .set<Color>({GREEN})
             .add<rendering::Priority>(1);
+
 
     auto hori = m_world.entity("player_horizontal_input").child_of(player).set<input::InputHorizontal>({});
     m_world.entity().child_of(hori).set<input::KeyBinding>({KEY_A, -1});
@@ -82,96 +88,102 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_window
     m_world.entity().child_of(vert).set<input::KeyBinding>({KEY_UP, -1});
     m_world.entity().child_of(vert).set<input::KeyBinding>({KEY_DOWN, 1});
 
-    m_world.entity("enemy")
+    m_world.prefab("enemy")
             .set<core::Position2D>({800, 400})
-            .set<core::Speed>({150})
+            .set<core::Speed>({100})
             .set<physics::Velocity2D>({0, 0})
             .set<physics::DesiredVelocity2D>({0, 0})
             .set<physics::AccelerationSpeed>({5.0})
             .set<ai::Target>({"player"})
             .add<ai::FollowTarget>()
             .set<ai::StoppingDistance>({50.0})
-            .set<rendering::Circle>({25})
-            .set<Color>({RED});
+            .set<rendering::Circle>({24})
+            .set<Texture2D>({LoadTexture("../resources/ghost.png")});
 
     m_world.entity("gui_canvas").set<Rectangle>({
         0, 0, static_cast<float>(m_windowWidth), static_cast<float>(m_windowHeight)
     });
 
-    m_world.entity("button 1").child_of(m_world.lookup("gui_canvas"))
-            .set<rendering::gui::Button>({
-                "A Button",
-                m_world.system<const core::Position2D>().kind(0).each(
-                    [](flecs::entity e, const core::Position2D &position) {
-                        std::printf("Button Clicked\n");
-                        std::printf("Entity name: %s \n", e.name().c_str());
-                        std::printf("Position: (%f, %f) \n", position.value.x,
-                                    position.value.y);
-                    })
-            })
-            .set<Rectangle>({-150, -300, 300, 100})
-            .set<rendering::gui::Anchor>({
-                rendering::gui::HORIZONTAL_ANCHOR::CENTER,
-                rendering::gui::VERTICAL_ANCHOR::BOTTOM
-            });
-
-    m_world.entity("text 0").child_of(m_world.lookup("gui_canvas"))
-            .set<rendering::gui::Text>({"A text 0", TEXT_ALIGN_LEFT})
-            .set<Rectangle>({-300, 0, 600, 300})
-            .set<rendering::gui::Outline>({
-                2,
-                GetColor(GuiGetStyle(LABEL, BORDER_COLOR_NORMAL)),
-                GetColor(GuiGetStyle(LABEL, BACKGROUND_COLOR))
-            })
-            .set<rendering::gui::Anchor>({
-                rendering::gui::HORIZONTAL_ANCHOR::CENTER,
-                rendering::gui::VERTICAL_ANCHOR::TOP
-            });
-
-    m_world.entity("text 1").child_of(m_world.lookup("gui_canvas"))
-            .set<rendering::gui::Text>({"A text 1", TEXT_ALIGN_CENTER})
-            .set<Rectangle>({0, 0, 200, 300})
-            .set<rendering::gui::Outline>({
-                2,
-                GetColor(GuiGetStyle(LABEL, BORDER_COLOR_NORMAL)),
-                GetColor(GuiGetStyle(LABEL, BACKGROUND_COLOR))
-            })
-            .set<rendering::gui::Anchor>({});
-
-    m_world.entity("text 2").child_of(m_world.lookup("gui_canvas"))
-            .set<rendering::gui::Text>({"A text 2", TEXT_ALIGN_RIGHT})
-            .set<Rectangle>({-200, -300, 200, 300})
-            .set<rendering::gui::Outline>({
-                2,
-                GetColor(GuiGetStyle(LABEL, BORDER_COLOR_NORMAL)),
-                GetColor(GuiGetStyle(LABEL, BACKGROUND_COLOR))
-            })
-            .set<rendering::gui::Anchor>({
-                rendering::gui::HORIZONTAL_ANCHOR::RIGHT,
-                rendering::gui::VERTICAL_ANCHOR::BOTTOM
-            });
-
+    // m_world.entity("button 1").child_of(m_world.lookup("gui_canvas"))
+    //         .set<rendering::gui::Button>({
+    //             "A Button",
+    //             m_world.system<const core::Position2D>().kind(0).each(
+    //                 [](flecs::entity e, const core::Position2D &position) {
+    //                     std::printf("Button Clicked\n");
+    //                     std::printf("Entity name: %s \n", e.name().c_str());
+    //                     std::printf("Position: (%f, %f) \n", position.value.x,
+    //                                 position.value.y);
+    //                 })
+    //         })
+    //         .set<Rectangle>({-150, -300, 300, 100})
+    //         .set<rendering::gui::Anchor>({
+    //             rendering::gui::HORIZONTAL_ANCHOR::CENTER,
+    //             rendering::gui::VERTICAL_ANCHOR::BOTTOM
+    //         });
+    //
+    // m_world.entity("text 0").child_of(m_world.lookup("gui_canvas"))
+    //         .set<rendering::gui::Text>({"A text 0", TEXT_ALIGN_LEFT})
+    //         .set<Rectangle>({-300, 0, 600, 300})
+    //         .set<rendering::gui::Outline>({
+    //             2,
+    //             GetColor(GuiGetStyle(LABEL, BORDER_COLOR_NORMAL)),
+    //             GetColor(GuiGetStyle(LABEL, BACKGROUND_COLOR))
+    //         })
+    //         .set<rendering::gui::Anchor>({
+    //             rendering::gui::HORIZONTAL_ANCHOR::CENTER,
+    //             rendering::gui::VERTICAL_ANCHOR::TOP
+    //         });
+    //
+    // m_world.entity("text 1").child_of(m_world.lookup("gui_canvas"))
+    //         .set<rendering::gui::Text>({"A text 1", TEXT_ALIGN_CENTER})
+    //         .set<Rectangle>({0, 0, 200, 300})
+    //         .set<rendering::gui::Outline>({
+    //             2,
+    //             GetColor(GuiGetStyle(LABEL, BORDER_COLOR_NORMAL)),
+    //             GetColor(GuiGetStyle(LABEL, BACKGROUND_COLOR))
+    //         })
+    //         .set<rendering::gui::Anchor>({});
+    //
+    // m_world.entity("text 2").child_of(m_world.lookup("gui_canvas"))
+    //         .set<rendering::gui::Text>({"A text 2", TEXT_ALIGN_RIGHT})
+    //         .set<Rectangle>({-200, -300, 200, 300})
+    //         .set<rendering::gui::Outline>({
+    //             2,
+    //             GetColor(GuiGetStyle(LABEL, BORDER_COLOR_NORMAL)),
+    //             GetColor(GuiGetStyle(LABEL, BACKGROUND_COLOR))
+    //         })
+    //         .set<rendering::gui::Anchor>({
+    //             rendering::gui::HORIZONTAL_ANCHOR::RIGHT,
+    //             rendering::gui::VERTICAL_ANCHOR::BOTTOM
+    //         });
+    //
     m_world.entity("panel").child_of(m_world.lookup("gui_canvas"))
-            .set<Rectangle>({-387.5f, -150, 775, 150})
+            .set<Rectangle>({0, -25, 300, 100})
             .set<rendering::gui::Anchor>({
-                rendering::gui::HORIZONTAL_ANCHOR::CENTER, rendering::gui::VERTICAL_ANCHOR::BOTTOM
+                rendering::gui::HORIZONTAL_ANCHOR::LEFT, rendering::gui::VERTICAL_ANCHOR::TOP
             })
             .set<rendering::gui::Panel>({"A Panel"});
+    //
+    // for (int i = 0; i < 6; i++) {
+    //     m_world.entity().child_of(m_world.lookup("gui_canvas::panel"))
+    //             .set<Rectangle>({25 + i * 125.f, -40, 100, 100})
+    //             .set<rendering::gui::Anchor>({
+    //                 rendering::gui::HORIZONTAL_ANCHOR::LEFT,
+    //                 rendering::gui::VERTICAL_ANCHOR::MIDDLE
+    //             })
+    //             .set<rendering::gui::Outline>({
+    //                 2,
+    //                 GetColor(GuiGetStyle(LABEL, BORDER_COLOR_NORMAL)),
+    //                 GetColor(GuiGetStyle(LABEL, BACKGROUND_COLOR))
+    //             });
+    // }
 
-    for (int i = 0; i < 6; i++) {
-        m_world.entity().child_of(m_world.lookup("gui_canvas::panel"))
-                .set<Rectangle>({25 + i * 125.f, -40, 100, 100})
-                .set<rendering::gui::Anchor>({
-                    rendering::gui::HORIZONTAL_ANCHOR::LEFT,
-                    rendering::gui::VERTICAL_ANCHOR::MIDDLE
-                })
-                .set<rendering::gui::Outline>({
-                    2,
-                    GetColor(GuiGetStyle(LABEL, BORDER_COLOR_NORMAL)),
-                    GetColor(GuiGetStyle(LABEL, BACKGROUND_COLOR))
-                });
-    }
+
+    m_world.entity("enemy_spawner")
+        .set<gameplay::Spawner>({"enemy"});
 }
+
+
 
 void Game::run() {
     // ON START

@@ -11,6 +11,7 @@ namespace rendering {
     };
 
     struct Priority {};
+    struct Visible {};
 }
 
 #endif //RENDERING_COMPONENTS_H

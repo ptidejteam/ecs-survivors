@@ -8,3 +8,4 @@ target_sources(${LIBRARY_NAME} PUBLIC
 add_subdirectory("engine")
 add_subdirectory("player")
 add_subdirectory("ai")
+add_subdirectory("gameplay")
