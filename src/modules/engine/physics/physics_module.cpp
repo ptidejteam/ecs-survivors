@@ -54,7 +54,6 @@ namespace physics {
         s1 = world.system<const core::Position2D, const rendering::Circle>(
                     "Detect Collisions ECS (Naive add collision component)")
                 .with<rendering::Visible>()
-                .tick_source(m_physicsTick)
                 .kind(flecs::OnValidate)
                 .multi_threaded()
                 .cached()
@@ -107,7 +106,6 @@ namespace physics {
         s3 = world.system<const core::Position2D, const rendering::Circle>(
                     "Detect Collisions ECS (Naive create collision entity)")
                 .with<rendering::Visible>()
-                .tick_source(m_physicsTick)
                 .kind(flecs::OnValidate)
                 .multi_threaded()
                 .cached()
@@ -119,10 +117,10 @@ namespace physics {
                                     const rendering::Circle &other_collider) {
                             if (self == other) return;
 
-                            if (Vector2DistanceSqr(pos.value, other_pos.value) <
-                                std::pow(collider.radius + other_collider.radius, 2)) {
-                                world.entity().child_of(e).set<CollisionRecord>({self, other});
-                            }
+                            // if (Vector2DistanceSqr(pos.value, other_pos.value) <
+                            //     std::pow(collider.radius + other_collider.radius, 2)) {
+                            //     // world.entity().child_of(e).set<CollisionRecord>({self, other});
+                            // }
                         });
                 }).disable();
 

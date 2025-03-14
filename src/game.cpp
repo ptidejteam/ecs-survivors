@@ -90,14 +90,14 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_window
 
     m_world.prefab("enemy")
             .set<core::Position2D>({800, 400})
-            .set<core::Speed>({100})
+            .set<core::Speed>({25})
             .set<physics::Velocity2D>({0, 0})
             .set<physics::DesiredVelocity2D>({0, 0})
             .set<physics::AccelerationSpeed>({5.0})
             .set<ai::Target>({"player"})
             .add<ai::FollowTarget>()
             .set<ai::StoppingDistance>({50.0})
-            .set<rendering::Circle>({24})
+            .set<rendering::Circle>({16})
             .set<Texture2D>({LoadTexture("../resources/ghost.png")});
 
     m_world.entity("gui_canvas").set<Rectangle>({

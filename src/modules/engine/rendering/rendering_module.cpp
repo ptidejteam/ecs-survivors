@@ -56,7 +56,7 @@ void rendering::RenderingModule::register_systems(flecs::world world) {
             .with<Visible>()
             .group_by<Priority>()
             .each([](const Texture2D &texture, const core::Position2D &position) {
-                DrawTextureEx(texture, Vector2Subtract(position.value ,Vector2{16,16} / 2 * 3), 0, 3.f, WHITE);
+                DrawTextureEx(texture, Vector2Subtract(position.value ,Vector2{16,16} / 2 * 2), 0, 2.f, WHITE);
             });
 
     world.system("After Draw")

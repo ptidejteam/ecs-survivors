@@ -9,7 +9,7 @@
 #include <flecs.h>
 
 namespace gameplay {
-    constexpr float SPAWNER_INTERVAL = 0.05f;
+    constexpr float SPAWNER_INTERVAL = 0.001f;
     class GameplayModule : public BaseModule<GameplayModule> {
     public:
         GameplayModule(flecs::world &world): BaseModule(world) {}
