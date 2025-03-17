@@ -19,7 +19,7 @@ namespace ai {
     }
 
     void AIModule::register_systems(flecs::world world) {
-        world.system<const Target, const core::Position2D, const core::Speed, physics::DesiredVelocity2D>()
+        world.system<const Target, const core::Position2D, const core::Speed, physics::DesiredVelocity2D>("Follow Target")
                 .with<FollowTarget>()
                 .each([world](const Target &target,
                               const core::Position2D &position,
@@ -31,7 +31,7 @@ namespace ai {
                     velocity.value = dir * speed.value;
                 });
 
-        world.system<const StoppingDistance, const Target, const core::Position2D, physics::DesiredVelocity2D>()
+        world.system<const StoppingDistance, const Target, const core::Position2D, physics::DesiredVelocity2D>("Stop when arrived at distance of target")
                 .each([world](const StoppingDistance &distance,
                               const Target &target,
                               const core::Position2D &pos,

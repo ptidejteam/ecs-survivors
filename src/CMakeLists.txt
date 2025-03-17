@@ -1,7 +1,10 @@
 set(LIBRARY_SOURCES
         "game.cpp")
 set(LIBRARY_HEADERS
-        "game.h")
+        "game.h"
+        modules/engine/physics/spatial_hash_rebuilding.h
+        modules/engine/physics/spatial_hash_updating.h
+        modules/engine/physics/base_spatial_hash.h)
 set(LIBRARY_INCLUDES
         "./")
 

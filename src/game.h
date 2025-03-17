@@ -9,6 +9,10 @@
 
 #include "flecs.h"
 
+struct EventBus {
+    std::string name;
+};
+
 class Game {
 public:
     Game(const char* windowName, int windowWidth, int windowHeight);

@@ -44,13 +44,13 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_window
     InitWindow(m_windowWidth, m_windowHeight, m_windowName.c_str());
     SetTargetFPS(60);
 
-
-    m_world.import<input::InputModule>();
+    //m_world.set_threads(8);
     m_world.import<core::CoreModule>();
+    m_world.import<input::InputModule>();
+    m_world.import<rendering::RenderingModule>();
     m_world.import<physics::PhysicsModule>();
     m_world.import<player::PlayerModule>();
     m_world.import<ai::AIModule>();
-    m_world.import<rendering::RenderingModule>();
     m_world.import<gameplay::GameplayModule>();
 
 
@@ -69,7 +69,7 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_window
             .set<physics::Velocity2D>({0, 0})
             .set<physics::DesiredVelocity2D>({0, 0})
             .set<physics::AccelerationSpeed>({5.0})
-            .set<rendering::Circle>({25})
+            .set<rendering::Circle>({16})
             .set<Color>({GREEN})
             .add<rendering::Priority>(1);
 
@@ -105,7 +105,7 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_window
     });
 
     m_world.entity("panel").child_of(m_world.lookup("gui_canvas"))
-            .set<Rectangle>({0, -25, 300, 475})
+            .set<Rectangle>({0, -25, 300, 600})
             .set<rendering::gui::Anchor>({
                 rendering::gui::HORIZONTAL_ANCHOR::LEFT, rendering::gui::VERTICAL_ANCHOR::TOP
             })
@@ -119,17 +119,7 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_window
             .set<rendering::gui::Button>({
                 "Enable Naive ECS Collision Systems (Relationships)",
                 m_world.system().kind(0).run([&](flecs::iter &it) {
-                    physics::PhysicsModule::s1.enable();
-                    physics::PhysicsModule::s2.enable();
-
-                    physics::PhysicsModule::s3.disable();
-                    physics::PhysicsModule::s4.disable();
-                    physics::PhysicsModule::s5.disable();
-
-                    physics::PhysicsModule::s6.disable();
-                    physics::PhysicsModule::s7.disable();
-                    physics::PhysicsModule::s8.disable();
-                    physics::PhysicsModule::s9.disable();
+                    physics::PhysicsModule::change_collision_strategy(COLLISION_RELATIONSHIP);
                 })
             });
 
@@ -141,42 +131,35 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_window
             .set<rendering::gui::Button>({
                 "Enable Naive ECS Collision Systems (Entities)",
                 m_world.system().kind(0).run([&](flecs::iter &it) {
-                    physics::PhysicsModule::s1.disable();
-                    physics::PhysicsModule::s2.disable();
-
-                    physics::PhysicsModule::s3.enable();
-                    physics::PhysicsModule::s4.enable();
-                    physics::PhysicsModule::s5.enable();
-
-                    physics::PhysicsModule::s6.disable();
-                    physics::PhysicsModule::s7.disable();
-                    physics::PhysicsModule::s8.disable();
-                    physics::PhysicsModule::s9.disable();
+                    physics::PhysicsModule::change_collision_strategy(COLLISION_ENTITY);
                 })
             });
 
-    m_world.entity("non_ecs_accelerated_button").child_of(m_world.lookup("gui_canvas::panel"))
+    m_world.entity("non_ecs_accelerated_updating_button").child_of(m_world.lookup("gui_canvas::panel"))
             .set<rendering::gui::Anchor>({
                 rendering::gui::HORIZONTAL_ANCHOR::LEFT, rendering::gui::VERTICAL_ANCHOR::TOP
             })
             .set<Rectangle>({25, 350, 250, 100})
             .set<rendering::gui::Button>({
-                "Enable External Collision Systems (Entities)",
+                "Enable External Collision Systems (UPDATING)",
                 m_world.system().kind(0).run([&](flecs::iter &it) {
-                    physics::PhysicsModule::s1.disable();
-                    physics::PhysicsModule::s2.disable();
-
-                    physics::PhysicsModule::s3.disable();
-                    physics::PhysicsModule::s4.disable();
-                    physics::PhysicsModule::s5.disable();
-
-                    physics::PhysicsModule::s6.enable();
-                    physics::PhysicsModule::s7.enable();
-                    physics::PhysicsModule::s8.enable();
-                    physics::PhysicsModule::s9.enable();
+                    physics::PhysicsModule::change_collision_strategy(SPATIAL_HASH_UPDATING);
                 })
             });
 
+    m_world.entity("non_ecs_accelerated_rebuilding_button").child_of(m_world.lookup("gui_canvas::panel"))
+           .set<rendering::gui::Anchor>({
+               rendering::gui::HORIZONTAL_ANCHOR::LEFT, rendering::gui::VERTICAL_ANCHOR::TOP
+           })
+           .set<Rectangle>({25, 475, 250, 100})
+           .set<rendering::gui::Button>({
+               "Enable External Collision Systems (REBUILDING)",
+               m_world.system().kind(0).run([&](flecs::iter &it) {
+                   physics::PhysicsModule::change_collision_strategy(SPATIAL_HASH_REBUILDING);
+               })
+           });
+
+    m_world.entity("event_bus").add<EventBus>();
 
     m_world.entity("enemy_spawner")
             .set<gameplay::Spawner>({"enemy"});
@@ -186,7 +169,6 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_window
 void Game::run() {
     // ON START
     m_world.progress();
-
 
     // Main game loop
     while (!WindowShouldClose()) // Detect window close button or ESC key

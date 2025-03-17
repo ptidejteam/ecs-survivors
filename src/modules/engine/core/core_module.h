@@ -20,7 +20,7 @@ namespace core {
         void register_systems(flecs::world &world);
     };
 
-    struct WindowResizedEvent {};
+    struct WindowResizedEvent { int width, height; };
 }
 
 #endif //CORE_MODULE_H

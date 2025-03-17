@@ -10,6 +10,7 @@
 #include <stack>
 #include <unordered_set>
 
+#include "game.h"
 #include "raygui.h"
 #include "modules/engine/core/core_module.h"
 #include "modules/engine/rendering/components.h"
@@ -26,12 +27,15 @@ namespace rendering::gui {
             GuiLoadStyle("../resources/styles/amber/style_amber.rgs");
         });
 
-        world.system("On start set move gui elements to match anchors")
+        world.system<core::GameSettings>("On start set move gui elements to match anchors")
                 .kind(flecs::OnStart)
-                .run([world](flecs::iter &iter) {
+                .each([world](core::GameSettings &settings) {
                     world.lookup("gui_canvas").set<Rectangle>({
                         0, 0, static_cast<float>(GetScreenWidth()), static_cast<float>(GetScreenHeight())
                     });
+                    settings.windowHeight = GetScreenHeight();
+                    settings.windowWidth = GetScreenWidth();
+                    world.event<core::WindowResizedEvent>().id<EventBus>().entity(world.lookup("event_bus")).emit();
                 });
 
         world.system<const Rectangle, Anchor>("on start, set anchored position")
@@ -53,10 +57,10 @@ namespace rendering::gui {
 
                     Rectangle temp{*e.get<Rectangle>()};
                     switch (anchor->horizontal_anchor) {
-                        case HORIZONTAL_ANCHOR::CENTER:
+                        case CENTER:
                             temp.x = anchor->position.x + parent.x + parent.width / 2;
                             break;
-                        case HORIZONTAL_ANCHOR::RIGHT:
+                        case RIGHT:
                             temp.x = anchor->position.x + parent.x + parent.width;
                             break;
                         default:
@@ -64,10 +68,10 @@ namespace rendering::gui {
                             break;
                     }
                     switch (anchor->vertical_anchor) {
-                        case VERTICAL_ANCHOR::MIDDLE:
+                        case MIDDLE:
                             temp.y = anchor->position.y + parent.y + parent.height / 2;
                             break;
-                        case VERTICAL_ANCHOR::BOTTOM:
+                        case BOTTOM:
                             temp.y = anchor->position.y + parent.y + parent.height;
                             break;
                         default:
@@ -86,6 +90,7 @@ namespace rendering::gui {
                         });
                         settings.windowHeight = GetScreenHeight();
                         settings.windowWidth = GetScreenWidth();
+                        world.event<core::WindowResizedEvent>().id<EventBus>().entity(world.lookup("event_bus")).emit();
                     }
                 });
 

@@ -10,9 +10,7 @@
 #include "raygui.h"
 #include "gui/components.h"
 #include "gui/gui_module.h"
-#include "rlgl.h"
-#include "../../../../cmake-build-web-debug/_deps/raylib-src/src/raymath.h"
-#include "modules/engine/core/core_module.h"
+#include <raymath.h>
 
 using namespace rendering::gui;
 
@@ -32,15 +30,24 @@ void rendering::RenderingModule::register_systems(flecs::world world) {
     world.system<const core::Position2D, const Circle>("Determine Visible Entities")
             .immediate()
             .kind<PreRender>()
-            .each([&](flecs::entity e, const core::Position2D &pos, const Circle& circle) {
+            .each([&](flecs::entity e, const core::Position2D &pos, const Circle &circle) {
                 //world.defer_begin();
                 if (pos.value.x > GetScreenWidth() + circle.radius || pos.value.x < -circle.radius ||
                     pos.value.y > GetScreenHeight() + circle.radius || pos.value.y < -circle.radius) {
                     e.remove<Visible>();
-                } else {
+                } else if (!e.has<Visible>()) {
                     e.add<Visible>();
                 }
                 //world.defer_end();
+            });
+
+
+    world.system<const Texture2D, const core::Position2D>("Draw Entities with Textures")
+            .kind<Render>()
+            .with<Visible>()
+            .group_by<Priority>()
+            .each([](const Texture2D &texture, const core::Position2D &position) {
+                DrawTextureEx(texture, Vector2Subtract(position.value, Vector2{16, 16} / 2 * 2), 0, 2.f, WHITE);
             });
 
     world.system<const Circle, const core::Position2D, const Color>("Draw Entities")
@@ -49,14 +56,6 @@ void rendering::RenderingModule::register_systems(flecs::world world) {
             .group_by<Priority>()
             .each([](const Circle &circle, const core::Position2D &position, const Color &color) {
                 DrawCircle(position.value.x, position.value.y, circle.radius, color);
-            });
-
-    world.system<const Texture2D, const core::Position2D>("Draw Entities with Textures")
-            .kind<Render>()
-            .with<Visible>()
-            .group_by<Priority>()
-            .each([](const Texture2D &texture, const core::Position2D &position) {
-                DrawTextureEx(texture, Vector2Subtract(position.value ,Vector2{16,16} / 2 * 2), 0, 2.f, WHITE);
             });
 
     world.system("After Draw")

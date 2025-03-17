@@ -23,6 +23,14 @@ namespace physics {
         flecs::entity a;
         flecs::entity b;
     };
+
+
+    struct ContainedBy {};
+    struct Contains {};
+    struct Cell {
+        int x;
+        int y;
+    };
 }
 
 #endif //PHYSICS_COMPONENTS_H
