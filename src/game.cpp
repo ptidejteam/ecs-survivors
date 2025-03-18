@@ -45,7 +45,7 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_window
     InitWindow(m_windowWidth, m_windowHeight, m_windowName.c_str());
     SetTargetFPS(60);
 
-    //m_world.set_threads(8);
+    m_world.set_threads(8);
     m_world.import<core::CoreModule>();
     m_world.import<input::InputModule>();
     m_world.import<rendering::RenderingModule>();

@@ -24,11 +24,14 @@
 #include "spatial_hash_rebuilding.h"
 #include "spatial_hash_updating.h"
 
+#include <box2d/box2d.h>
+
 enum PHYSICS_COLLISION_STRATEGY {
     COLLISION_RELATIONSHIP,
     COLLISION_ENTITY,
     SPATIAL_HASH_REBUILDING,
-    SPATIAL_HASH_UPDATING
+    SPATIAL_HASH_UPDATING,
+    BOX2D
 };
 
 namespace physics {
@@ -43,7 +46,7 @@ namespace physics {
             m_spatial_hash = new SpatialHashRebuilding();
         };
 
-        inline static flecs::entity s1, s2, s3, s4, s5, s6, s7, s8, s9, s10;
+        inline static flecs::entity s1, s2, s3, s4, s5, s6, add_entity_to_physics, remove_entity_to_physics, s8, s9, s10;
 
 
         static void change_collision_strategy(PHYSICS_COLLISION_STRATEGY type) {
@@ -54,7 +57,8 @@ namespace physics {
             s4.disable();
             s5.disable();
             s6.disable();
-            s7.disable();
+            remove_entity_to_physics.disable();
+            add_entity_to_physics.disable();
             s8.disable();
             s9.disable();
             //s10.disable();
@@ -72,7 +76,8 @@ namespace physics {
                 case SPATIAL_HASH_REBUILDING:
                     m_spatial_hash = new SpatialHashRebuilding();
                     s6.enable();
-                    s7.enable();
+                    remove_entity_to_physics.enable();
+                    add_entity_to_physics.enable();
                     s8.enable();
                     s9.enable();
                     //s10.enable();
@@ -80,11 +85,15 @@ namespace physics {
                 case SPATIAL_HASH_UPDATING:
                     m_spatial_hash = new SpatialHashUpdating();
                     s6.enable();
-                    s7.enable();
+                    remove_entity_to_physics.enable();
+                    add_entity_to_physics.enable();
                     s8.enable();
                     s9.enable();
                     //s10.enable();
                     break;
+                //case BOX2D:
+                    //b2WorldDef worldDef = b2DefaultWorldDef();
+                    //b2WorldId myWorldId = b2CreateWorld(&worldDef);
             }
         }
 
@@ -99,13 +108,13 @@ namespace physics {
         void register_systems(flecs::world &world);
 
         // call the spatial hash implementation
-        void remove_entity_from_grid(flecs::entity &entity) {
-            m_spatial_hash->remove_entity(entity);
+        void add_entity_to_grid(flecs::entity &entity) {
+            m_spatial_hash->add_entity(entity);
         }
 
         // call the spatial hash implementation
-        void add_entity_to_grid(flecs::entity &entity) {
-            m_spatial_hash->add_entity(entity);
+        void remove_entity_from_grid(flecs::entity &entity) {
+            m_spatial_hash->remove_entity(entity);
         }
 
         // Update the position of an entity and rehash if necessary

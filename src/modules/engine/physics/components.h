@@ -17,6 +17,14 @@ namespace physics {
         float value;
     };
 
+    struct Collider {
+        float radius;
+    };
+
+    struct Box2DID {
+
+    };
+
     struct CollidedWith {};
 
     struct CollisionRecord {

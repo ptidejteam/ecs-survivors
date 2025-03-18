@@ -37,6 +37,7 @@ namespace physics {
         world.system<Velocity2D, const DesiredVelocity2D, const AccelerationSpeed>("Lerp Current to Desired Velocity")
                 .kind(flecs::OnValidate)
                 .multi_threaded()
+                .write<Velocity2D>()
                 .each([&](flecs::iter &it, size_t, Velocity2D &vel, const DesiredVelocity2D &desiredVel,
                           const AccelerationSpeed &acceleration_speed) {
                     // eventually I want to use spherical linear interpolation for a smooth transition
@@ -44,10 +45,16 @@ namespace physics {
                                             PHYSICS_TICK_LENGTH * acceleration_speed.value);
                 });
 
-        world.system<core::Position2D, const Velocity2D>("Update Position")
+        world.system<core::Position2D, const Velocity2D, const DesiredVelocity2D, const AccelerationSpeed>(
+                    "Update Position")
                 .kind(flecs::OnValidate)
-                .each([&](const flecs::iter &it, size_t i, core::Position2D &pos, const Velocity2D &vel) {
-                    pos.value = Vector2Add(pos.value, vel.value * PHYSICS_TICK_LENGTH);
+                .write<core::Position2D>()
+                .each([&](const flecs::iter &it, size_t i, core::Position2D &pos, const Velocity2D &vel,
+                          const DesiredVelocity2D &desiredVel,
+                          const AccelerationSpeed &acceleration_speed) {
+                    auto vnplus1 = Vector2Lerp(vel.value, desiredVel.value,
+                                               PHYSICS_TICK_LENGTH * acceleration_speed.value);
+                    pos.value = Vector2Add(pos.value, vnplus1 * PHYSICS_TICK_LENGTH);
                 });
 
         auto get_all_position_and_collider_entities =
@@ -160,8 +167,8 @@ namespace physics {
                 }).disable();
 
         auto get_visible_entity_positions = world.query_builder<const core::Position2D>()
-            .with<rendering::Visible>()
-            .build();
+                .with<rendering::Visible>()
+                .build();
 
         s6 = world.system("Update Visible entities in physics")
                 .with<core::Position2D>()
@@ -172,21 +179,29 @@ namespace physics {
                 }).disable();
 
 
-        s7 = world.observer("remove enemies from collisions when they are no longer visible")
+        remove_entity_to_physics = world.observer("remove enemies from collisions when they are no longer visible")
                 .with<rendering::Visible>()
                 .event(flecs::OnRemove)
                 .each([&](flecs::entity e) {
                     remove_entity_from_grid(e);
                 }).disable();
 
+        add_entity_to_physics = world.observer("add enemies from collisions when they become visible")
+                .with<rendering::Visible>()
+                .event(flecs::OnAdd)
+                .each([&](flecs::entity e) {
+                    add_entity_to_grid(e);
+                }).disable();
+
         s8 = world.system<const Cell>("Detect Collisions External (Accelerated)")
                 .kind(flecs::OnValidate)
                 .multi_threaded()
                 .each([&, world](const Cell &cell) {
-                    auto stopwatch = std::chrono::high_resolution_clock::now();
+                    //auto stopwatch = std::chrono::high_resolution_clock::now();
                     detect_collisions(cell);
-                    auto timeElapsed = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - stopwatch);
-                    world.lookup("event_bus").emit<CollisionDetectionPhaseCompleted>({timeElapsed.count()});
+                    // auto timeElapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
+                    //     std::chrono::high_resolution_clock::now() - stopwatch);
+                    // world.lookup("event_bus").emit<CollisionDetectionPhaseCompleted>({(long)timeElapsed.count()});
                 }).disable();
 
         s9 = world.system("Resolve Collisions External (Accelerated)")

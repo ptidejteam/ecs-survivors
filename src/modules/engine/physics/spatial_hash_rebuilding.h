@@ -91,10 +91,10 @@ public:
             float overlap = combinedRadius - Vector2Length(direction);
             if (overlap <= 0.f) continue;
 
-            Vector2 move = moveDirection * overlap * 0.5f;
+            Vector2 move = moveDirection * overlap * 0.75f;
 
-            self.set<physics::Velocity2D>({self.get<physics::Velocity2D>()->value - move * 2.f});
-            other.set<physics::Velocity2D>({other.get<physics::Velocity2D>()->value + move * 2.f});
+            //self.set<physics::Velocity2D>({self.get<physics::Velocity2D>()->value - move * 2.f});
+            //other.set<physics::Velocity2D>({other.get<physics::Velocity2D>()->value + move * 2.f});
 
             self.set<core::Position2D>({mypos - move / 2.f});
             other.set<core::Position2D>({otherPos + move / 2.f});

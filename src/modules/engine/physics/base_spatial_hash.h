@@ -80,7 +80,7 @@ protected:
 private:
     int m_screen_width = 1920;
     int m_screen_height = 1080;
-    const int m_cell_size = 32;
+    const int m_cell_size = 64;
 };
 
 #endif //BASE_SPATIAL_HASH_H
