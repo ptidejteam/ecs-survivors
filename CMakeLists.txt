@@ -4,7 +4,7 @@ project(ECS_Survivors VERSION 1.0.0 LANGUAGES C CXX)
 set(EXECUTABLE_NAME Executable)
 set(LIBRARY_NAME Library)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 # Generate compile_commands.json
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
@@ -41,7 +41,7 @@ if (NOT raylib_FOUND) # If there's none, fetch and build raylib
     endif()
 endif()
 
-set(FLECS_VERSION 4.0.4)
+set(FLECS_VERSION 4.0.5)
 find_package(flecs ${FLECS_VERSION} QUIET) # QUIET or REQUIRED
 if (NOT flecs_FOUND) # If there's none, fetch and build flecs
     include(FetchContent)
@@ -57,8 +57,12 @@ if (NOT flecs_FOUND) # If there's none, fetch and build flecs
     endif()
 endif()
 
-# Dependencies
 
+option(TRACY_ENABLE "Enable Tracy Profiler" ON)
+option(TRACY_ON_DEMAND "Start profiling only after server connects" ON)  # Optional
+add_definitions(-DTRACY_NO_CRASH_HANDLER)
+add_definitions(-D_HAS_CXX23_FORMAT=0)
+add_subdirectory("external/tracy")
 
 # Our Project
 add_subdirectory("src")
@@ -66,7 +70,10 @@ add_subdirectory("include")
 add_subdirectory("resources")
 add_subdirectory("app")
 
+
 target_link_libraries(${LIBRARY_NAME} PUBLIC
         raylib
-        flecs::flecs_static)
+        flecs::flecs_static
+        Tracy::TracyClient
+)
 

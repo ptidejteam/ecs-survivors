@@ -38,7 +38,7 @@ namespace physics {
     constexpr float PHYSICS_TICK_LENGTH = 0.016f;
 
     class PhysicsModule : public BaseModule<PhysicsModule> {
-        friend class BaseModule;
+        friend class BaseModule<PhysicsModule>;
 
     public:
         // do not add implementation to the constructor
@@ -77,7 +77,7 @@ namespace physics {
                     m_spatial_hash = new SpatialHashRebuilding();
                     s6.enable();
                     remove_entity_to_physics.enable();
-                    add_entity_to_physics.enable();
+                    //add_entity_to_physics.enable();
                     s8.enable();
                     s9.enable();
                     //s10.enable();

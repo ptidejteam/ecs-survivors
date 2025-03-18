@@ -6,15 +6,14 @@
 
 #include "components.h"
 #define RAYGUI_IMPLEMENTATION
+#include <raygui.h>
 #include <modules/engine/rendering/pipeline_steps.h>
-#include <stack>
-#include <unordered_set>
 
 #include "game.h"
-#include "raygui.h"
+#include "raylib.h"
 #include "modules/engine/core/core_module.h"
 #include "modules/engine/rendering/components.h"
-#define RAYGUI_IMPLEMENTATION
+
 namespace rendering::gui {
     void GUIModule::register_components(flecs::world &world) {
         world.component<Button>();
@@ -104,9 +103,9 @@ namespace rendering::gui {
                 .kind<RenderGUI>()
                 .each([](const Button &button, const Rectangle &rect) {
                     GuiSetStyle(BUTTON, TEXT_WRAP_MODE, TEXT_WRAP_WORD);
-                    if (GuiButton(rect, button.text.c_str())) {
-                        button.on_click_system.run();
-                    }
+                     if (GuiButton(rect, button.text.c_str())) {
+                         button.on_click_system.run();
+                     }
                     GuiSetStyle(BUTTON, TEXT_WRAP_MODE, DEFAULT);
                 });
 

@@ -10,8 +10,7 @@
 #include <emscripten/emscripten.h>
 #endif
 
-#include <raygui.h>
-
+#include <tracy/Tracy.hpp>
 
 #include "modules/ai/ai_module.h"
 #include "modules/ai/components.h"
@@ -27,9 +26,7 @@
 
 #include "modules/engine/rendering/components.h"
 #include "modules/engine/rendering/rendering_module.h"
-#include "raygui.h"
 #include "modules/analytics/analytics_module.h"
-#include "modules/engine/rendering/gui/gui_module.h"
 #include "modules/gameplay/components.h"
 #include "modules/gameplay/gameplay_module.h"
 
@@ -45,7 +42,7 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_window
     InitWindow(m_windowWidth, m_windowHeight, m_windowName.c_str());
     SetTargetFPS(60);
 
-    m_world.set_threads(8);
+    // m_world.set_threads(8);
     m_world.import<core::CoreModule>();
     m_world.import<input::InputModule>();
     m_world.import<rendering::RenderingModule>();
@@ -56,7 +53,7 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_window
     m_world.import<analytics::AnalyticsModule>();
 
 
-#if not defined(EMSCRIPTEN)
+#ifndef EMSCRIPTEN
     // use the flecs explorer when not on browser
     m_world.import<flecs::stats>();
     m_world.set<flecs::Rest>({});
@@ -170,12 +167,16 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_window
 
 void Game::run() {
     // ON START
+    TracyNoop;
     m_world.progress();
 
     // Main game loop
     while (!WindowShouldClose()) // Detect window close button or ESC key
     {
+        // ZoneScoped;
         m_world.progress(GetFrameTime());
+
+        FrameMark;
     }
     // De-Initialization
     //--------------------------------------------------------------------------------------

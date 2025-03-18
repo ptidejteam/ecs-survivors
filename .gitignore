@@ -1,2 +1,5 @@
 cmake*/
 .idea/
+out/
+.vs/
+CMakeSettings.json

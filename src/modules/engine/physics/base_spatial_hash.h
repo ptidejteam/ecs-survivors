@@ -10,6 +10,7 @@
 #include <flecs.h>
 #include <raymath.h>
 #include <flecs/addons/cpp/entity.hpp>
+#include <tracy/Tracy.hpp>
 
 #include "modules/engine/core/components.h"
 #include "modules/engine/rendering/components.h"
@@ -52,6 +53,7 @@ public:
 
 protected:
     bool collide(flecs::entity &self, flecs::entity &other) {
+        ZoneScoped;
 
         // if we are colliding with our selfs of the collision is already counted.
         // we only compute when self id < other id, that way we check the collision only once

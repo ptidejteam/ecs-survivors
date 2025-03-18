@@ -8,6 +8,7 @@
 #include <set>
 #include <unordered_map>
 #include <vector>
+#include <tracy/Tracy.hpp>
 
 #include "base_spatial_hash.h"
 
@@ -46,13 +47,13 @@ public:
     };
 
     void detect_collisions(const physics::Cell &cell) override {
+        ZoneScoped;
         std::vector<std::pair<flecs::entity, flecs::entity> > local_pairs;
 
         auto it_cell = m_collision_cells.find({cell.x, cell.y});
         if (it_cell == m_collision_cells.end())
             return;
 
-        auto current_cell = std::make_pair(cell.x, cell.y);
         for (auto &neighbor_offset: m_neighbor_offsets) {
             auto neighborCell = std::make_pair(cell.x + neighbor_offset.first,
                                                cell.y + neighbor_offset.second);
@@ -81,6 +82,7 @@ public:
     }
 
     void resolve_collisions() override {
+        ZoneScoped;
         for (auto &[self, other]: m_collision_pairs) {
             Vector2 mypos = self.get<core::Position2D>()->value;
             Vector2 otherPos = other.get<core::Position2D>()->value;

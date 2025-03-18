@@ -1,6 +1,9 @@
 #include <iostream>
+#include <tracy/Tracy.hpp>
 
 #include "game.h"
+
+#include "tracy/Tracy.hpp"
 
 int main() {
 #ifdef EMSCRIPTEN
@@ -11,7 +14,15 @@ int main() {
     const int screenHeight = 1080;
 #endif
 
+
+
+#ifdef TRACY_ENABLE
+    std::printf("JOE");
+#endif
+
+    // TracyNoop;
     Game("ECS-Survivors", screenWidth, screenHeight).run();
+    FrameMark;
 
     return 0;
 }

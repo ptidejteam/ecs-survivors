@@ -7,7 +7,6 @@
 #include "components.h"
 #include "pipeline_steps.h"
 #include "modules/engine/core/components.h"
-#include "raygui.h"
 #include "gui/components.h"
 #include "gui/gui_module.h"
 #include <raymath.h>
@@ -28,17 +27,15 @@ void rendering::RenderingModule::register_systems(flecs::world world) {
             });
 
     world.system<const core::Position2D, const Circle>("Determine Visible Entities")
-            .immediate()
+            .write<Visible>()
             .kind<PreRender>()
             .each([&](flecs::entity e, const core::Position2D &pos, const Circle &circle) {
-                //world.defer_begin();
                 if (pos.value.x > GetScreenWidth() + circle.radius || pos.value.x < -circle.radius ||
                     pos.value.y > GetScreenHeight() + circle.radius || pos.value.y < -circle.radius) {
                     e.remove<Visible>();
                 } else if (!e.has<Visible>()) {
                     e.add<Visible>();
                 }
-                //world.defer_end();
             });
 
 

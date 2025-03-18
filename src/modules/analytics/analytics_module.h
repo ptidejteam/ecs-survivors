@@ -9,7 +9,7 @@
 namespace analytics {
 
 class AnalyticsModule : public BaseModule<AnalyticsModule> {
-    friend class BaseModule;
+    friend class BaseModule<AnalyticsModule>;
 public:
     AnalyticsModule(flecs::world world) : BaseModule(world) {};
 

@@ -10,6 +10,8 @@
 #include "components.h"
 #include "modules/engine/core/components.h"
 #include <raymath.h>
+#include <tracy/Tracy.hpp>
+#include <tracy/TracyC.h>
 
 #include "game.h"
 #include "modules/engine/core/core_module.h"
@@ -112,31 +114,37 @@ namespace physics {
                 }).disable();
 
         flecs::entity collision_records_container = world.lookup("collision_records_container");
-        s3 = world.system<const core::Position2D, const rendering::Circle>(
+        s3 = world.system(
                     "Detect Collisions ECS (Naive create collision entity)")
                 .with<rendering::Visible>()
                 .kind(flecs::OnValidate)
-                .write<CollisionRecord>()
-                .each([world,collision_records_container, get_all_position_and_collider_entities](
-                flecs::entity self, const core::Position2D &pos,
-                const rendering::Circle &collider) {
+                .immediate()
+                .run([world,collision_records_container, get_all_position_and_collider_entities](flecs::iter &it) {
+                    ZoneScopedN("Collision Detection");
+                    get_all_position_and_collider_entities.each([&](flecs::entity self, const core::Position2D &pos,
+                                                                    const rendering::Circle &collider) {
                         get_all_position_and_collider_entities.each(
                             [&](flecs::entity other, const core::Position2D &other_pos,
                                 const rendering::Circle &other_collider) {
+                                ZoneScopedN("Collide");
                                 if (self.id() >= other.id()) return;
-
-                                float rad = collider.radius + other_collider.radius;
-                                if (Vector2DistanceSqr(pos.value, other_pos.value) < rad * rad) {
-                                    world.entity().child_of(collision_records_container).set<CollisionRecord>({
-                                        self, other
-                                    });
+                                {
+                                    float rad = collider.radius + other_collider.radius;
+                                    if (Vector2DistanceSqr(pos.value, other_pos.value) < rad * rad) {
+                                        world.entity().child_of(collision_records_container).set<CollisionRecord>({
+                                            self, other
+                                        });
+                                    }
                                 }
                             });
-                    }).disable();
+                    });
+                }).disable();
 
+        // auto recs_query =
         s4 = world.system<const CollisionRecord>("Collision Resolution ECS (Naive create collision entity)")
                 .kind(flecs::PostUpdate)
                 .each([](const CollisionRecord &rec) {
+                    ZoneScopedN("Collision Resolution");
                     flecs::entity other = rec.b; // Colliding entity
                     flecs::entity self = rec.a; // Current entity
                     Vector2 mypos = self.get<core::Position2D>()->value;
@@ -197,11 +205,8 @@ namespace physics {
                 .kind(flecs::OnValidate)
                 .multi_threaded()
                 .each([&, world](const Cell &cell) {
-                    //auto stopwatch = std::chrono::high_resolution_clock::now();
+                    ZoneScoped;
                     detect_collisions(cell);
-                    // auto timeElapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
-                    //     std::chrono::high_resolution_clock::now() - stopwatch);
-                    // world.lookup("event_bus").emit<CollisionDetectionPhaseCompleted>({(long)timeElapsed.count()});
                 }).disable();
 
         s9 = world.system("Resolve Collisions External (Accelerated)")
