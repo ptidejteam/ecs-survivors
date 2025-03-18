@@ -43,11 +43,10 @@ namespace physics {
             m_spatial_hash = new SpatialHashRebuilding();
         };
 
-        inline static flecs::entity s1, s2, s3, s4, s5, s6, s7, s8, s9;
+        inline static flecs::entity s1, s2, s3, s4, s5, s6, s7, s8, s9, s10;
 
 
         static void change_collision_strategy(PHYSICS_COLLISION_STRATEGY type) {
-            delete m_spatial_hash;
 
             s1.disable();
             s2.disable();
@@ -58,6 +57,8 @@ namespace physics {
             s7.disable();
             s8.disable();
             s9.disable();
+            //s10.disable();
+            delete m_spatial_hash;
             switch (type) {
                 case COLLISION_RELATIONSHIP:
                     s1.enable();
@@ -74,6 +75,7 @@ namespace physics {
                     s7.enable();
                     s8.enable();
                     s9.enable();
+                    //s10.enable();
                     break;
                 case SPATIAL_HASH_UPDATING:
                     m_spatial_hash = new SpatialHashUpdating();
@@ -81,6 +83,7 @@ namespace physics {
                     s7.enable();
                     s8.enable();
                     s9.enable();
+                    //s10.enable();
                     break;
             }
         }

@@ -24,12 +24,23 @@ namespace physics {
         flecs::entity b;
     };
 
+    struct CollisionDetectionPhaseCompleted {
+        long time;
+    };
+
+    struct CollisionResolutionPhaseCompleted {
+        long time;
+    };
 
     struct ContainedBy {};
     struct Contains {};
     struct Cell {
         int x;
         int y;
+    };
+
+    struct CellHash {
+        std::pair<int, int> cell;
     };
 }
 

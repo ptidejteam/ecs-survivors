@@ -28,6 +28,7 @@
 #include "modules/engine/rendering/components.h"
 #include "modules/engine/rendering/rendering_module.h"
 #include "raygui.h"
+#include "modules/analytics/analytics_module.h"
 #include "modules/engine/rendering/gui/gui_module.h"
 #include "modules/gameplay/components.h"
 #include "modules/gameplay/gameplay_module.h"
@@ -52,6 +53,7 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_window
     m_world.import<player::PlayerModule>();
     m_world.import<ai::AIModule>();
     m_world.import<gameplay::GameplayModule>();
+    m_world.import<analytics::AnalyticsModule>();
 
 
 #if not defined(EMSCRIPTEN)

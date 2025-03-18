@@ -4,10 +4,19 @@
 
 #ifndef ANALYTICS_MODULE_H
 #define ANALYTICS_MODULE_H
+#include "modules/base_module.h"
 
 namespace analytics {
 
-class AnalyticsModule {
+class AnalyticsModule : public BaseModule<AnalyticsModule> {
+    friend class BaseModule;
+public:
+    AnalyticsModule(flecs::world world) : BaseModule(world) {};
+
+    void register_components(flecs::world world);
+    void register_systems(flecs::world world);
+
+private:
 
 };
 

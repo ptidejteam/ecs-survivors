@@ -159,6 +159,10 @@ namespace physics {
                     world.delete_with<CollisionRecord>();
                 }).disable();
 
+        auto get_visible_entity_positions = world.query_builder<const core::Position2D>()
+            .with<rendering::Visible>()
+            .build();
+
         s6 = world.system("Update Visible entities in physics")
                 .with<core::Position2D>()
                 .with<rendering::Visible>()
@@ -166,6 +170,7 @@ namespace physics {
                 .each([&](flecs::entity e) {
                     update_entity_position(e);
                 }).disable();
+
 
         s7 = world.observer("remove enemies from collisions when they are no longer visible")
                 .with<rendering::Visible>()
@@ -177,8 +182,11 @@ namespace physics {
         s8 = world.system<const Cell>("Detect Collisions External (Accelerated)")
                 .kind(flecs::OnValidate)
                 .multi_threaded()
-                .each([&](const Cell &cell) {
+                .each([&, world](const Cell &cell) {
+                    auto stopwatch = std::chrono::high_resolution_clock::now();
                     detect_collisions(cell);
+                    auto timeElapsed = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - stopwatch);
+                    world.lookup("event_bus").emit<CollisionDetectionPhaseCompleted>({timeElapsed.count()});
                 }).disable();
 
         s9 = world.system("Resolve Collisions External (Accelerated)")

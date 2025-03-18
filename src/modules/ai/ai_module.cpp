@@ -25,9 +25,9 @@ namespace ai {
                               const core::Position2D &position,
                               const core::Speed &speed,
                               physics::DesiredVelocity2D &velocity) {
-                    const flecs::entity e = world.entity(target.name.c_str());
-                    if (e != world.lookup(target.name.c_str())) return;
-                    const Vector2 dir = Vector2Normalize(e.get<core::Position2D>()->value - position.value);
+                    const flecs::entity t =world.lookup(target.name.c_str());
+                    if (t.id() == 0) return;
+                    const Vector2 dir = Vector2Normalize(t.get<core::Position2D>()->value - position.value);
                     velocity.value = dir * speed.value;
                 });
 
@@ -36,9 +36,9 @@ namespace ai {
                               const Target &target,
                               const core::Position2D &pos,
                               physics::DesiredVelocity2D &velocity) {
-                    const flecs::entity e = world.entity(target.name.c_str());
-                    if (e != world.lookup(target.name.c_str())) return;
-                    const Vector2 ab = e.get<core::Position2D>()->value - pos.value;
+                    const flecs::entity t =world.lookup(target.name.c_str());
+                    if (t.id() == 0) return;
+                    const Vector2 ab = t.get<core::Position2D>()->value - pos.value;
 
                     // using the squared length is faster computationally
                     const float distSquared = Vector2LengthSqr(ab);
