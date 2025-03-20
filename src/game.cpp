@@ -10,8 +10,6 @@
 #include <emscripten/emscripten.h>
 #endif
 
-#include <tracy/Tracy.hpp>
-
 #include "modules/ai/ai_module.h"
 #include "modules/ai/components.h"
 #include "modules/engine/core/components.h"
@@ -42,7 +40,7 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_window
     InitWindow(m_windowWidth, m_windowHeight, m_windowName.c_str());
     SetTargetFPS(60);
 
-    // m_world.set_threads(8);
+    m_world.set_threads(4);
     m_world.import<core::CoreModule>();
     m_world.import<input::InputModule>();
     m_world.import<rendering::RenderingModule>();
@@ -68,7 +66,7 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_window
             .set<physics::Velocity2D>({0, 0})
             .set<physics::DesiredVelocity2D>({0, 0})
             .set<physics::AccelerationSpeed>({5.0})
-            .set<rendering::Circle>({16})
+            .set<rendering::Circle>({8})
             .set<Color>({GREEN})
             .add<rendering::Priority>(1);
 
@@ -96,7 +94,7 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_window
             .set<ai::Target>({"player"})
             .add<ai::FollowTarget>()
             .set<ai::StoppingDistance>({50.0})
-            .set<rendering::Circle>({16})
+            .set<rendering::Circle>({8})
             .set<Texture2D>({LoadTexture("../resources/ghost.png")});
 
     m_world.entity("gui_canvas").set<Rectangle>({
@@ -104,7 +102,7 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_window
     });
 
     m_world.entity("panel").child_of(m_world.lookup("gui_canvas"))
-            .set<Rectangle>({0, -25, 300, 600})
+            .set<Rectangle>({0, -25, 300, 725})
             .set<rendering::gui::Anchor>({
                 rendering::gui::HORIZONTAL_ANCHOR::LEFT, rendering::gui::VERTICAL_ANCHOR::TOP
             })
@@ -157,6 +155,17 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_window
                    physics::PhysicsModule::change_collision_strategy(SPATIAL_HASH_REBUILDING);
                })
            });
+    m_world.entity("box2d_button").child_of(m_world.lookup("gui_canvas::panel"))
+           .set<rendering::gui::Anchor>({
+               rendering::gui::HORIZONTAL_ANCHOR::LEFT, rendering::gui::VERTICAL_ANCHOR::TOP
+           })
+           .set<Rectangle>({25, 600, 250, 100})
+           .set<rendering::gui::Button>({
+               "Enable Box2d Collisions (REBUILDING)",
+               m_world.system().kind(0).run([&](flecs::iter &it) {
+                   physics::PhysicsModule::change_collision_strategy(BOX2D);
+               })
+           });
 
     m_world.entity("event_bus").add<EventBus>();
 
@@ -167,16 +176,12 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_window
 
 void Game::run() {
     // ON START
-    TracyNoop;
     m_world.progress();
 
     // Main game loop
     while (!WindowShouldClose()) // Detect window close button or ESC key
     {
-        // ZoneScoped;
         m_world.progress(GetFrameTime());
-
-        FrameMark;
     }
     // De-Initialization
     //--------------------------------------------------------------------------------------

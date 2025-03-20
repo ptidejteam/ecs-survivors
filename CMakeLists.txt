@@ -58,11 +58,7 @@ if (NOT flecs_FOUND) # If there's none, fetch and build flecs
 endif()
 
 
-option(TRACY_ENABLE "Enable Tracy Profiler" ON)
-option(TRACY_ON_DEMAND "Start profiling only after server connects" ON)  # Optional
-add_definitions(-DTRACY_NO_CRASH_HANDLER)
-add_definitions(-D_HAS_CXX23_FORMAT=0)
-add_subdirectory("external/tracy")
+link_directories("./libs")
 
 # Our Project
 add_subdirectory("src")
@@ -74,6 +70,6 @@ add_subdirectory("app")
 target_link_libraries(${LIBRARY_NAME} PUBLIC
         raylib
         flecs::flecs_static
-        Tracy::TracyClient
+        box2d
 )
 

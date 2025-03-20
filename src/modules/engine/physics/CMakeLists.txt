@@ -7,4 +7,5 @@ target_sources(${LIBRARY_NAME} PUBLIC
 
 target_link_libraries(${LIBRARY_NAME} PUBLIC
         raylib
-        flecs::flecs_static)
+        flecs::flecs_static
+        box2d)

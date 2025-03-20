@@ -1,9 +1,5 @@
-#include <iostream>
-#include <tracy/Tracy.hpp>
-
 #include "game.h"
 
-#include "tracy/Tracy.hpp"
 
 int main() {
 #ifdef EMSCRIPTEN
@@ -22,7 +18,6 @@ int main() {
 
     // TracyNoop;
     Game("ECS-Survivors", screenWidth, screenHeight).run();
-    FrameMark;
 
     return 0;
 }

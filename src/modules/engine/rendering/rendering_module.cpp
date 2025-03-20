@@ -44,7 +44,7 @@ void rendering::RenderingModule::register_systems(flecs::world world) {
             .with<Visible>()
             .group_by<Priority>()
             .each([](const Texture2D &texture, const core::Position2D &position) {
-                DrawTextureEx(texture, Vector2Subtract(position.value, Vector2{16, 16} / 2 * 2), 0, 2.f, WHITE);
+                DrawTextureEx(texture, Vector2Subtract(position.value, Vector2{8, 8} / 2 * 2), 0, 1.f, WHITE);
             });
 
     world.system<const Circle, const core::Position2D, const Color>("Draw Entities")

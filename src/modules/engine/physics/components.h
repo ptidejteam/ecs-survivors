@@ -5,6 +5,7 @@
 #ifndef PHYSICS_COMPONENTS_H
 #define PHYSICS_COMPONENTS_H
 #include <raylib.h>
+#include <box2d/id.h>
 
 namespace physics {
     struct Velocity2D {
@@ -22,7 +23,8 @@ namespace physics {
     };
 
     struct Box2DID {
-
+        b2BodyId bodyId;
+        b2ShapeId shapeId;
     };
 
     struct CollidedWith {};

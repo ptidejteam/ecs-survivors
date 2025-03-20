@@ -24,7 +24,11 @@
 #include "spatial_hash_rebuilding.h"
 #include "spatial_hash_updating.h"
 
-#include <box2d/box2d.h>
+#include "box2d/base.h"
+#include "box2d/box2d.h"
+#include "box2d/id.h"
+#include "box2d/types.h"
+#include "box2d/math_functions.h"
 
 enum PHYSICS_COLLISION_STRATEGY {
     COLLISION_RELATIONSHIP,
@@ -44,13 +48,15 @@ namespace physics {
         // do not add implementation to the constructor
         PhysicsModule(flecs::world &world): BaseModule(world) {
             m_spatial_hash = new SpatialHashRebuilding();
+            //change_collision_strategy(BOX2D);
         };
 
-        inline static flecs::entity s1, s2, s3, s4, s5, s6, add_entity_to_physics, remove_entity_to_physics, s8, s9, s10;
+        inline static flecs::entity s1, s2, s3, s4, s5, s6, add_entity_to_physics, remove_entity_to_physics, s8, s9, s10
+                , s_update_position, s_update_box2d_velocity, s_box2d_step, s_position_from_box2d;
 
 
         static void change_collision_strategy(PHYSICS_COLLISION_STRATEGY type) {
-
+            collision_strategy = type;
             s1.disable();
             s2.disable();
             s3.disable();
@@ -61,6 +67,10 @@ namespace physics {
             add_entity_to_physics.disable();
             s8.disable();
             s9.disable();
+            s_update_position.enable();
+            s_box2d_step.disable();
+            s_position_from_box2d.disable();
+
             //s10.disable();
             delete m_spatial_hash;
             switch (type) {
@@ -77,10 +87,8 @@ namespace physics {
                     m_spatial_hash = new SpatialHashRebuilding();
                     s6.enable();
                     remove_entity_to_physics.enable();
-                    //add_entity_to_physics.enable();
                     s8.enable();
                     s9.enable();
-                    //s10.enable();
                     break;
                 case SPATIAL_HASH_UPDATING:
                     m_spatial_hash = new SpatialHashUpdating();
@@ -89,16 +97,28 @@ namespace physics {
                     add_entity_to_physics.enable();
                     s8.enable();
                     s9.enable();
-                    //s10.enable();
+                //s10.enable();
                     break;
-                //case BOX2D:
-                    //b2WorldDef worldDef = b2DefaultWorldDef();
-                    //b2WorldId myWorldId = b2CreateWorld(&worldDef);
+                case BOX2D:
+                    worldDef = b2DefaultWorldDef();
+                    worldDef.workerCount = 8;
+                    worldDef.gravity = b2Vec2(0.0f, 0.0f);
+                    worldId = b2CreateWorld(&worldDef);
+                    remove_entity_to_physics.enable();
+                    add_entity_to_physics.enable();
+                    s_update_position.disable();
+                    s_update_box2d_velocity.enable();
+                    s_box2d_step.enable();
+                    s_position_from_box2d.enable();
             }
         }
 
     private:
         inline static BaseSpatialHash *m_spatial_hash = nullptr;
+        inline static b2WorldDef worldDef;
+        inline static b2WorldId worldId;
+        inline static PHYSICS_COLLISION_STRATEGY collision_strategy;
+
         flecs::entity m_physicsTick;
 
 
@@ -109,12 +129,18 @@ namespace physics {
 
         // call the spatial hash implementation
         void add_entity_to_grid(flecs::entity &entity) {
-            m_spatial_hash->add_entity(entity);
+            if (collision_strategy == SPATIAL_HASH_REBUILDING || collision_strategy == SPATIAL_HASH_UPDATING) {
+                m_spatial_hash->add_entity(entity);
+            } else if (collision_strategy == BOX2D) {
+                create_body_for_entity(entity);
+            }
         }
 
         // call the spatial hash implementation
         void remove_entity_from_grid(flecs::entity &entity) {
-            m_spatial_hash->remove_entity(entity);
+            if (collision_strategy == SPATIAL_HASH_REBUILDING || collision_strategy == SPATIAL_HASH_UPDATING) {
+                m_spatial_hash->remove_entity(entity);
+            }
         }
 
         // Update the position of an entity and rehash if necessary
@@ -142,6 +168,23 @@ namespace physics {
 
         void resolve_collisions() {
             m_spatial_hash->resolve_collisions();
+        }
+
+        void create_body_for_entity(flecs::entity &e) {
+            if (e.has<Box2DID>()) return;
+            auto pos = e.get<core::Position2D>()->value;
+            b2BodyDef bodyDef = b2DefaultBodyDef();
+            bodyDef.type = b2_dynamicBody;
+            bodyDef.position = b2Vec2(pos.x, pos.y);
+            b2BodyId bodyId = b2CreateBody(worldId, &bodyDef);
+            b2ShapeDef shapeDef = b2DefaultShapeDef();
+            shapeDef.density = 1.0f;
+            shapeDef.friction = 0.3f;
+            b2Circle circle;
+            circle.center = {0,0};
+            circle.radius = 8.0f;
+            b2ShapeId shapeId = b2CreateCircleShape(bodyId, &shapeDef, &circle);
+            e.set<Box2DID>({bodyId, shapeId});
         }
 
         // Neighboring cells (including the current cell itself)

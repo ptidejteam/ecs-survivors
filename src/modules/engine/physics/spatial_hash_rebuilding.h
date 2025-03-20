@@ -5,10 +5,8 @@
 #ifndef SPATIAL_HASH_REBUILDING_H
 #define SPATIAL_HASH_REBUILDING_H
 #include <mutex>
-#include <set>
 #include <unordered_map>
 #include <vector>
-#include <tracy/Tracy.hpp>
 
 #include "base_spatial_hash.h"
 
@@ -47,7 +45,6 @@ public:
     };
 
     void detect_collisions(const physics::Cell &cell) override {
-        ZoneScoped;
         std::vector<std::pair<flecs::entity, flecs::entity> > local_pairs;
 
         auto it_cell = m_collision_cells.find({cell.x, cell.y});
@@ -82,7 +79,6 @@ public:
     }
 
     void resolve_collisions() override {
-        ZoneScoped;
         for (auto &[self, other]: m_collision_pairs) {
             Vector2 mypos = self.get<core::Position2D>()->value;
             Vector2 otherPos = other.get<core::Position2D>()->value;
@@ -93,10 +89,10 @@ public:
             float overlap = combinedRadius - Vector2Length(direction);
             if (overlap <= 0.f) continue;
 
-            Vector2 move = moveDirection * overlap * 0.75f;
+            Vector2 move = moveDirection * overlap * 0.5f;
 
-            //self.set<physics::Velocity2D>({self.get<physics::Velocity2D>()->value - move * 2.f});
-            //other.set<physics::Velocity2D>({other.get<physics::Velocity2D>()->value + move * 2.f});
+            self.set<physics::Velocity2D>({self.get<physics::Velocity2D>()->value - move * 2.f});
+            other.set<physics::Velocity2D>({other.get<physics::Velocity2D>()->value + move * 2.f});
 
             self.set<core::Position2D>({mypos - move / 2.f});
             other.set<core::Position2D>({otherPos + move / 2.f});
