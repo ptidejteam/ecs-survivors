@@ -22,11 +22,10 @@ namespace gameplay {
                 .term_at(1).singleton()
                 .each([&,world](flecs::entity self, const Spawner &spawner, const core::GameSettings &settings) {
                     const flecs::entity e = world.lookup(spawner.enemy_prefab_name.c_str());
-                    if (count > 20000) return;
 
                     if (0 == e) return;
 
-                    for (int i = 0; i < 3; i++) {
+                    for (int i = 0; i < 5; i++) {
                         float factor = rand() % 2 - 1;
                         float neg = rand() % 1 - 1;
                         float randX = outside_side_switch

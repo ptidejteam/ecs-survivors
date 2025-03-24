@@ -31,11 +31,11 @@
 #include "box2d/math_functions.h"
 
 enum PHYSICS_COLLISION_STRATEGY {
+    NONE,
     COLLISION_RELATIONSHIP,
     COLLISION_ENTITY,
     SPATIAL_HASH_REBUILDING,
-    SPATIAL_HASH_UPDATING,
-    BOX2D
+    BOX2D,
 };
 
 namespace physics {
@@ -90,18 +90,8 @@ namespace physics {
                     s8.enable();
                     s9.enable();
                     break;
-                case SPATIAL_HASH_UPDATING:
-                    m_spatial_hash = new SpatialHashUpdating();
-                    s6.enable();
-                    remove_entity_to_physics.enable();
-                    add_entity_to_physics.enable();
-                    s8.enable();
-                    s9.enable();
-                //s10.enable();
-                    break;
                 case BOX2D:
                     worldDef = b2DefaultWorldDef();
-                    worldDef.workerCount = 8;
                     worldDef.gravity = b2Vec2(0.0f, 0.0f);
                     worldId = b2CreateWorld(&worldDef);
                     remove_entity_to_physics.enable();
@@ -110,6 +100,8 @@ namespace physics {
                     s_update_box2d_velocity.enable();
                     s_box2d_step.enable();
                     s_position_from_box2d.enable();
+                default:
+                    break;
             }
         }
 
@@ -129,7 +121,7 @@ namespace physics {
 
         // call the spatial hash implementation
         void add_entity_to_grid(flecs::entity &entity) {
-            if (collision_strategy == SPATIAL_HASH_REBUILDING || collision_strategy == SPATIAL_HASH_UPDATING) {
+            if (collision_strategy == SPATIAL_HASH_REBUILDING) {
                 m_spatial_hash->add_entity(entity);
             } else if (collision_strategy == BOX2D) {
                 create_body_for_entity(entity);
@@ -138,7 +130,7 @@ namespace physics {
 
         // call the spatial hash implementation
         void remove_entity_from_grid(flecs::entity &entity) {
-            if (collision_strategy == SPATIAL_HASH_REBUILDING || collision_strategy == SPATIAL_HASH_UPDATING) {
+            if (collision_strategy == SPATIAL_HASH_REBUILDING) {
                 m_spatial_hash->remove_entity(entity);
             }
         }

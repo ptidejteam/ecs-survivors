@@ -29,6 +29,7 @@ namespace physics {
 
     void PhysicsModule::register_systems(flecs::world &world) {
         world.system<const Velocity2D, DesiredVelocity2D>("reset desired vel")
+                .tick_source(m_physicsTick)
                 .kind(flecs::PreUpdate)
                 .each([](const Velocity2D &vel, DesiredVelocity2D &desiredVel) {
                     desiredVel.value = vel.value;
@@ -36,6 +37,7 @@ namespace physics {
 
         world.system<Velocity2D, const DesiredVelocity2D, const AccelerationSpeed>("Lerp Current to Desired Velocity")
                 .kind(flecs::OnValidate)
+                .tick_source(m_physicsTick)
                 .multi_threaded()
                 .write<Velocity2D>()
                 .each([&](flecs::iter &it, size_t, Velocity2D &vel, const DesiredVelocity2D &desiredVel,
@@ -47,6 +49,7 @@ namespace physics {
 
         s_update_position = world.system<core::Position2D, const Velocity2D>(
                     "Update Position")
+                .tick_source(m_physicsTick)
                 .kind(flecs::OnValidate)
                 .write<core::Position2D>()
                 .each([&](const flecs::iter &it, size_t i, core::Position2D &pos, const Velocity2D &vel) {
@@ -62,6 +65,7 @@ namespace physics {
                     "Detect Collisions ECS (Naive add collision component)")
                 .with<rendering::Visible>()
                 .kind(flecs::OnValidate)
+                .tick_source(m_physicsTick)
                 .each([get_all_position_and_collider_entities](flecs::entity self, const core::Position2D &pos,
                                                                const rendering::Circle &collider) {
                     get_all_position_and_collider_entities.each(
@@ -82,6 +86,7 @@ namespace physics {
         s2 = world.system("Collision Resolution ECS (Naive add collision component)")
                 .with<CollidedWith>(flecs::Wildcard)
                 .kind(flecs::PostUpdate)
+                .tick_source(m_physicsTick)
                 .each([](flecs::iter &it, size_t i) {
                     flecs::entity other = it.pair(0).second(); // Colliding entity
                     flecs::entity self = it.entity(i); // Current entity
@@ -107,33 +112,33 @@ namespace physics {
                     other.set<core::Position2D>({otherPos + move / 2.f}); // Move the other entity
                 }).disable();
 
-        flecs::entity collision_records_container = world.lookup("collision_records_container");
-        s3 = world.system("Detect Collisions ECS (Naive create collision entity)")
+        s3 = world.system<const core::Position2D, const rendering::Circle>(
+                    "Detect Collisions ECS (Naive create collision entity)")
                 .with<rendering::Visible>()
                 .kind(flecs::OnValidate)
+                .tick_source(m_physicsTick)
                 .immediate()
-                .run([world,collision_records_container, get_all_position_and_collider_entities](flecs::iter &it) {
-                    get_all_position_and_collider_entities.each([&](flecs::entity self, const core::Position2D &pos,
-                                                                    const rendering::Circle &collider) {
+                .each([&, world, get_all_position_and_collider_entities](
+                flecs::entity self, const core::Position2D &pos,
+                const rendering::Circle &collider) {
                         get_all_position_and_collider_entities.each(
                             [&](flecs::entity other, const core::Position2D &other_pos,
                                 const rendering::Circle &other_collider) {
-                                if (self.id() >= other.id()) return;
-                                {
+                                if (self.id() >= other.id()) return; {
                                     float rad = collider.radius + other_collider.radius;
                                     if (Vector2DistanceSqr(pos.value, other_pos.value) < rad * rad) {
-                                        world.entity().child_of(collision_records_container).set<CollisionRecord>({
+                                        world.entity().set<CollisionRecord>({
                                             self, other
                                         });
                                     }
                                 }
                             });
-                    });
-                }).disable();
+                    }).disable();
 
         // auto recs_query =
         s4 = world.system<const CollisionRecord>("Collision Resolution ECS (Naive create collision entity)")
                 .kind(flecs::PostUpdate)
+                .tick_source(m_physicsTick)
                 .each([](const CollisionRecord &rec) {
                     flecs::entity other = rec.b; // Colliding entity
                     flecs::entity self = rec.a; // Current entity
@@ -160,6 +165,7 @@ namespace physics {
 
         s5 = world.system("Collision Cleanup ECS (Naive create collision entity)")
                 .kind(flecs::OnStore)
+                .tick_source(m_physicsTick)
                 .run([world](flecs::iter &it) {
                     world.delete_with<CollisionRecord>();
                 }).disable();
@@ -172,6 +178,7 @@ namespace physics {
                 .with<core::Position2D>()
                 .with<rendering::Visible>()
                 .kind(flecs::OnUpdate)
+                .tick_source(m_physicsTick)
                 .each([&](flecs::entity e) {
                     update_entity_position(e);
                 }).disable();
@@ -194,18 +201,21 @@ namespace physics {
         s8 = world.system<const Cell>("Detect Collisions External (Accelerated)")
                 .kind(flecs::OnValidate)
                 .multi_threaded()
+                .tick_source(m_physicsTick)
                 .each([&, world](const Cell &cell) {
                     detect_collisions(cell);
                 }).disable();
 
         s9 = world.system("Resolve Collisions External (Accelerated)")
                 .kind(flecs::PostUpdate)
+                .tick_source(m_physicsTick)
                 .run([&](flecs::iter &it) {
                     resolve_collisions();
                 }).disable();
 
         world.observer<EventBus>("Create partition cells")
                 .event<core::WindowResizedEvent>()
+
                 .each([&, world](EventBus &bus) {
                     core::GameSettings settings = *world.get<core::GameSettings>();
                     world.delete_with<Cell>();
@@ -220,6 +230,7 @@ namespace physics {
 
         s_update_box2d_velocity = world.system<const Velocity2D, const Box2DID>(
                     "Update Body Velocity")
+                .tick_source(m_physicsTick)
                 .kind(flecs::OnValidate)
                 .multi_threaded()
                 .each([&](const Velocity2D &vel, const Box2DID &id) {
@@ -228,15 +239,17 @@ namespace physics {
 
         s_box2d_step = world.system("Update Box2d world step")
                 .kind(flecs::OnValidate)
-                .run([&](flecs::iter& it) {
-                    b2World_Step(worldId, 1.0f/60.0f, 4);
+                .tick_source(m_physicsTick)
+                .run([&](flecs::iter &it) {
+                    b2World_Step(worldId, 1.0f / 60.0f, 4);
                 }).disable();
 
         s_position_from_box2d = world.system<core::Position2D, Velocity2D, const Box2DID>("Reflect box2d positions")
                 .kind(flecs::PostUpdate)
+                .tick_source(m_physicsTick)
                 .multi_threaded()
-                .each([&](core::Position2D& pos, Velocity2D& vel, const Box2DID &id) {
-                    auto [px,py]= b2Body_GetPosition(id.bodyId);
+                .each([&](core::Position2D &pos, Velocity2D &vel, const Box2DID &id) {
+                    auto [px,py] = b2Body_GetPosition(id.bodyId);
                     auto [vx, vy] = b2Body_GetLinearVelocity(id.bodyId);
                     pos.value.x = px;
                     pos.value.y = py;

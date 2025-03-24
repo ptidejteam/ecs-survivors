@@ -126,18 +126,18 @@ namespace rendering::gui {
             .run([](flecs::iter &iter) {
                 DrawFPS(10, 10);
             });
-
-        auto entity_count_query = world.query_builder<Circle>().build();
-        world.system("Draw Entity Count")
-            .kind<RenderGUI>()
-            .run([entity_count_query](flecs::iter &iter) {
-                DrawText(std::string(std::to_string(entity_count_query.count()) + " entities").c_str(), 10, 30, 20, GREEN);
-            });
-        auto entity_visible_count_query = world.query_builder<Circle>().with<Visible>().build();
-        world.system("Draw Visible Entity Count")
-            .kind<RenderGUI>()
-            .run([entity_visible_count_query](flecs::iter &iter) {
-                DrawText(std::string(std::to_string(entity_visible_count_query.count()) + " visible entities").c_str(), 10, 50, 20, GREEN);
-            });
+        //
+        // auto entity_count_query = world.query_builder<Circle>().build();
+        // world.system("Draw Entity Count")
+        //     .kind<RenderGUI>()
+        //     .run([entity_count_query](flecs::iter &iter) {
+        //         DrawText(std::string(std::to_string(entity_count_query.count()) + " entities").c_str(), 10, 30, 20, GREEN);
+        //     });
+        // auto entity_visible_count_query = world.query_builder<Circle>().with<Visible>().build();
+        // world.system("Draw Visible Entity Count")
+        //     .kind<RenderGUI>()
+        //     .run([entity_visible_count_query](flecs::iter &iter) {
+        //         DrawText(std::string(std::to_string(entity_visible_count_query.count()) + " visible entities").c_str(), 10, 50, 20, GREEN);
+        //     });
     }
 } // namespace rendering::gui

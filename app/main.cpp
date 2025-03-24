@@ -1,3 +1,5 @@
+#include <format>
+
 #include "game.h"
 
 
@@ -11,13 +13,20 @@ int main() {
 #endif
 
 
-
-#ifdef TRACY_ENABLE
-    std::printf("JOE");
-#endif
-
-    // TracyNoop;
-    Game("ECS-Survivors", screenWidth, screenHeight).run();
+    std::string titles[6] =  {
+        "baseline-no-physics",
+        "collision-relationship",
+        "collision-entity",
+        "spatial-hash-rebuilding",
+        "box2d"
+    };
+    for (int strategy = 0; strategy < 5; strategy++) {
+        for (int i = 0; i < 1; i++) {
+            auto g = Game(std::format("{}-{}",titles[strategy], i).c_str(), screenWidth, screenHeight);
+            g.set_collision_strategy(static_cast<PHYSICS_COLLISION_STRATEGY>(strategy));
+            g.run();
+        }
+    }
 
     return 0;
 }
