@@ -34,6 +34,7 @@ enum PHYSICS_COLLISION_STRATEGY {
     NONE,
     COLLISION_RELATIONSHIP,
     COLLISION_ENTITY,
+    RECORD_LIST,
     SPATIAL_HASH_REBUILDING,
     BOX2D,
 };
@@ -52,7 +53,7 @@ namespace physics {
         };
 
         inline static flecs::entity s1, s2, s3, s4, s5, s6, add_entity_to_physics, remove_entity_to_physics, s8, s9, s10
-                , s_update_position, s_update_box2d_velocity, s_box2d_step, s_position_from_box2d;
+                ,s_update_position, s_update_box2d_velocity, s_box2d_step, s_position_from_box2d, record_list_detection, record_list_resolution, record_list_cleanup;
 
 
         static void change_collision_strategy(PHYSICS_COLLISION_STRATEGY type) {
@@ -70,6 +71,7 @@ namespace physics {
             s_update_position.enable();
             s_box2d_step.disable();
             s_position_from_box2d.disable();
+            record_list_detection.disable(); record_list_resolution.disable(); record_list_cleanup.disable();
 
             //s10.disable();
             delete m_spatial_hash;
@@ -82,6 +84,11 @@ namespace physics {
                     s3.enable();
                     s4.enable();
                     s5.enable();
+                    break;
+                case RECORD_LIST:
+                    record_list_detection.enable();
+                    record_list_resolution.enable();
+                    record_list_cleanup.enable();
                     break;
                 case SPATIAL_HASH_REBUILDING:
                     m_spatial_hash = new SpatialHashRebuilding();

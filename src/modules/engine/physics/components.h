@@ -34,6 +34,10 @@ namespace physics {
         flecs::entity b;
     };
 
+    struct CollisionRecordHolder {
+        std::vector<CollisionRecord> records;
+    };
+
     struct CollisionDetectionPhaseCompleted {
         long time;
     };

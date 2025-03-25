@@ -62,6 +62,7 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_window
 
 
     m_world.set<core::GameSettings>({m_windowName, m_windowWidth, m_windowHeight});
+    m_world.set<physics::CollisionRecordHolder>({std::vector<physics::CollisionRecord>()});
 
     flecs::entity player = m_world.entity("player")
             .set<core::Position2D>({960, 540})

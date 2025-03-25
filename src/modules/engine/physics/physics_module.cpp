@@ -112,6 +112,7 @@ namespace physics {
                     other.set<core::Position2D>({otherPos + move / 2.f}); // Move the other entity
                 }).disable();
 
+
         s3 = world.system<const core::Position2D, const rendering::Circle>(
                     "Detect Collisions ECS (Naive create collision entity)")
                 .with<rendering::Visible>()
@@ -168,6 +169,66 @@ namespace physics {
                 .tick_source(m_physicsTick)
                 .run([world](flecs::iter &it) {
                     world.delete_with<CollisionRecord>();
+                }).disable();
+
+        record_list_detection = world.system<const core::Position2D, const rendering::Circle, CollisionRecordHolder>(
+                    "Detect Collisions ECS (Naive Record List)")
+                .term_at(2).singleton()
+                .with<rendering::Visible>()
+                .kind(flecs::OnValidate)
+                .tick_source(m_physicsTick)
+                .immediate()
+                .each([&, world, get_all_position_and_collider_entities](
+                flecs::entity self, const core::Position2D &pos,
+                const rendering::Circle &collider, CollisionRecordHolder &holder) {
+                        get_all_position_and_collider_entities.each(
+                            [&](flecs::entity other, const core::Position2D &other_pos,
+                                const rendering::Circle &other_collider) {
+                                if (self.id() >= other.id()) return; {
+                                    float rad = collider.radius + other_collider.radius;
+                                    if (Vector2DistanceSqr(pos.value, other_pos.value) < rad * rad) {
+                                        holder.records.push_back({self, other});
+                                    }
+                                }
+                            });
+                    }).disable();
+
+        // auto recs_query =
+        record_list_resolution = world.system<CollisionRecordHolder>("Collision Resolution ECS (Naive Record List)")
+                .kind(flecs::PostUpdate)
+                .tick_source(m_physicsTick)
+                .each([](CollisionRecordHolder &rec) {
+                    for (int i = 0; i < rec.records.size(); i++) {
+                        flecs::entity other = rec.records[i].b; // Colliding entity
+                        flecs::entity self = rec.records[i].a; // Current entity
+                        Vector2 mypos = self.get<core::Position2D>()->value;
+                        Vector2 otherPos = other.get<core::Position2D>()->value;
+                        float combinedRadius = self.get<rendering::Circle>()->radius + other.get<rendering::Circle>()->
+                                               radius;
+
+                        // Find the distance and adjust to resolve the overlap
+                        Vector2 direction = otherPos - mypos;
+                        Vector2 moveDirection = Vector2Normalize(direction);
+                        float overlap = combinedRadius - Vector2Length(direction);
+
+                        // Move the entities apart by the amount of overlap
+                        Vector2 move = moveDirection * overlap * 0.5f;
+
+                        self.set<Velocity2D>({self.get<Velocity2D>()->value - move});
+                        other.set<Velocity2D>({other.get<Velocity2D>()->value + move});
+
+                        // Resolve by adjusting positions
+                        self.set<core::Position2D>({mypos - move / 2.f}); // Move the current entity
+                        other.set<core::Position2D>({otherPos + move / 2.f}); // Move the other entity
+                        }
+                }).disable();
+
+        record_list_cleanup = world.system<CollisionRecordHolder>("Collision Cleanup ECS (Naive Record List)")
+                .term_at(0).singleton()
+                .kind(flecs::OnStore)
+                .tick_source(m_physicsTick)
+                .each([world](CollisionRecordHolder &holder) {
+                    holder.records.clear();
                 }).disable();
 
         auto get_visible_entity_positions = world.query_builder<const core::Position2D>()
