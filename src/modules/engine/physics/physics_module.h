@@ -52,7 +52,7 @@ namespace physics {
             //change_collision_strategy(BOX2D);
         };
 
-        inline static flecs::entity s1, s2, s3, s4, s5, s6, add_entity_to_physics, remove_entity_to_physics, s8, s9, s10
+        inline static flecs::entity s1, s2,relationship_cleanup, s3, s4, s5, s6, add_entity_to_physics, remove_entity_to_physics, s8, s9, s10
                 ,s_update_position, s_update_box2d_velocity, s_box2d_step, s_position_from_box2d, record_list_detection, record_list_resolution, record_list_cleanup;
 
 
@@ -60,6 +60,7 @@ namespace physics {
             collision_strategy = type;
             s1.disable();
             s2.disable();
+            relationship_cleanup.disable();
             s3.disable();
             s4.disable();
             s5.disable();
@@ -79,6 +80,7 @@ namespace physics {
                 case COLLISION_RELATIONSHIP:
                     s1.enable();
                     s2.enable();
+                    relationship_cleanup.enable();
                     break;
                 case COLLISION_ENTITY:
                     s3.enable();

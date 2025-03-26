@@ -44,46 +44,35 @@ for dir in dir_paths:
     else:
         df.plot.area(ax=ax_line,ylim=(30,200), x = "Entities", y = "FPS", logx=True, label=dir_names[dir], stacked=False)
         
-ax_bar = None
-fpsmeans = {
-    "baseline-no-physics": [],
-    "box2d": [],
-    "spatial-hash-rebuilding" : [],
-    "record-list": [],
-    "collision-entity": [],
-    "collision-relationship": []
-    
-}
+fps_values = [30, 60, 100, 200]
+fps_labels = ["30 FPS", "60 FPS", "100 FPS", "200 FPS"]
+
+fpsmeans = {fps: [] for fps in fps_values}
+
 for dir in dir_paths:
-    df = join_all_results_in_one(dir)[["Entities", "FPS"]].sort_values(by="FPS")    
-    fpsmeans[dir_names[dir]].append(np.interp(30, df['FPS'], df["Entities"]))
-    fpsmeans[dir_names[dir]].append(np.interp(60, df['FPS'], df["Entities"]))
-    fpsmeans[dir_names[dir]].append(np.interp(100, df['FPS'], df["Entities"]))
-    fpsmeans[dir_names[dir]].append(np.interp(200, df['FPS'], df["Entities"]))   
-
-fpss = [ "30 FPS", "60 FPS","100 FPS","200 FPS"]
-
-fig, ax = plt.subplots(layout='constrained', figsize=(24, 6))
-
-x = np.arange(len(fpss))
-width = 0.16
-mult = 0
-
-for att, measurement in fpsmeans.items():
-    offset = width * mult
-    rects = ax.bar(x + offset, measurement, width, label=att)
-    ax.bar_label(rects, padding = 3, fmt="%.0f")
-    mult += 1
-
-ax.set_ylabel('Entities')
-ax.set_title('Entity count at common FPS values')
-ax.set_xticks(x + width, fpss)
-ax.legend(loc='upper right')
+    df = join_all_results_in_one(dir)[["Entities", "FPS"]].sort_values(by="FPS")
+    for i, fps in enumerate(fps_values):
+        fpsmeans[fps].append(np.interp(fps, df['FPS'], df["Entities"]))
 
 
 
-plt.yscale('log')
-plt.grid(axis='y', linestyle='--', alpha=0.7)
-plt.tight_layout()
+width = 1
+x = np.arange(len(dir_names))
+
+for i, fps in enumerate(fps_values):
+    fig, ax = plt.subplots(figsize=(8, 6))
+    mult = 0
+    for j, (att, measurement) in enumerate(dir_names.items()):
+        rects = ax.bar(x[j], fpsmeans[fps][j], width, label=measurement)
+        ax.bar_label(rects, padding=3, fmt="%.0f")
     
+    ax.set_title(f'Entity count at {fps_labels[i]}')
+    ax.set_ylabel('Entities')
+    #ax.set_xticks(x, dir_names.values(), rotation=45, ha='right')
+    ax.get_xaxis().set_visible(False)
+    ax.set_yscale('log')
+    ax.grid(axis='y', linestyle='--', alpha=0.7)
+    ax.legend(loc='upper right')
+
+plt.tight_layout()
 plt.show()

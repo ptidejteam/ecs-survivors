@@ -76,8 +76,7 @@ namespace physics {
                             float rad = collider.radius + other_collider.radius;
                             if (Vector2DistanceSqr(pos.value, other_pos.value) < rad * rad) {
                                 self.add<CollidedWith>(other);
-                            } else {
-                                self.remove<CollidedWith>(other);
+                                other.add<CollidedWith>(self);
                             }
                         });
                 }).disable();
@@ -111,6 +110,18 @@ namespace physics {
                     self.set<core::Position2D>({mypos - move / 2.f}); // Move the current entity
                     other.set<core::Position2D>({otherPos + move / 2.f}); // Move the other entity
                 }).disable();
+
+        relationship_cleanup = world.system("Collision Cleanup ECS (Naive Relationship)")
+        .kind(flecs::OnStore)
+        .tick_source(m_physicsTick)
+        .with<CollidedWith>(flecs::Wildcard)
+        .each([world](flecs::iter& it, size_t i) {
+            flecs::entity self = it.entity(i);
+            flecs::entity other = it.pair(0).second();
+
+            self.remove<CollidedWith>(other);
+            other.remove<CollidedWith>(self);
+        }).disable();
 
 
         s3 = world.system<const core::Position2D, const rendering::Circle>(
