@@ -220,8 +220,8 @@ void Game::run() {
         if (time >= 1000000 && count <= 30) {
             std::cout << time << std::endl;
             std::cout << count << std::endl;
-            std::string target = std::format("results/{}/{}.png", m_windowName.substr(0, m_windowName.size() - 2), m_windowName);
-            std::string name = std::format("{}.png", m_windowName);
+            std::string target = std::format("results/{}/{}-{}.png", m_windowName, m_windowName, rep);
+            std::string name = std::format("{}-{}.png", m_windowName, rep);
             TakeScreenshot(name.c_str());
             try {
                 if (std::filesystem::exists(target))
@@ -240,14 +240,14 @@ void Game::run() {
     CloseWindow(); // Close window and OpenGL context
     try {
         //--------------------------------------------------------------------------------------
-        if (std::ofstream file(std::format("./results/{}/{}.txt", m_windowName.substr(0, m_windowName.size() - 2), m_windowName)); file.is_open()) {
+        if (std::ofstream file(std::format("results/{}/{}-{}.txt", m_windowName, m_windowName, rep)); file.is_open()) {
             for (int i = 0; i < frames; i++) {
                 file << i << "," << entities[i] << "," << frameRates[i] << "," << delta_times[i].count() << "\n";
             }
             file.close();
         } else {
             printf("Failed to open file %s\n",
-                   std::format("./results/{}/{}.txt", m_windowName.substr(0, m_windowName.size() - 2), m_windowName).c_str());
+                   std::format("results/{}/{}-{}.txt", m_windowName, m_windowName, rep).c_str());
         }
     }
     catch(std::exception& e) {

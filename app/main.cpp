@@ -21,10 +21,11 @@ int main() {
         "spatial-hash-rebuilding",
         "box2d"
     };
-    for (int i = 0; i < 1; i++) {
+    for (int i = 0; i < 30; i++) {
         for (int strategy = 0; strategy < 6; strategy++) {
-            auto g = Game(std::format("{}-{}", titles[strategy], i).c_str(), screenWidth, screenHeight);
+            auto g = Game(titles[strategy].c_str(), screenWidth, screenHeight);
             g.set_collision_strategy(static_cast<PHYSICS_COLLISION_STRATEGY>(strategy));
+            g.set_rep(i);
             g.run();
         }
     }
