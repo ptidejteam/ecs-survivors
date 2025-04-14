@@ -22,7 +22,7 @@ int main() {
         "box2d"
     };
     for (int i = 0; i < 30; i++) {
-        for (int strategy = 1; strategy < 3; strategy++) {
+        for (int strategy = 4; strategy < 5; strategy++) {
             auto g = Game(titles[strategy].c_str(), screenWidth, screenHeight);
             g.set_collision_strategy(static_cast<PHYSICS_COLLISION_STRATEGY>(strategy));
             g.set_rep(i);
