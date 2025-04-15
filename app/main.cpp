@@ -9,13 +9,6 @@ int main() {
     const int screenWidth = 1920;
     const int screenHeight = 1080;
 #endif
-
-
-
-#ifdef TRACY_ENABLE
-    std::printf("JOE");
-#endif
-
     // TracyNoop;
     Game("ECS-Survivors", screenWidth, screenHeight).run();
 

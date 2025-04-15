@@ -21,6 +21,18 @@ namespace core {
         int windowHeight;
     };
 
+    struct Damage {
+        float value;
+    };
+
+    struct Health {
+        float max;
+        float value;
+    };
+
+    struct Player{};
+    struct Enemy{};
+
 }
 
 #endif //CORE_COMPONENTS_H

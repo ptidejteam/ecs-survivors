@@ -24,23 +24,21 @@
 
 #include "modules/engine/rendering/components.h"
 #include "modules/engine/rendering/rendering_module.h"
-#include "modules/analytics/analytics_module.h"
 #include "modules/gameplay/components.h"
 #include "modules/gameplay/gameplay_module.h"
 
-Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_windowName(windowName),
-                                                                        m_windowWidth(windowWidth),
+Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(flecs::world()),
+                                                                        m_windowName(windowName),
                                                                         m_windowHeight(windowHeight),
-                                                                        m_world(flecs::world()) {
+                                                                        m_windowWidth(windowWidth) {
     // Raylib window
 #ifndef EMSCRIPTEN
-    SetConfigFlags(FLAG_WINDOW_RESIZABLE | FLAG_VSYNC_HINT);
 #endif
+    SetConfigFlags(FLAG_WINDOW_RESIZABLE);
 
     InitWindow(m_windowWidth, m_windowHeight, m_windowName.c_str());
-    SetTargetFPS(60);
 
-    m_world.set_threads(4);
+    //m_world.set_threads(4);
     m_world.import<core::CoreModule>();
     m_world.import<input::InputModule>();
     m_world.import<rendering::RenderingModule>();
@@ -48,7 +46,6 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_window
     m_world.import<player::PlayerModule>();
     m_world.import<ai::AIModule>();
     m_world.import<gameplay::GameplayModule>();
-    m_world.import<analytics::AnalyticsModule>();
 
 
 #ifndef EMSCRIPTEN
@@ -59,16 +56,32 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_window
 
 
     m_world.set<core::GameSettings>({m_windowName, m_windowWidth, m_windowHeight});
+    m_world.add<physics::CollisionRecordList>();
 
     flecs::entity player = m_world.entity("player")
-            .set<core::Position2D>({800, 400})
+            .add<core::Player>()
+            .set<core::Health>({150, 150})
+            .set<core::Damage>({5})
+            .set<core::Position2D>({GetScreenWidth() / 2.f, GetScreenHeight() / 2.f})
             .set<core::Speed>({1000})
             .set<physics::Velocity2D>({0, 0})
             .set<physics::DesiredVelocity2D>({0, 0})
             .set<physics::AccelerationSpeed>({5.0})
-            .set<rendering::Circle>({8})
-            .set<Color>({GREEN})
-            .add<rendering::Priority>(1);
+            .set<physics::Collider>({
+                16,
+                physics::CollisionFilter::player,
+                physics::player_filter
+            })
+            .add<rendering::Priority>(1)
+            .set<rendering::Renderable>({
+                LoadTexture("../resources/player.png"), // 8x8
+                {0, 0},
+                0.f,
+                2.f,
+                WHITE
+            })
+            .set<gameplay::RegenHealth>({2.5f})
+            .set<rendering::HealthBar>({0,0,50,10});
 
 
     auto hori = m_world.entity("player_horizontal_input").child_of(player).set<input::InputHorizontal>({});
@@ -85,7 +98,12 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_window
 
     m_world.entity("collision_records_container");
 
+    std::printf("creating enemy prefab");
+
     m_world.prefab("enemy")
+            .add<core::Enemy>()
+            .set<core::Health>({10, 10})
+            .set<core::Damage>({1})
             .set<core::Position2D>({800, 400})
             .set<core::Speed>({25})
             .set<physics::Velocity2D>({0, 0})
@@ -93,79 +111,24 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_window
             .set<physics::AccelerationSpeed>({5.0})
             .set<ai::Target>({"player"})
             .add<ai::FollowTarget>()
-            .set<ai::StoppingDistance>({50.0})
-            .set<rendering::Circle>({8})
-            .set<Texture2D>({LoadTexture("../resources/ghost.png")});
+            .set<ai::StoppingDistance>({8.0})
+            .set<physics::Collider>({
+                16,
+                physics::CollisionFilter::enemy,
+                physics::enemy_filter
+            })
+            .set<rendering::Renderable>({
+                LoadTexture("../resources/ghost.png"), // 8x8
+                {0, 0},
+                0.f,
+                2.f,
+                WHITE
+            });
+
 
     m_world.entity("gui_canvas").set<Rectangle>({
         0, 0, static_cast<float>(m_windowWidth), static_cast<float>(m_windowHeight)
     });
-
-    m_world.entity("panel").child_of(m_world.lookup("gui_canvas"))
-            .set<Rectangle>({0, -25, 300, 725})
-            .set<rendering::gui::Anchor>({
-                rendering::gui::HORIZONTAL_ANCHOR::LEFT, rendering::gui::VERTICAL_ANCHOR::TOP
-            })
-            .set<rendering::gui::Panel>({"A Panel"});
-
-    m_world.entity("naive_ecs_add_relationship_button").child_of(m_world.lookup("gui_canvas::panel"))
-            .set<rendering::gui::Anchor>({
-                rendering::gui::HORIZONTAL_ANCHOR::LEFT, rendering::gui::VERTICAL_ANCHOR::TOP
-            })
-            .set<Rectangle>({25, 100, 250, 100})
-            .set<rendering::gui::Button>({
-                "Enable Naive ECS Collision Systems (Relationships)",
-                m_world.system().kind(0).run([&](flecs::iter &it) {
-                    physics::PhysicsModule::change_collision_strategy(COLLISION_RELATIONSHIP);
-                })
-            });
-
-    m_world.entity("naive_ecs_add_entity_button").child_of(m_world.lookup("gui_canvas::panel"))
-            .set<rendering::gui::Anchor>({
-                rendering::gui::HORIZONTAL_ANCHOR::LEFT, rendering::gui::VERTICAL_ANCHOR::TOP
-            })
-            .set<Rectangle>({25, 225, 250, 100})
-            .set<rendering::gui::Button>({
-                "Enable Naive ECS Collision Systems (Entities)",
-                m_world.system().kind(0).run([&](flecs::iter &it) {
-                    physics::PhysicsModule::change_collision_strategy(COLLISION_ENTITY);
-                })
-            });
-
-    m_world.entity("non_ecs_accelerated_updating_button").child_of(m_world.lookup("gui_canvas::panel"))
-            .set<rendering::gui::Anchor>({
-                rendering::gui::HORIZONTAL_ANCHOR::LEFT, rendering::gui::VERTICAL_ANCHOR::TOP
-            })
-            .set<Rectangle>({25, 350, 250, 100})
-            .set<rendering::gui::Button>({
-                "Enable External Collision Systems (UPDATING)",
-                m_world.system().kind(0).run([&](flecs::iter &it) {
-                    physics::PhysicsModule::change_collision_strategy(SPATIAL_HASH_UPDATING);
-                })
-            });
-
-    m_world.entity("non_ecs_accelerated_rebuilding_button").child_of(m_world.lookup("gui_canvas::panel"))
-           .set<rendering::gui::Anchor>({
-               rendering::gui::HORIZONTAL_ANCHOR::LEFT, rendering::gui::VERTICAL_ANCHOR::TOP
-           })
-           .set<Rectangle>({25, 475, 250, 100})
-           .set<rendering::gui::Button>({
-               "Enable External Collision Systems (REBUILDING)",
-               m_world.system().kind(0).run([&](flecs::iter &it) {
-                   physics::PhysicsModule::change_collision_strategy(SPATIAL_HASH_REBUILDING);
-               })
-           });
-    m_world.entity("box2d_button").child_of(m_world.lookup("gui_canvas::panel"))
-           .set<rendering::gui::Anchor>({
-               rendering::gui::HORIZONTAL_ANCHOR::LEFT, rendering::gui::VERTICAL_ANCHOR::TOP
-           })
-           .set<Rectangle>({25, 600, 250, 100})
-           .set<rendering::gui::Button>({
-               "Enable Box2d Collisions (REBUILDING)",
-               m_world.system().kind(0).run([&](flecs::iter &it) {
-                   physics::PhysicsModule::change_collision_strategy(BOX2D);
-               })
-           });
 
     m_world.entity("event_bus").add<EventBus>();
 

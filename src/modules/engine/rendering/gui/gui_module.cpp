@@ -23,7 +23,7 @@ namespace rendering::gui {
 
     void GUIModule::register_systems(flecs::world &world) {
         world.system().kind(flecs::OnStart).run([](flecs::iter &iter) {
-            GuiLoadStyle("../resources/styles/amber/style_amber.rgs");
+            GuiLoadStyle("../resources/styles/style_amber.rgs");
         });
 
         world.system<core::GameSettings>("On start set move gui elements to match anchors")
@@ -34,7 +34,6 @@ namespace rendering::gui {
                     });
                     settings.windowHeight = GetScreenHeight();
                     settings.windowWidth = GetScreenWidth();
-                    world.event<core::WindowResizedEvent>().id<EventBus>().entity(world.lookup("event_bus")).emit();
                 });
 
         world.system<const Rectangle, Anchor>("on start, set anchored position")
@@ -89,7 +88,6 @@ namespace rendering::gui {
                         });
                         settings.windowHeight = GetScreenHeight();
                         settings.windowWidth = GetScreenWidth();
-                        world.event<core::WindowResizedEvent>().id<EventBus>().entity(world.lookup("event_bus")).emit();
                     }
                 });
 
@@ -121,19 +119,21 @@ namespace rendering::gui {
                     GuiDrawRectangle(rect, outline.border_size, outline.border_color, outline.fill_color);
                 });
 
+
+
         world.system("Draw FPS")
             .kind<RenderGUI>()
             .run([](flecs::iter &iter) {
                 DrawFPS(10, 10);
             });
 
-        auto entity_count_query = world.query_builder<Circle>().build();
+        auto entity_count_query = world.query_builder<Renderable>().build();
         world.system("Draw Entity Count")
             .kind<RenderGUI>()
             .run([entity_count_query](flecs::iter &iter) {
                 DrawText(std::string(std::to_string(entity_count_query.count()) + " entities").c_str(), 10, 30, 20, GREEN);
             });
-        auto entity_visible_count_query = world.query_builder<Circle>().with<Visible>().build();
+        auto entity_visible_count_query = world.query_builder<Renderable>().with<Visible>().build();
         world.system("Draw Visible Entity Count")
             .kind<RenderGUI>()
             .run([entity_visible_count_query](flecs::iter &iter) {

@@ -5,9 +5,16 @@
 #ifndef PHYSICS_COMPONENTS_H
 #define PHYSICS_COMPONENTS_H
 #include <raylib.h>
-#include <box2d/id.h>
+#include <unordered_set>
 
 namespace physics {
+    enum CollisionFilter {
+        none = 0x00,
+        player = 0x01,
+        enemy = 0x02,
+        more = 0x04,
+    };
+
     struct Velocity2D {
       Vector2 value;
     };
@@ -20,11 +27,12 @@ namespace physics {
 
     struct Collider {
         float radius;
+        CollisionFilter collision_type;
+        CollisionFilter collision_filter;
     };
 
-    struct Box2DID {
-        b2BodyId bodyId;
-        b2ShapeId shapeId;
+    struct OnCollisionDetected {
+        flecs::entity other;
     };
 
     struct CollidedWith {};
@@ -34,23 +42,8 @@ namespace physics {
         flecs::entity b;
     };
 
-    struct CollisionDetectionPhaseCompleted {
-        long time;
-    };
-
-    struct CollisionResolutionPhaseCompleted {
-        long time;
-    };
-
-    struct ContainedBy {};
-    struct Contains {};
-    struct Cell {
-        int x;
-        int y;
-    };
-
-    struct CellHash {
-        std::pair<int, int> cell;
+    struct CollisionRecordList {
+        std::vector<CollisionRecord> records;
     };
 }
 

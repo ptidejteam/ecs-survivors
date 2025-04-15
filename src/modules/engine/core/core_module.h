@@ -19,8 +19,6 @@ namespace core {
         void register_components(flecs::world &world);
         void register_systems(flecs::world &world);
     };
-
-    struct WindowResizedEvent { int width, height; };
 }
 
 #endif //CORE_MODULE_H

@@ -13,13 +13,14 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 if (EMSCRIPTEN)
     set(CMAKE_EXE_LINKER_FLAGS  "\
         ${CMAKE_EXE_LINKER_FLAGS} \
+        --embed-file resources \
         -s USE_GLFW=3 \
         -s ASSERTIONS=1 \
         -s WASM=1 \
         -s ASYNCIFY \
         -s GL_ENABLE_GET_PROC_ADDRESS=1 \
         -s ALLOW_MEMORY_GROWTH=1 \
-        -s STACK_SIZE=131072 \
+        -s STACK_SIZE=67108864 \
         -s EXPORTED_RUNTIME_METHODS=cwrap")
     set(CMAKE_EXECUTABLE_SUFFIX ".html") # This line is used to set your executable to build with the emscripten html template so taht you can directly open it.
 endif ()
@@ -63,13 +64,11 @@ link_directories("./libs")
 # Our Project
 add_subdirectory("src")
 add_subdirectory("include")
-add_subdirectory("resources")
 add_subdirectory("app")
 
 
 target_link_libraries(${LIBRARY_NAME} PUBLIC
         raylib
         flecs::flecs_static
-        box2d
 )
 

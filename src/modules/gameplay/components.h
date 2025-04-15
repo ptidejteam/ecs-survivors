@@ -13,5 +13,13 @@ namespace gameplay {
         std::string enemy_prefab_name;
     };
 
+    struct TakeDamage {
+        float damage;
+    };
+
+    struct RegenHealth {
+        float rate; // per second
+    };
+
 }
 #endif //GAMEPLAY_COMPONENTS_H

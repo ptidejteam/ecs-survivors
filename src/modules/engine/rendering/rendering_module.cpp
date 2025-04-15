@@ -11,7 +11,6 @@
 #include "gui/gui_module.h"
 #include <raymath.h>
 
-using namespace rendering::gui;
 
 void rendering::RenderingModule::register_components(flecs::world world) {
     world.component<Circle>();
@@ -26,12 +25,16 @@ void rendering::RenderingModule::register_systems(flecs::world world) {
                 ClearBackground(GetColor(GuiGetStyle(DEFAULT, BACKGROUND_COLOR)));
             });
 
-    world.system<const core::Position2D, const Circle>("Determine Visible Entities")
+    world.system<const core::Position2D, const Renderable, const core::GameSettings>("Determine Visible Entities")
+            .term_at(2).singleton()
             .write<Visible>()
             .kind<PreRender>()
-            .each([&](flecs::entity e, const core::Position2D &pos, const Circle &circle) {
-                if (pos.value.x > GetScreenWidth() + circle.radius || pos.value.x < -circle.radius ||
-                    pos.value.y > GetScreenHeight() + circle.radius || pos.value.y < -circle.radius) {
+            .each([&](flecs::entity e, const core::Position2D &pos, const Renderable &renderable,
+                      const core::GameSettings &settings) {
+                if (pos.value.x > settings.windowWidth + renderable.texture.width || pos.value.x < -renderable.texture.
+                    width ||
+                    pos.value.y > settings.windowHeight + renderable.texture.height || pos.value.y < -renderable.texture
+                    .height) {
                     e.remove<Visible>();
                 } else if (!e.has<Visible>()) {
                     e.add<Visible>();
@@ -39,20 +42,41 @@ void rendering::RenderingModule::register_systems(flecs::world world) {
             });
 
 
-    world.system<const Texture2D, const core::Position2D>("Draw Entities with Textures")
+    world.system<const Renderable, const core::Position2D>("Draw Entities with Textures")
             .kind<Render>()
             .with<Visible>()
             .group_by<Priority>()
-            .each([](const Texture2D &texture, const core::Position2D &position) {
-                DrawTextureEx(texture, Vector2Subtract(position.value, Vector2{8, 8} / 2 * 2), 0, 1.f, WHITE);
+            .each([](const Renderable &renderable, const core::Position2D &position) {
+                DrawTextureEx(
+                    renderable.texture,
+                    position.value - Vector2(renderable.texture.width, renderable.texture.height) - renderable.draw_offset * renderable.scale,
+                    renderable.rotation,
+                    renderable.scale,
+                    renderable.tint
+                );
             });
 
-    world.system<const Circle, const core::Position2D, const Color>("Draw Entities")
+    // world.system<const Circle, const core::Position2D, const Color>("Draw Entities")
+    //         .kind<Render>()
+    //         .with<Visible>()
+    //         .group_by<Priority>()
+    //         .each([](const Circle &circle, const core::Position2D &position, const Color &color) {
+    //             DrawCircle(position.value.x, position.value.y, circle.radius, color);
+    //         });
+
+    world.system<const HealthBar, core::Health, const core::Position2D, const Renderable>("show healthbar")
             .kind<Render>()
-            .with<Visible>()
-            .group_by<Priority>()
-            .each([](const Circle &circle, const core::Position2D &position, const Color &color) {
-                DrawCircle(position.value.x, position.value.y, circle.radius, color);
+            .each([](flecs::entity e, const HealthBar bar, core::Health &health, const core::Position2D &pos,
+                     const Renderable &renderable) {
+                if (health.max - health.value <= 0.05f) return;
+                GuiProgressBar(
+                    {
+                        pos.value.x - bar.rectangle.width / 2.f,
+                        pos.value.y - bar.rectangle.height - renderable.texture.height,
+                        bar.rectangle.width,
+                        bar.rectangle.height
+                    }, "", "", &health.value, 0,
+                    health.max);
             });
 
     world.system("After Draw")
@@ -70,5 +94,5 @@ void rendering::RenderingModule::register_pipeline(flecs::world world) {
 }
 
 void rendering::RenderingModule::register_submodules(flecs::world world) {
-    world.import<GUIModule>();
+    world.import<gui::GUIModule>();
 }
