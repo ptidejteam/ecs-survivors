@@ -4,17 +4,14 @@
 
 #include "physics_module.h"
 
-#include <chrono>
 #include <raygui.h>
+#include <raymath.h>
 
 #include "components.h"
 #include "modules/engine/core/components.h"
-#include <raymath.h>
 
-#include "game.h"
 #include "modules/engine/core/core_module.h"
 #include "modules/engine/rendering/components.h"
-#include "modules/engine/rendering/gui/components.h"
 
 namespace physics {
     void PhysicsModule::register_components(flecs::world &world) {

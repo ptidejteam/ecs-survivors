@@ -32,11 +32,10 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
                                                                         m_windowHeight(windowHeight),
                                                                         m_windowWidth(windowWidth) {
     // Raylib window
-#ifndef EMSCRIPTEN
-#endif
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
 
     InitWindow(m_windowWidth, m_windowHeight, m_windowName.c_str());
+    SetTargetFPS(GetMonitorRefreshRate(0));
 
     //m_world.set_threads(4);
     m_world.import<core::CoreModule>();
@@ -129,8 +128,6 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
     m_world.entity("gui_canvas").set<Rectangle>({
         0, 0, static_cast<float>(m_windowWidth), static_cast<float>(m_windowHeight)
     });
-
-    m_world.entity("event_bus").add<EventBus>();
 
     m_world.entity("enemy_spawner")
             .set<gameplay::Spawner>({"enemy"});

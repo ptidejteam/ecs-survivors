@@ -26,6 +26,7 @@ namespace player {
                          physics::DesiredVelocity2D &desired_vel) {
                     desired_vel.value.x = horizontal.value;
                 });
+        
         world.system<const input::InputVertical, physics::DesiredVelocity2D>()
                 .term_at(1).parent().cascade()
                 .each([](const input::InputVertical &vertical,

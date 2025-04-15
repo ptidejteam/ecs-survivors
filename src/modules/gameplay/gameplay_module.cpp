@@ -17,7 +17,6 @@ namespace gameplay {
     }
 
     bool outside_side_switch = false;
-    int count = 0;
 
     void GameplayModule::register_systems(flecs::world world) {
         world.system<const Spawner, const core::GameSettings>("Spawn Enemies")
@@ -42,7 +41,6 @@ namespace gameplay {
                             .set<core::Position2D>({randX, randY});
 
                     outside_side_switch = !outside_side_switch;
-                    count++;
                 });
 
         world.system<core::Damage>("collision detected, deal damage to target")
@@ -66,32 +64,5 @@ namespace gameplay {
                 .each([](flecs::iter &it, size_t i, core::Health &health, RegenHealth &regen) {
                     health.value = std::min(health.value + regen.rate * it.delta_time(), health.max);
                 });
-
-        // world.system<const Spawner, const core::GameSettings>("delete enemies")
-        //         .tick_source(m_spawner_tick)
-        //         .term_at(1).singleton()
-        //         .each([&,world](flecs::entity self, const Spawner &spawner, const core::GameSettings &settings) {
-        //             const flecs::entity e = world.lookup(spawner.enemy_prefab_name.c_str());
-        //             if (count > 20000) return;
-        //
-        //             if (0 == e) return;
-        //
-        //             for (int i = 0; i < 3; i++) {
-        //                 float factor = rand() % 2 - 1;
-        //                 float neg = rand() % 1 - 1;
-        //                 float randX = outside_side_switch
-        //                                   ? neg * factor * settings.windowWidth
-        //                                   : rand() % settings.windowWidth;
-        //                 float randY = outside_side_switch
-        //                                   ? rand() % settings.windowHeight
-        //                                   : neg * factor * settings.windowHeight;
-        //
-        //                 world.entity().is_a(e).child_of(self)
-        //                         .set<core::Position2D>({randX, randY});
-        //
-        //                 outside_side_switch = !outside_side_switch;
-        //                 count++;
-        //             }
-        //         });
     }
 }
