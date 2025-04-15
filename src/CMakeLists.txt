@@ -1,7 +1,8 @@
 set(LIBRARY_SOURCES
         "game.cpp")
 set(LIBRARY_HEADERS
-        "game.h")
+        "game.h"
+)
 set(LIBRARY_INCLUDES
         "./")
 

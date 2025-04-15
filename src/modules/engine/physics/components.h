@@ -5,8 +5,16 @@
 #ifndef PHYSICS_COMPONENTS_H
 #define PHYSICS_COMPONENTS_H
 #include <raylib.h>
+#include <unordered_set>
 
 namespace physics {
+    enum CollisionFilter {
+        none = 0x00,
+        player = 0x01,
+        enemy = 0x02,
+        more = 0x04,
+    };
+
     struct Velocity2D {
       Vector2 value;
     };
@@ -15,6 +23,27 @@ namespace physics {
     };
     struct AccelerationSpeed {
         float value;
+    };
+
+    struct Collider {
+        float radius;
+        CollisionFilter collision_type;
+        CollisionFilter collision_filter;
+    };
+
+    struct OnCollisionDetected {
+        flecs::entity other;
+    };
+
+    struct CollidedWith {};
+
+    struct CollisionRecord {
+        flecs::entity a;
+        flecs::entity b;
+    };
+
+    struct CollisionRecordList {
+        std::vector<CollisionRecord> records;
     };
 }
 

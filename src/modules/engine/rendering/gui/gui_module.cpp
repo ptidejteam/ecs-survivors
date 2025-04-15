@@ -6,13 +6,14 @@
 
 #include "components.h"
 #define RAYGUI_IMPLEMENTATION
+#include <raygui.h>
 #include <modules/engine/rendering/pipeline_steps.h>
-#include <stack>
-#include <unordered_set>
 
-#include "raygui.h"
+#include "game.h"
+#include "raylib.h"
 #include "modules/engine/core/core_module.h"
-#define RAYGUI_IMPLEMENTATION
+#include "modules/engine/rendering/components.h"
+
 namespace rendering::gui {
     void GUIModule::register_components(flecs::world &world) {
         world.component<Button>();
@@ -22,15 +23,17 @@ namespace rendering::gui {
 
     void GUIModule::register_systems(flecs::world &world) {
         world.system().kind(flecs::OnStart).run([](flecs::iter &iter) {
-            GuiLoadStyle("../resources/styles/amber/style_amber.rgs");
+            GuiLoadStyle("../resources/styles/style_amber.rgs");
         });
 
-        world.system("On start set move gui elements to match anchors")
+        world.system<core::GameSettings>("On start set move gui elements to match anchors")
                 .kind(flecs::OnStart)
-                .run([world](flecs::iter &iter) {
+                .each([world](core::GameSettings &settings) {
                     world.lookup("gui_canvas").set<Rectangle>({
                         0, 0, static_cast<float>(GetScreenWidth()), static_cast<float>(GetScreenHeight())
                     });
+                    settings.windowHeight = GetScreenHeight();
+                    settings.windowWidth = GetScreenWidth();
                 });
 
         world.system<const Rectangle, Anchor>("on start, set anchored position")
@@ -52,10 +55,10 @@ namespace rendering::gui {
 
                     Rectangle temp{*e.get<Rectangle>()};
                     switch (anchor->horizontal_anchor) {
-                        case HORIZONTAL_ANCHOR::CENTER:
+                        case CENTER:
                             temp.x = anchor->position.x + parent.x + parent.width / 2;
                             break;
-                        case HORIZONTAL_ANCHOR::RIGHT:
+                        case RIGHT:
                             temp.x = anchor->position.x + parent.x + parent.width;
                             break;
                         default:
@@ -63,10 +66,10 @@ namespace rendering::gui {
                             break;
                     }
                     switch (anchor->vertical_anchor) {
-                        case VERTICAL_ANCHOR::MIDDLE:
+                        case MIDDLE:
                             temp.y = anchor->position.y + parent.y + parent.height / 2;
                             break;
-                        case VERTICAL_ANCHOR::BOTTOM:
+                        case BOTTOM:
                             temp.y = anchor->position.y + parent.y + parent.height;
                             break;
                         default:
@@ -76,21 +79,15 @@ namespace rendering::gui {
                     e.set<Rectangle>({temp});
                 });
 
-        world.system("Window Resized")
+        world.system<core::GameSettings>("Window Resized")
                 .kind<PreRender>()
-                .run([world](flecs::iter &iter) {
+                .each([world](core::GameSettings& settings) {
                     if (IsWindowResized()) {
                         world.lookup("gui_canvas").set<Rectangle>({
                             0, 0, static_cast<float>(GetScreenWidth()), static_cast<float>(GetScreenHeight())
                         });
-                    }
-                });
-
-        world.system<const Button, const Rectangle>("Draw Button")
-                .kind<RenderGUI>()
-                .each([](const Button &button, const Rectangle &rect) {
-                    if (GuiButton(rect, button.text.c_str())) {
-                        button.on_click_system.run();
+                        settings.windowHeight = GetScreenHeight();
+                        settings.windowWidth = GetScreenWidth();
                     }
                 });
 
@@ -98,6 +95,16 @@ namespace rendering::gui {
                 .kind<RenderGUI>()
                 .each([](const Panel &panel, const Rectangle &rect) {
                     GuiPanel(rect, panel.name.c_str());
+                });
+
+        world.system<const Button, const Rectangle>("Draw Button")
+                .kind<RenderGUI>()
+                .each([](const Button &button, const Rectangle &rect) {
+                    GuiSetStyle(BUTTON, TEXT_WRAP_MODE, TEXT_WRAP_WORD);
+                     if (GuiButton(rect, button.text.c_str())) {
+                         button.on_click_system.run();
+                     }
+                    GuiSetStyle(BUTTON, TEXT_WRAP_MODE, DEFAULT);
                 });
 
         world.system<const Text, const Rectangle>("Draw Text")
@@ -112,10 +119,25 @@ namespace rendering::gui {
                     GuiDrawRectangle(rect, outline.border_size, outline.border_color, outline.fill_color);
                 });
 
+
+
         world.system("Draw FPS")
             .kind<RenderGUI>()
             .run([](flecs::iter &iter) {
                 DrawFPS(10, 10);
+            });
+
+        auto entity_count_query = world.query_builder<Renderable>().build();
+        world.system("Draw Entity Count")
+            .kind<RenderGUI>()
+            .run([entity_count_query](flecs::iter &iter) {
+                DrawText(std::string(std::to_string(entity_count_query.count()) + " entities").c_str(), 10, 30, 20, GREEN);
+            });
+        auto entity_visible_count_query = world.query_builder<Renderable>().with<Visible>().build();
+        world.system("Draw Visible Entity Count")
+            .kind<RenderGUI>()
+            .run([entity_visible_count_query](flecs::iter &iter) {
+                DrawText(std::string(std::to_string(entity_visible_count_query.count()) + " visible entities").c_str(), 10, 50, 20, GREEN);
             });
     }
 } // namespace rendering::gui
