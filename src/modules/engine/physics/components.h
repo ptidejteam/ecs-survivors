@@ -36,6 +36,7 @@ namespace physics {
     };
 
     struct CollidedWith {};
+    struct Test{};
 
     struct CollisionRecord {
         flecs::entity a;

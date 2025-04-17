@@ -17,6 +17,7 @@ namespace physics {
     void PhysicsModule::register_components(flecs::world &world) {
         world.component<Velocity2D>();
         world.component<AccelerationSpeed>();
+        world.component<CollidedWith>();
         m_physicsTick = world.timer().interval(PHYSICS_TICK_LENGTH);
     }
 
@@ -61,28 +62,31 @@ namespace physics {
                 .term_at(0).singleton()
                 .kind(flecs::OnValidate)
                 .tick_source(m_physicsTick)
-                .each([&, get_all_position_and_collider_entities](
-                CollisionRecordList &holder) {
-                        get_all_position_and_collider_entities.each(
-                            [&](flecs::entity self, const core::Position2D &pos,
-                                const Collider &collider) {
-                                get_all_position_and_collider_entities.each(
-                                    [&](flecs::entity other, const core::Position2D &other_pos,
-                                        const Collider &other_collider) {
-                                        if (self.id() >= other.id()) return;
-                                        if ((collider.collision_filter & other_collider.collision_type) == none) return;
+                .immediate()
+                .each([&, get_all_position_and_collider_entities](CollisionRecordList &holder) {
+                    get_all_position_and_collider_entities.each(
+                        [&](flecs::iter &self_it, size_t self_id,
+                            const core::Position2D &pos,
+                            const Collider &collider) {
+                            get_all_position_and_collider_entities.each(
+                                [&](flecs::iter &other_it, size_t other_id, const core::Position2D &other_pos,
+                                    const Collider &other_collider) {
+                                    if (self_id > other_id) return;
+                                    if ((collider.collision_filter & other_collider.collision_type) == none) return;
 
-                                        float rad = collider.radius + other_collider.radius;
-                                        if (Vector2DistanceSqr(pos.value, other_pos.value) < rad * rad) {
-                                            holder.records.push_back({self, other});
-                                            if (collider.collision_type != other_collider.collision_type) {
-                                                self.add<CollidedWith>(other);
-                                                other.add<CollidedWith>(self);
-                                            }
+                                    float rad = collider.radius + other_collider.radius;
+                                    if (Vector2DistanceSqr(pos.value, other_pos.value) < rad * rad) {
+                                        flecs::entity self = self_it.entity(self_id);
+                                        flecs::entity other = other_it.entity(other_id);
+                                        holder.records.push_back({self, other});
+                                        if ((collider.collision_type & other_collider.collision_type) == none) {
+                                            self.add<CollidedWith>(other);
+                                            other.add<CollidedWith>(self);
                                         }
-                                    });
-                            });
-                    });
+                                    }
+                                });
+                        });
+                });
 
         world.system<CollisionRecordList>("Collision Resolution ECS (Naive Record List)")
                 .kind(flecs::PostUpdate)
@@ -125,6 +129,7 @@ namespace physics {
                 .kind(flecs::OnStore)
                 .tick_source(m_physicsTick)
                 .with<CollidedWith>(flecs::Wildcard)
+                .immediate()
                 .each([](flecs::iter &it, size_t i) {
                     flecs::entity self = it.entity(i);
                     flecs::entity other = it.pair(0).second();

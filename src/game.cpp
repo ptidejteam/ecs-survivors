@@ -35,7 +35,7 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
 
     InitWindow(m_windowWidth, m_windowHeight, m_windowName.c_str());
-    SetTargetFPS(GetMonitorRefreshRate(0));
+    // SetTargetFPS(GetMonitorRefreshRate(0));
 
     //m_world.set_threads(4);
     m_world.import<core::CoreModule>();
@@ -60,7 +60,7 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
     flecs::entity player = m_world.entity("player")
             .add<core::Player>()
             .set<core::Health>({150, 150})
-            .set<core::Damage>({5})
+            .set<core::Damage>({1})
             .set<core::Position2D>({GetScreenWidth() / 2.f, GetScreenHeight() / 2.f})
             .set<core::Speed>({1000})
             .set<physics::Velocity2D>({0, 0})
@@ -79,7 +79,7 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
                 2.f,
                 WHITE
             })
-            .set<gameplay::RegenHealth>({2.5f})
+            .set<gameplay::RegenHealth>({250.0f})
             .set<rendering::HealthBar>({0,0,50,10});
 
 
@@ -122,7 +122,8 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
                 0.f,
                 2.f,
                 WHITE
-            });
+            })
+            .set<rendering::HealthBar>({0,0,50,10});
 
 
     m_world.entity("gui_canvas").set<Rectangle>({

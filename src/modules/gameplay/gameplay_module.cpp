@@ -17,6 +17,7 @@ namespace gameplay {
     }
 
     bool outside_side_switch = false;
+    int count = 0;
 
     void GameplayModule::register_systems(flecs::world world) {
         world.system<const Spawner, const core::GameSettings>("Spawn Enemies")
@@ -24,7 +25,7 @@ namespace gameplay {
                 .term_at(1).singleton()
                 .each([&,world](flecs::entity self, const Spawner &spawner, const core::GameSettings &settings) {
                     const flecs::entity e = world.lookup(spawner.enemy_prefab_name.c_str());
-                    // if (count > 20000) return;
+                    if (world.query<physics::Collider>().count() > 2000) return;
 
                     if (0 == e) return;
 
@@ -41,18 +42,21 @@ namespace gameplay {
                             .set<core::Position2D>({randX, randY});
 
                     outside_side_switch = !outside_side_switch;
+                    count ++;
                 });
 
         world.system<core::Damage>("collision detected, deal damage to target")
                 .with<physics::CollidedWith>(flecs::Wildcard)
                 .write<TakeDamage>()
+                .kind(flecs::PostUpdate)
                 .each([](flecs::iter &it, size_t i, core::Damage &dmg) {
                     flecs::entity other = it.pair(1).second();
-                    if (other.has<TakeDamage>()) return;
+                    if (other.has<TakeDamage>() && !other.has<core::Health>()) return;
                     other.set<TakeDamage>({dmg.value});
                 });
 
         world.system<core::Health, TakeDamage>("take damage")
+                .kind(flecs::PostUpdate)
                 .each([](flecs::entity e, core::Health &health, TakeDamage &dmg) {
                     health.value -= dmg.damage;
                     if (health.value <= 0)
@@ -61,6 +65,7 @@ namespace gameplay {
                 });
 
         world.system<core::Health, RegenHealth>("regen health")
+                .kind(flecs::PostUpdate)
                 .each([](flecs::iter &it, size_t i, core::Health &health, RegenHealth &regen) {
                     health.value = std::min(health.value + regen.rate * it.delta_time(), health.max);
                 });
