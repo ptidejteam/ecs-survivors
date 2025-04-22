@@ -18,9 +18,22 @@ namespace gameplay {
 
         flecs::entity m_spawner_tick;
 
+        flecs::system add_pierce;
+        flecs::system remove_pierce;
+        flecs::system add_chain;
+        flecs::system remove_chain;
+        flecs::system add_split;
+        flecs::system remove_split;
+        flecs::system add_pierce_amt;
+        flecs::system remove_pierce_amt;
+        flecs::system add_chain_amt;
+        flecs::system remove_chain_amt;
+
         void register_components(flecs::world);
 
         void register_systems(flecs::world);
+
+        void register_entities(flecs::world);
 
         friend class BaseModule<GameplayModule>;
     };

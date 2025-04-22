@@ -16,9 +16,12 @@ namespace rendering {
     struct Renderable {
         Texture2D texture;
         Vector2 draw_offset;
-        float rotation;
         float scale;
         Color tint;
+    };
+
+    struct Rotation {
+        float angle;
     };
 
     struct HealthBar {

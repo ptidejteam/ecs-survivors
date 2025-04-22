@@ -23,6 +23,7 @@ namespace rendering::gui {
 
     void GUIModule::register_systems(flecs::world &world) {
         world.system().kind(flecs::OnStart).run([](flecs::iter &iter) {
+            std::cout << "Loading Style" << std::endl;
             GuiLoadStyle("../resources/styles/style_amber.rgs");
         });
 
@@ -81,13 +82,17 @@ namespace rendering::gui {
 
         world.system<core::GameSettings>("Window Resized")
                 .kind<PreRender>()
-                .each([world](core::GameSettings& settings) {
+                .each([world](core::GameSettings &settings) {
                     if (IsWindowResized()) {
                         world.lookup("gui_canvas").set<Rectangle>({
                             0, 0, static_cast<float>(GetScreenWidth()), static_cast<float>(GetScreenHeight())
                         });
                         settings.windowHeight = GetScreenHeight();
                         settings.windowWidth = GetScreenWidth();
+#ifdef EMSCRIPTEN
+                        SetMouseScale(settings.windowWidth / (float) settings.initialWidth,
+                                      settings.windowHeight / (float) settings.initialHeight);
+#endif
                     }
                 });
 
@@ -101,9 +106,9 @@ namespace rendering::gui {
                 .kind<RenderGUI>()
                 .each([](const Button &button, const Rectangle &rect) {
                     GuiSetStyle(BUTTON, TEXT_WRAP_MODE, TEXT_WRAP_WORD);
-                     if (GuiButton(rect, button.text.c_str())) {
-                         button.on_click_system.run();
-                     }
+                    if (GuiButton(rect, button.text.c_str())) {
+                        button.on_click_system.run();
+                    }
                     GuiSetStyle(BUTTON, TEXT_WRAP_MODE, DEFAULT);
                 });
 
@@ -119,25 +124,59 @@ namespace rendering::gui {
                     GuiDrawRectangle(rect, outline.border_size, outline.border_color, outline.fill_color);
                 });
 
+        world.system<MenuBar>("Draw Menu Bar")
+                .kind<RenderGUI>()
+                .each([](MenuBar &bar) {
+                    GuiDrawRectangle(
+                        {0, 0, (float) GetScreenWidth(), (float) 25},
+                        bar.border_size,
+                        GetColor(GuiGetStyle(DEFAULT, BORDER_COLOR_NORMAL)),
+                        GetColor(GuiGetStyle(DEFAULT, BACKGROUND_COLOR)));
+                });
 
+        world.system<MenuBarTab, MenuBar>("Draw Tabs")
+                .term_at(1).parent()
+                .kind<RenderGUI>()
+                .each([](flecs::iter &it, size_t i, MenuBarTab &tab, MenuBar &bar) {
+                    //std::cout << i << std::endl;
+                    Rectangle rec = {
+                        GetScreenWidth() - (float) (i + 1) * bar.item_width, 0, (float) bar.item_width, (float) 25
+                    };
 
-        world.system("Draw FPS")
-            .kind<RenderGUI>()
-            .run([](flecs::iter &iter) {
-                DrawFPS(10, 10);
-            });
+                    if (GuiButton(rec, tab.name.c_str())) {
+                        tab.active = !tab.active;
+                        it.entity(i).set<Rectangle>(rec);
+                    }
+                });
 
-        auto entity_count_query = world.query_builder<Renderable>().build();
-        world.system("Draw Entity Count")
-            .kind<RenderGUI>()
-            .run([entity_count_query](flecs::iter &iter) {
-                DrawText(std::string(std::to_string(entity_count_query.count()) + " entities").c_str(), 10, 30, 20, GREEN);
-            });
-        auto entity_visible_count_query = world.query_builder<Renderable>().with<Visible>().build();
-        world.system("Draw Visible Entity Count")
-            .kind<RenderGUI>()
-            .run([entity_visible_count_query](flecs::iter &iter) {
-                DrawText(std::string(std::to_string(entity_visible_count_query.count()) + " visible entities").c_str(), 10, 50, 20, GREEN);
-            });
+        world.system<MenuBarTabItem, MenuBarTab, Rectangle>("Draw Tab Items")
+                .term_at(1).parent()
+                .term_at(2).parent()
+                .kind<RenderGUI>()
+                .each([](flecs::iter &it, size_t i, MenuBarTabItem &item, MenuBarTab &tab, Rectangle &rec) {
+                    //std::cout << i << std::endl;
+                    if (!tab.active) return;
+                    if (GuiButton({rec.x, rec.y + (i + 1) * rec.height, rec.width, rec.height}, item.name.c_str())) {
+                        // tab.active = !tab.active;
+                        if(item.type == TOGGLE) {
+                            if (item.toggle_system_entity.enabled())
+                                item.toggle_system_entity.disable();
+                            else
+                                item.toggle_system_entity.enable();
+                        } else if (item.type == RUN) {
+                            item.toggle_system_entity.run();
+                        }
+                    }
+                });
+    }
+
+    void GUIModule::register_entities(flecs::world &world) {
+        menu_bar = world.entity("menu_bar")
+                .set<MenuBar>({
+                    200,
+                    1,
+                    GetColor(GuiGetStyle(DEFAULT, LINE_COLOR)),
+                    GetColor(GuiGetStyle(BUTTON, BACKGROUND_COLOR)),
+                });
     }
 } // namespace rendering::gui

@@ -24,6 +24,7 @@ public:
         static_cast<T *>(this)->register_pipeline(world);
         static_cast<T *>(this)->register_systems(world);
         static_cast<T *>(this)->register_submodules(world);
+        static_cast<T *>(this)->register_entities(world);
     }
 
     ~BaseModule() = default;
@@ -51,6 +52,10 @@ private:
 
     void register_submodules(flecs::world &world) {
         std::cout << "No sub module registration implemented" << std::endl;
+    }
+
+    void register_entities(flecs::world &world) {
+        std::cout << "No entity registration implemented" << std::endl;
     }
 };
 

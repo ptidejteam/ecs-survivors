@@ -25,8 +25,22 @@ namespace core {
     void CoreModule::register_systems(flecs::world &world) {
         std::cout << "Registering core systems" << std::endl;
 
+        world.system<DestroyAfterTime>("Destroy entities after time")
+            .kind(flecs::PostFrame)
+            .write<DestroyAfterFrame>()
+            .each([](flecs::iter& it, size_t i, DestroyAfterTime& time) {
+                time.time -= it.delta_time();
+                if(time.time <= 0.0f) it.entity(i).add<DestroyAfterFrame>();
+            });
+
+        world.system<DestroyAfterFrame>("Destroy entities after frame")
+           .kind(flecs::PostFrame)
+           .each([](flecs::iter& it, size_t i, DestroyAfterFrame f) {
+                it.entity(i).destruct();
+           });
+
         world.system("Remove empty tables to avoid fragmentation in collision (CHANGE TO DONTFRAGMENT WHEN FEATURE IS OUT)")
-            .interval(5.0f)
+            .interval(0.25f)
             .kind(flecs::PostFrame)
             .run([world](flecs::iter& it) {
                 ecs_delete_empty_tables_desc_t desc;

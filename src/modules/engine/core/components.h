@@ -17,6 +17,8 @@ namespace core {
 
     struct GameSettings {
         std::string windowName;
+        int initialWidth;
+        int initialHeight;
         int windowWidth;
         int windowHeight;
     };
@@ -30,8 +32,20 @@ namespace core {
         float value;
     };
 
-    struct Player{};
-    struct Enemy{};
+    struct Attack {
+        std::string attack_prefab_name;
+        std::string target_tag;
+    };
+
+    struct Tag {
+        std::string name;
+    };
+
+    struct DestroyAfterTime {
+        float time;
+    };
+
+    struct DestroyAfterFrame {};
 
 }
 

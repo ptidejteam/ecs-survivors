@@ -10,9 +10,6 @@
 #include "modules/engine/core/components.h"
 
 namespace rendering::gui {
-
-
-
     struct Button {
         std::string text;
         // not sure this is the best thing to store
@@ -24,14 +21,37 @@ namespace rendering::gui {
         int alignment;
     };
 
-	struct Outline {
-		int border_size;
-		Color border_color;
-		Color fill_color;
-	};
+    struct Outline {
+        int border_size;
+        Color border_color;
+        Color fill_color;
+    };
 
     struct Panel {
         std::string name;
+    };
+
+    struct MenuBar {
+        int item_width;
+        int border_size;
+        Color border_color;
+        Color fill_color;
+    };
+
+    struct MenuBarTab {
+        std::string name;
+        int item_spacing;
+        bool active = false;
+    };
+
+    enum MenuBarTabItemType {
+        TOGGLE,
+        RUN
+    };
+    struct MenuBarTabItem {
+        std::string name;
+        flecs::system toggle_system_entity;
+        MenuBarTabItemType type;
     };
 
     enum HORIZONTAL_ANCHOR {
@@ -63,7 +83,6 @@ namespace rendering::gui {
             this->vertical_anchor = vertical_anchor;
         };
     };
-
 }
 
 #endif //GUI_COMPONENTS_H

@@ -3,8 +3,8 @@
 
 int main() {
 #ifdef EMSCRIPTEN
-    const int screenWidth = 1280;
-    const int screenHeight = 607;
+    const int screenWidth = 1440;
+    const int screenHeight = 810;
 #else
     const int screenWidth = 1920;
     const int screenHeight = 1080;

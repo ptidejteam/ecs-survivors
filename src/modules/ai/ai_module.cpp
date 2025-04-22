@@ -19,26 +19,29 @@ namespace ai {
     }
 
     void AIModule::register_systems(flecs::world world) {
-        world.system<const Target, const core::Position2D, const core::Speed, physics::DesiredVelocity2D>("Follow Target")
+        world.system<const core::Position2D, const core::Speed, physics::DesiredVelocity2D>("Follow Target")
+                .with<Target>(flecs::Wildcard)
                 .with<FollowTarget>()
-                .each([world](const Target &target,
+                .each([world](flecs::iter &it, size_t i,
                               const core::Position2D &position,
                               const core::Speed &speed,
                               physics::DesiredVelocity2D &velocity) {
-                    const flecs::entity t =world.lookup(target.name.c_str());
-                    if (t.id() == 0) return;
-                    const Vector2 dir = Vector2Normalize(t.get<core::Position2D>()->value - position.value);
+                    const flecs::entity target = it.pair(3).second();
+                    if (target.id() == 0) return;
+                    const Vector2 dir = Vector2Normalize(target.get<core::Position2D>()->value - position.value);
                     velocity.value = dir * speed.value;
                 });
 
-        world.system<const StoppingDistance, const Target, const core::Position2D, physics::DesiredVelocity2D>("Stop when arrived at distance of target")
-                .each([world](const StoppingDistance &distance,
-                              const Target &target,
+        world.system<const StoppingDistance, const core::Position2D, physics::DesiredVelocity2D>(
+                    "Stop when arrived at distance of target")
+                .with<Target>(flecs::Wildcard)
+                .each([world](flecs::iter &it, size_t i,
+                              const StoppingDistance &distance,
                               const core::Position2D &pos,
                               physics::DesiredVelocity2D &velocity) {
-                    const flecs::entity t =world.lookup(target.name.c_str());
-                    if (t.id() == 0) return;
-                    const Vector2 ab = t.get<core::Position2D>()->value - pos.value;
+                    const flecs::entity target = it.pair(3).second();
+                    if (target.id() == 0) return;
+                    const Vector2 ab = target.get<core::Position2D>()->value - pos.value;
 
                     // using the squared length is faster computationally
                     const float distSquared = Vector2LengthSqr(ab);

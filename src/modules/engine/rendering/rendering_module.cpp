@@ -11,6 +11,9 @@
 #include "gui/gui_module.h"
 #include <raymath.h>
 
+#include <rlgl.h>
+#include "modules/engine/physics/components.h"
+
 
 void rendering::RenderingModule::register_components(flecs::world world) {
     world.component<Circle>();
@@ -18,9 +21,10 @@ void rendering::RenderingModule::register_components(flecs::world world) {
 }
 
 void rendering::RenderingModule::register_systems(flecs::world world) {
+
     world.system("Before Draw")
             .kind<PreRender>()
-            .run([](flecs::iter &iter) {
+            .run([&, world](flecs::iter &iter) {
                 BeginDrawing();
                 ClearBackground(GetColor(GuiGetStyle(DEFAULT, BACKGROUND_COLOR)));
             });
@@ -41,29 +45,35 @@ void rendering::RenderingModule::register_systems(flecs::world world) {
                 }
             });
 
-
-    world.system<const Renderable, const core::Position2D>("Draw Entities with Textures")
+    world.system<const Renderable, const core::Position2D, const Rotation *>("Draw Entities with Textures")
             .kind<Render>()
             .with<Visible>()
             .group_by<Priority>()
-            .each([](const Renderable &renderable, const core::Position2D &position) {
-                DrawTextureEx(
-                    renderable.texture,
-                    position.value - Vector2(renderable.texture.width, renderable.texture.height) - renderable.draw_offset * renderable.scale,
-                    renderable.rotation,
-                    renderable.scale,
-                    renderable.tint
-                );
+            .each([&](const Renderable &renderable, const core::Position2D &position, const Rotation *rotation) {
+                Rectangle rec{
+                    0.0f, 0.0f,
+                    (float) renderable.texture.width,
+                    (float) renderable.texture.height
+                };
+
+                float scaledWidth = renderable.texture.width * renderable.scale;
+                float scaledHeight = renderable.texture.height * renderable.scale;
+
+                Rectangle source{
+                    position.value.x + renderable.draw_offset.x * renderable.scale,
+                    position.value.y + renderable.draw_offset.y * renderable.scale,
+                    scaledWidth,
+                    scaledHeight
+                };
+
+                Vector2 origin = Vector2{
+                    scaledWidth / 2.0f,
+                    scaledHeight / 2.0f
+                };
+
+                float r = rotation ? rotation->angle : 0.0f;
+                DrawTexturePro(renderable.texture, rec, source, origin, r, renderable.tint);
             });
-
-    // world.system<const Circle, const core::Position2D, const Color>("Draw Entities")
-    //         .kind<Render>()
-    //         .with<Visible>()
-    //         .group_by<Priority>()
-    //         .each([](const Circle &circle, const core::Position2D &position, const Color &color) {
-    //             DrawCircle(position.value.x, position.value.y, circle.radius, color);
-    //         });
-
     world.system<const HealthBar, core::Health, const core::Position2D, const Renderable>("show healthbar")
             .kind<Render>()
             .each([](flecs::entity e, const HealthBar bar, core::Health &health, const core::Position2D &pos,
