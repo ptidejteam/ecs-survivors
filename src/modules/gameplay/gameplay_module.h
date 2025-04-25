@@ -18,12 +18,16 @@ namespace gameplay {
 
         flecs::entity m_spawner_tick;
 
+        flecs::system add_multiproj;
+        flecs::system remove_multiproj;
         flecs::system add_pierce;
         flecs::system remove_pierce;
         flecs::system add_chain;
         flecs::system remove_chain;
         flecs::system add_split;
         flecs::system remove_split;
+        flecs::system add_proj;
+        flecs::system remove_proj;
         flecs::system add_pierce_amt;
         flecs::system remove_pierce_amt;
         flecs::system add_chain_amt;

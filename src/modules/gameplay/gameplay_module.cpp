@@ -29,7 +29,7 @@ namespace gameplay {
                 .term_at(1).singleton()
                 .each([&,world](flecs::entity self, const Spawner &spawner, const core::GameSettings &settings) {
                     const flecs::entity e = world.lookup(spawner.enemy_prefab_name.c_str());
-                    if (world.query<physics::Collider>().count() > 1000) return;
+                    if (world.query<physics::Collider>().count() > 5000) return;
 
                     if (0 == e) return;
 
@@ -85,9 +85,6 @@ namespace gameplay {
 
                     if (target_pos.value == pos.value) return;
 
-                    // std::printf("%f\n", Vector2Angle(Vector2{0,1}, target_pos.value - pos.value) * RAD2DEG);
-
-
                     float rot = Vector2Angle(Vector2{0, 1}, pos.value - target_pos.value) * RAD2DEG;
 
                     int proj_count = multi_proj ? multi_proj->projectile_count : 1;
@@ -95,11 +92,7 @@ namespace gameplay {
 
                     float offset = proj_count % 2 == 0 ? spread_angle / proj_count / 2: 0;
 
-                    std::printf("%f", offset);
                     for(int i = -proj_count / 2; i < (proj_count + 1) / 2; i++) {
-                        std::printf("proj: %d", i);
-
-                        Vector2 dir = Vector2Rotate(Vector2Normalize(target_pos.value - pos.value) * speed.value, (i * (spread_angle / proj_count) - offset) * DEG2RAD);
 
                         world.entity().is_a(world.lookup(attack.attack_prefab_name.c_str())).child_of(e)
                                 .set<core::Position2D>({pos.value + Vector2{0,0} * i})
@@ -245,6 +238,25 @@ namespace gameplay {
                     health.value = std::min(health.value + regen.rate * it.delta_time(), health.max);
                 });
 
+        add_multiproj = world.system("add multi proj")
+                .kind(0)
+                .with<core::Attack>()
+                .without<MultiProj>()
+                .with(flecs::ChildOf, "player")
+                .each([](flecs::entity e) {
+                    std::cout << "add multiproj" << std::endl;
+                    e.set<MultiProj>({2, 15});
+                });
+
+        remove_multiproj = world.system("remove multi proj")
+                .kind(0)
+                .with<core::Attack>()
+                .with<MultiProj>()
+                .with(flecs::ChildOf, "player")
+                .each([](flecs::entity e) {
+                    std::cout << "remove muti proj" << std::endl;
+                    e.remove<MultiProj>();
+                });
 
         add_pierce = world.system("add pierce")
                 .kind(0)
@@ -308,6 +320,26 @@ namespace gameplay {
                     e.remove<Split>();
                 });
 
+        add_proj = world.system<MultiProj>("+1 proj")
+                .kind(0)
+                .with<core::Attack>()
+                .with(flecs::ChildOf, "player")
+                .each([](MultiProj &p) {
+                    std::cout << "+1 proj" << std::endl;
+                    p.projectile_count += 1;
+                    p.spead_angle = std::min(p.spead_angle + 15.0f, 150.0f);
+                });
+
+        remove_proj = world.system<MultiProj>("-1 proj")
+                .kind(0)
+                .with<core::Attack>()
+                .with(flecs::ChildOf, "player")
+                .each([](MultiProj &p) {
+                    std::cout << "-1 proj" << std::endl;
+                    p.projectile_count = std::max(0, p.projectile_count - 1);
+                    p.spead_angle = std::max(p.spead_angle - 15.0f, 45.0f);
+                });
+
         add_pierce_amt = world.system<Pierce>("+1 Pierce")
                 .kind(0)
                 .with<Projectile>()
@@ -349,6 +381,14 @@ namespace gameplay {
         auto dropdown = world.entity("more_dropdown").child_of(rendering::gui::GUIModule::menu_bar)
                 .set<rendering::gui::MenuBarTab>({"Gameplay Tools", 25});
 
+        world.entity().child_of(dropdown)
+                .set<rendering::gui::MenuBarTabItem>({"Add Multi Proj", add_multiproj, rendering::gui::RUN});
+        world.entity().child_of(dropdown)
+                .set<rendering::gui::MenuBarTabItem>({"Remove Multi Proj", remove_multiproj, rendering::gui::RUN});
+        world.entity().child_of(dropdown)
+                .set<rendering::gui::MenuBarTabItem>({"+1 Proj", add_proj, rendering::gui::RUN});
+        world.entity().child_of(dropdown)
+                .set<rendering::gui::MenuBarTabItem>({"-1 Proj", remove_proj, rendering::gui::RUN});
         world.entity().child_of(dropdown)
                 .set<rendering::gui::MenuBarTabItem>({"Add Pierce", add_pierce, rendering::gui::RUN});
         world.entity().child_of(dropdown)
