@@ -66,12 +66,12 @@ namespace gameplay {
 
         auto target_type_query = world.query_builder<core::Tag, core::Position2D>().build();
 
-        world.system<core::Attack, core::Position2D, core::Speed>("Test Fire Projectile")
+        world.system<core::Attack, core::Position2D, core::Speed, MultiProj*>("Test Fire Projectile")
                 .term_at(1).parent()
                 .with<CooldownCompleted>()
                 .write<CooldownCompleted>()
                 .each([world, target_type_query](flecs::entity e, core::Attack &attack, core::Position2D &pos,
-                                                 core::Speed &speed) {
+                                                 core::Speed &speed, MultiProj* multi_proj) {
                     //std::printf("Firing proj\n");
                     float shortest_distance_sqr = 1000000;
                     core::Position2D target_pos = pos;
@@ -86,16 +86,32 @@ namespace gameplay {
                     if (target_pos.value == pos.value) return;
 
                     // std::printf("%f\n", Vector2Angle(Vector2{0,1}, target_pos.value - pos.value) * RAD2DEG);
-                    float rad = Vector2Angle(Vector2{0, 1}, pos.value - target_pos.value);
-                    world.entity().is_a(world.lookup(attack.attack_prefab_name.c_str())).child_of(e)
-                            .set<core::Position2D>(pos)
-                            .set<core::Speed>({speed.value})
-                            .set<rendering::Rotation>({
-                                rad * RAD2DEG
-                            })
-                            .set<physics::Velocity2D>({
-                                Vector2Normalize(target_pos.value - pos.value) * speed.value
-                            });
+
+
+                    float rot = Vector2Angle(Vector2{0, 1}, pos.value - target_pos.value) * RAD2DEG;
+
+                    int proj_count = multi_proj ? multi_proj->projectile_count : 1;
+                    float spread_angle = multi_proj ? multi_proj->spead_angle : 0.0f;
+
+                    float offset = proj_count % 2 == 0 ? spread_angle / proj_count / 2: 0;
+
+                    std::printf("%f", offset);
+                    for(int i = -proj_count / 2; i < (proj_count + 1) / 2; i++) {
+                        std::printf("proj: %d", i);
+
+                        Vector2 dir = Vector2Rotate(Vector2Normalize(target_pos.value - pos.value) * speed.value, (i * (spread_angle / proj_count) - offset) * DEG2RAD);
+
+                        world.entity().is_a(world.lookup(attack.attack_prefab_name.c_str())).child_of(e)
+                                .set<core::Position2D>({pos.value + Vector2{0,0} * i})
+                                .set<rendering::Rotation>({
+                                    rot + ((i * (spread_angle / proj_count) + offset))
+                                })
+                                .set<core::Speed>({150})
+                                .set<physics::Velocity2D>({
+                                    Vector2Rotate(Vector2Normalize(target_pos.value - pos.value) * speed.value, (i * (spread_angle / proj_count) + offset) * DEG2RAD)
+                                });
+                        DrawLineEx(pos.value, target_pos.value - pos.value,2,GREEN);
+                    }
 
                     e.remove<CooldownCompleted>();
                 });
@@ -116,8 +132,6 @@ namespace gameplay {
                 .immediate()
                 .each([](flecs::iter &it, size_t i, Pierce &pierce) {
                     flecs::entity other = it.pair(1).second();
-                    //std::cout << "piercing" << std::endl;
-
                     if (pierce.hits.contains(other.id())) {
                         it.entity(i).remove<physics::CollidedWith>(other);
                         return;
@@ -202,8 +216,6 @@ namespace gameplay {
                             .set<physics::Velocity2D>({
                                 {right}
                             }).remove<Split>().remove<Chain>().remove<Pierce>();
-
-
                 });
 
         world.system<core::Damage>("collision detected, deal damage to target")

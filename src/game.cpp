@@ -77,7 +77,7 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
             .set<physics::DesiredVelocity2D>({0, 0})
             .set<physics::AccelerationSpeed>({5.0})
             .set<physics::Collider>({
-                16,
+                24,
                 true,
                 physics::CollisionFilter::player,
                 physics::player_filter
@@ -86,7 +86,7 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
             .set<rendering::Renderable>({
                 LoadTexture("../resources/player.png"), // 8x8
                 {0, 0},
-                2.f,
+                3.f,
                 WHITE
             })
             .set<gameplay::RegenHealth>({2.5f})
@@ -95,16 +95,17 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
     m_world.entity("dagger attack").child_of(player)
             .set<core::Attack>({"projectile", "enemy"})
             .set<gameplay::Cooldown>({1.0f, 1})
-            .set<core::Speed>({150})
-            .add<gameplay::CooldownCompleted>();
+            .add<gameplay::CooldownCompleted>()
+            .set<gameplay::MultiProj>({3, 45.0f})
+            .set<core::Speed>({150});
 
     m_world.prefab("projectile")
             .add<gameplay::Projectile>()
             .set<core::Attack>({"projectile", "enemy"})
-             .set<gameplay::Chain>({
-                 6,
-                 std::unordered_set<int>()
-             })
+            .set<gameplay::Chain>({
+                6,
+                std::unordered_set<int>()
+            })
             .set<gameplay::Split>({std::unordered_set<int>()})
             .set<core::Damage>({10})
             .set<physics::Velocity2D>({0, 0})
@@ -112,10 +113,10 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
             .set<rendering::Renderable>({
                 LoadTexture("../resources/dagger.png"), // 8x8
                 {0, 0},
-                2.f,
+                3.f,
                 WHITE
             }).set<physics::Collider>({
-                16,
+                24,
                 false,
                 physics::CollisionFilter::player,
                 physics::player_filter
@@ -148,9 +149,9 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
             .set<physics::AccelerationSpeed>({5.0})
             .add<ai::Target>(player)
             .add<ai::FollowTarget>()
-            .set<ai::StoppingDistance>({8.0})
+            .set<ai::StoppingDistance>({16.0})
             .set<physics::Collider>({
-                16,
+                24,
                 true,
                 physics::CollisionFilter::enemy,
                 physics::enemy_filter
@@ -158,7 +159,7 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
             .set<rendering::Renderable>({
                 LoadTexture("../resources/ghost.png"), // 8x8
                 {0, 0},
-                2.f,
+                3.f,
                 WHITE
             })
             .set<rendering::HealthBar>({0, 0, 50, 10});

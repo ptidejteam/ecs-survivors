@@ -46,5 +46,10 @@ namespace gameplay {
         std::unordered_set<int> hits;
     };
 
+    struct MultiProj {
+        int projectile_count;
+        float spead_angle;
+    };
+
 }
 #endif //GAMEPLAY_COMPONENTS_H
