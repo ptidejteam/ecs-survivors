@@ -143,6 +143,10 @@ namespace rendering::gui {
                         GetScreenWidth() - (float) (i + 1) * bar.item_width, 0, (float) bar.item_width, (float) 25
                     };
 
+                    if(!it.entity(i).has<Rectangle>()) {
+                        it.entity(i).set<Rectangle>({rec});
+                    }
+
                     if (GuiButton(rec, tab.name.c_str())) {
                         tab.active = !tab.active;
                         it.entity(i).set<Rectangle>(rec);

@@ -109,7 +109,7 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
             .set<gameplay::Split>({std::unordered_set<int>()})
             .set<core::Damage>({10})
             .set<physics::Velocity2D>({0, 0})
-            .set<core::DestroyAfterTime>({10})
+            .set<core::DestroyAfterTime>({5})
             .set<rendering::Renderable>({
                 LoadTexture("../resources/dagger.png"), // 8x8
                 {0, 0},

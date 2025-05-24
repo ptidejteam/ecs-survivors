@@ -53,7 +53,6 @@ namespace debug {
         debug_entity_count.disable();
 
         debug_mouse_pos = world.system("Draw Mouse Position")
-                .term_at(0).singleton()
                 .kind<rendering::RenderGUI>()
                 .run([](flecs::iter &iter) {
                     DrawCircle(GetMouseX(), GetMouseY(), 10, RED);
@@ -61,7 +60,6 @@ namespace debug {
         debug_mouse_pos.disable();
 
         debug_grid = world.system("Draw Grid")
-                .term_at(0).singleton()
                 .kind<rendering::RenderGUI>()
                 .run([](flecs::iter &iter) {
                     GuiGrid({0,0, (float)GetScreenWidth(), (float)GetScreenHeight()}, "grid", 32, 1, nullptr);
