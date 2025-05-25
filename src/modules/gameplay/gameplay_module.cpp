@@ -66,12 +66,12 @@ namespace gameplay {
 
         auto target_type_query = world.query_builder<core::Tag, core::Position2D>().build();
 
-        world.system<core::Attack, core::Position2D, core::Speed, MultiProj*>("Test Fire Projectile")
+        world.system<core::Attack, core::Position2D, core::Speed, MultiProj *>("Test Fire Projectile")
                 .term_at(1).parent()
                 .with<CooldownCompleted>()
                 .write<CooldownCompleted>()
                 .each([world, target_type_query](flecs::entity e, core::Attack &attack, core::Position2D &pos,
-                                                 core::Speed &speed, MultiProj* multi_proj) {
+                                                 core::Speed &speed, MultiProj *multi_proj) {
                     //std::printf("Firing proj\n");
                     float shortest_distance_sqr = 1000000;
                     core::Position2D target_pos = pos;
@@ -90,20 +90,20 @@ namespace gameplay {
                     int proj_count = multi_proj ? multi_proj->projectile_count : 1;
                     float spread_angle = multi_proj ? multi_proj->spead_angle : 0.0f;
 
-                    float offset = proj_count % 2 == 0 ? spread_angle / proj_count / 2: 0;
+                    float offset = proj_count % 2 == 0 ? spread_angle / proj_count / 2 : 0;
 
-                    for(int i = -proj_count / 2; i < (proj_count + 1) / 2; i++) {
-
+                    for (int i = -proj_count / 2; i < (proj_count + 1) / 2; i++) {
                         world.entity().is_a(world.lookup(attack.attack_prefab_name.c_str())).child_of(e)
-                                .set<core::Position2D>({pos.value + Vector2{0,0} * i})
+                                .set<core::Position2D>({pos.value + Vector2{0, 0} * i})
                                 .set<rendering::Rotation>({
                                     rot + ((i * (spread_angle / proj_count) + offset))
                                 })
                                 .set<core::Speed>({150})
                                 .set<physics::Velocity2D>({
-                                    Vector2Rotate(Vector2Normalize(target_pos.value - pos.value) * speed.value, (i * (spread_angle / proj_count) + offset) * DEG2RAD)
+                                    Vector2Rotate(Vector2Normalize(target_pos.value - pos.value) * speed.value,
+                                                  (i * (spread_angle / proj_count) + offset) * DEG2RAD)
                                 });
-                        DrawLineEx(pos.value, target_pos.value - pos.value,2,GREEN);
+                        DrawLineEx(pos.value, target_pos.value - pos.value, 2,GREEN);
                     }
 
                     e.remove<CooldownCompleted>();
@@ -263,10 +263,13 @@ namespace gameplay {
                 .with<Projectile>()
                 .without<Pierce>()
                 .with(flecs::Prefab)
-                .each([](flecs::entity e) {
+                .each([world](flecs::entity e) {
                     e.remove<Chain>();
                     std::cout << "add pierce" << std::endl;
                     e.set<Pierce>({1, std::unordered_set<int>()});
+                    ecs_delete_empty_tables_desc_t desc;
+                    desc.delete_generation = true;
+                    ecs_delete_empty_tables(world.c_ptr(), &desc);
                 });
 
         remove_pierce = world.system("remove pierce")
@@ -274,9 +277,12 @@ namespace gameplay {
                 .with<Projectile>()
                 .with<Pierce>()
                 .with(flecs::Prefab)
-                .each([](flecs::entity e) {
+                .each([world](flecs::entity e) {
                     std::cout << "remove pierce" << std::endl;
                     e.remove<Pierce>();
+                    ecs_delete_empty_tables_desc_t desc;
+                    desc.delete_generation = true;
+                    ecs_delete_empty_tables(world.c_ptr(), &desc);
                 });
 
         add_chain = world.system("add chain")
@@ -284,10 +290,13 @@ namespace gameplay {
                 .with<Projectile>()
                 .without<Chain>()
                 .with(flecs::Prefab)
-                .each([](flecs::entity e) {
+                .each([world](flecs::entity e) {
                     e.remove<Pierce>();
                     std::cout << "add chain" << std::endl;
                     e.set<Chain>({1, std::unordered_set<int>()});
+                    ecs_delete_empty_tables_desc_t desc;
+                    desc.delete_generation = true;
+                    ecs_delete_empty_tables(world.c_ptr(), &desc);
                 });
 
         remove_chain = world.system("remove chain")
@@ -295,9 +304,12 @@ namespace gameplay {
                 .with<Projectile>()
                 .with<Chain>()
                 .with(flecs::Prefab)
-                .each([](flecs::entity e) {
+                .each([world](flecs::entity e) {
                     std::cout << "remove chain" << std::endl;
                     e.remove<Chain>();
+                    ecs_delete_empty_tables_desc_t desc;
+                    desc.delete_generation = true;
+                    ecs_delete_empty_tables(world.c_ptr(), &desc);
                 });
 
         add_split = world.system("add split")
@@ -305,9 +317,12 @@ namespace gameplay {
                 .with<Projectile>()
                 .without<Split>()
                 .with(flecs::Prefab)
-                .each([](flecs::entity e) {
+                .each([world](flecs::entity e) {
                     std::cout << "add split" << std::endl;
                     e.set<Split>({std::unordered_set<int>()});
+                    ecs_delete_empty_tables_desc_t desc;
+                    desc.delete_generation = true;
+                    ecs_delete_empty_tables(world.c_ptr(), &desc);
                 });
 
         remove_split = world.system("remove split")
@@ -315,9 +330,12 @@ namespace gameplay {
                 .with<Projectile>()
                 .with<Split>()
                 .with(flecs::Prefab)
-                .each([](flecs::entity e) {
+                .each([world](flecs::entity e) {
                     std::cout << "remove split" << std::endl;
                     e.remove<Split>();
+                    ecs_delete_empty_tables_desc_t desc;
+                    desc.delete_generation = true;
+                    ecs_delete_empty_tables(world.c_ptr(), &desc);
                 });
 
         add_proj = world.system<MultiProj>("+1 proj")

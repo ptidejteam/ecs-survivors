@@ -3,6 +3,7 @@
 //
 
 #include "physics_module.h"
+#include "pipeline_steps.h"
 
 #include <raygui.h>
 #include <raymath.h>
@@ -138,5 +139,12 @@ namespace physics {
                     flecs::entity other = it.pair(0).second();
                     self.remove<CollidedWith>(other);
                 });
+    }
+
+    void PhysicsModule::register_pipeline(flecs::world &world) {
+        world.component<Detection>().add(flecs::Phase).depends_on(flecs::OnValidate);
+        world.component<CollisionDetected>().add(flecs::Phase).depends_on(flecs::PostUpdate);
+        world.component<Resolution>().add(flecs::Phase).depends_on<CollisionDetected>();
+        world.component<CollisionCleanup>().add(flecs::Phase).depends_on(flecs::OnStore);
     }
 }

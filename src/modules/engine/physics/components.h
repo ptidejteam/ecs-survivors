@@ -6,6 +6,7 @@
 #define PHYSICS_COMPONENTS_H
 #include <raylib.h>
 #include <unordered_set>
+#include <vector>
 
 namespace physics {
     enum CollisionFilter {
