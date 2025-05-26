@@ -248,7 +248,7 @@ namespace gameplay {
                 .immediate()
                 .each([](flecs::entity e) {
                     std::cout << "add multiproj" << std::endl;
-                    e.set<MultiProj>({2, 15});
+                    e.set<MultiProj>({2, 15, 150.f, 30.f});
                 });
 
         remove_multiproj = world.system("remove multi proj")
