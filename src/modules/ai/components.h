@@ -9,9 +9,7 @@
 
 namespace ai {
 
-    struct Target {
-        std::string name;
-    };
+    struct Target {};
 
     struct FollowTarget {};
 

@@ -3,6 +3,7 @@
 //
 
 #include "physics_module.h"
+#include "pipeline_steps.h"
 
 #include <raygui.h>
 #include <raymath.h>
@@ -63,7 +64,7 @@ namespace physics {
                 .kind(flecs::OnValidate)
                 .tick_source(m_physicsTick)
                 .immediate()
-                .each([&, get_all_position_and_collider_entities](CollisionRecordList &holder) {
+                .each([&, get_all_position_and_collider_entities](CollisionRecordList &list) {
                     get_all_position_and_collider_entities.each(
                         [&](flecs::iter &self_it, size_t self_id,
                             const core::Position2D &pos,
@@ -78,7 +79,10 @@ namespace physics {
                                     if (Vector2DistanceSqr(pos.value, other_pos.value) < rad * rad) {
                                         flecs::entity self = self_it.entity(self_id);
                                         flecs::entity other = other_it.entity(other_id);
-                                        holder.records.push_back({self, other});
+
+                                        if(collider.correct_position && other_collider.correct_position)
+                                            list.records.push_back({self, other});
+
                                         if ((collider.collision_type & other_collider.collision_type) == none) {
                                             self.add<CollidedWith>(other);
                                             other.add<CollidedWith>(self);
@@ -135,5 +139,12 @@ namespace physics {
                     flecs::entity other = it.pair(0).second();
                     self.remove<CollidedWith>(other);
                 });
+    }
+
+    void PhysicsModule::register_pipeline(flecs::world &world) {
+        world.component<Detection>().add(flecs::Phase).depends_on(flecs::OnValidate);
+        world.component<CollisionDetected>().add(flecs::Phase).depends_on(flecs::PostUpdate);
+        world.component<Resolution>().add(flecs::Phase).depends_on<CollisionDetected>();
+        world.component<CollisionCleanup>().add(flecs::Phase).depends_on(flecs::OnStore);
     }
 }

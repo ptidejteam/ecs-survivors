@@ -21,10 +21,14 @@ namespace rendering::gui {
         };
 
 
+        inline static flecs::entity menu_bar;
+
     private:
         void register_components(flecs::world &world);
 
         void register_systems(flecs::world &world);
+
+        void register_entities(flecs::world &world);
 
         static Color font_color() { return GetColor(GuiGetStyle(TEXTBOX, TEXT_COLOR_NORMAL)); }
 

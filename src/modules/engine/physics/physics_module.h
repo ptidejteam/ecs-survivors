@@ -32,15 +32,17 @@ namespace physics {
         // do not add implementation to the constructor
         PhysicsModule(flecs::world &world): BaseModule(world) {};
 
+        inline static flecs::entity m_physicsTick;
     private:
 
-        flecs::entity m_physicsTick;
 
 
         void register_components(flecs::world &world);
 
         //void register_pipeline(flecs::world& world) = delete;
         void register_systems(flecs::world &world);
+
+        void register_pipeline(flecs::world &world);
 
 
         static bool collide(flecs::entity &self, flecs::entity &other) {

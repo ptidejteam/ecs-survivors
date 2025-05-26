@@ -1,5 +1,5 @@
 set(PHYSICS_SOURCES "physics_module.cpp")
-set(PHYSICS_HEADERS "physics_module.h" "components.h")
+set(PHYSICS_HEADERS "physics_module.h" "components.h" "pipeline_steps.h")
 
 target_sources(${LIBRARY_NAME} PUBLIC
         ${PHYSICS_SOURCES}

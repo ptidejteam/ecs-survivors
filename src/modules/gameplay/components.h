@@ -2,6 +2,7 @@
 // Created by laure on 3/12/2025.
 //
 
+#include <unordered_set>
 #ifndef GAMEPLAY_COMPONENTS_H
 #define GAMEPLAY_COMPONENTS_H
 
@@ -19,6 +20,37 @@ namespace gameplay {
 
     struct RegenHealth {
         float rate; // per second
+    };
+
+    struct Cooldown {
+        float value;
+        float elapsed_time;
+    };
+
+    struct CooldownCompleted {};
+
+    struct Projectile {};
+
+
+    struct Pierce {
+        int pierce_count;
+        std::unordered_set<int> hits;
+    };
+
+    struct Chain {
+        int chain_count;
+        std::unordered_set<int> hits;
+    };
+
+    struct Split {
+        std::unordered_set<int> hits;
+    };
+
+    struct MultiProj {
+        int projectile_count;
+        float spread_angle;
+        float max_spread;
+        float min_spread;
     };
 
 }
