@@ -66,13 +66,13 @@ namespace gameplay {
 
         auto target_type_query = world.query_builder<core::Tag, core::Position2D>().build();
 
-        world.system<core::Attack, core::Position2D, core::Speed, MultiProj *>("Test Fire Projectile")
-                .term_at(1).parent()
+        world.system<core::Position2D, core::Attack, core::Speed, MultiProj *>("Fire Projectile")
+                .with<Projectile>()
                 .with<CooldownCompleted>()
                 .write<CooldownCompleted>()
-                .each([world, target_type_query](flecs::entity e, core::Attack &attack, core::Position2D &pos,
+                .term_at(0).parent()
+                .each([world, target_type_query](flecs::entity e, core::Position2D &pos, core::Attack &attack,
                                                  core::Speed &speed, MultiProj *multi_proj) {
-                    //std::printf("Firing proj\n");
                     float shortest_distance_sqr = 1000000;
                     core::Position2D target_pos = pos;
                     target_type_query.each([&](flecs::entity o, core::Tag &t, core::Position2D &o_pos) {
@@ -88,7 +88,7 @@ namespace gameplay {
                     float rot = Vector2Angle(Vector2{0, 1}, pos.value - target_pos.value) * RAD2DEG;
 
                     int proj_count = multi_proj ? multi_proj->projectile_count : 1;
-                    float spread_angle = multi_proj ? multi_proj->spead_angle : 0.0f;
+                    float spread_angle = multi_proj ? multi_proj->spread_angle : 0.0f;
 
                     float offset = proj_count % 2 == 0 ? spread_angle / proj_count / 2 : 0;
 
@@ -107,7 +107,6 @@ namespace gameplay {
                                                   (i * (spread_angle / proj_count) + offset) * DEG2RAD)
                                 });
                     }
-
                     e.remove<CooldownCompleted>();
                 });
 
@@ -356,7 +355,7 @@ namespace gameplay {
                 .each([](MultiProj &p) {
                     std::cout << "+1 proj" << std::endl;
                     p.projectile_count += 1;
-                    p.spead_angle = std::min(p.spead_angle + 15.0f, 150.0f);
+                    p.spread_angle = std::min(p.spread_angle + 15.0f, p.max_spread);
                 });
 
         remove_proj = world.system<MultiProj>("-1 proj")
@@ -366,7 +365,7 @@ namespace gameplay {
                 .each([](MultiProj &p) {
                     std::cout << "-1 proj" << std::endl;
                     p.projectile_count = std::max(0, p.projectile_count - 1);
-                    p.spead_angle = std::max(p.spead_angle - 15.0f, 45.0f);
+                    p.spread_angle = std::max(p.spread_angle - 15.0f, p.min_spread);
                 });
 
         add_pierce_amt = world.system<Pierce>("+1 Pierce")
@@ -402,7 +401,7 @@ namespace gameplay {
                 .with(flecs::Prefab)
                 .each([](Chain &c) {
                     std::cout << "-1 chain" << std::endl;
-                    c.chain_count = std::max(0, c.chain_count - 1);;
+                    c.chain_count = std::max(0, c.chain_count - 1);
                 });
     }
 

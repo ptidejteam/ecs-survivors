@@ -48,7 +48,9 @@ namespace gameplay {
 
     struct MultiProj {
         int projectile_count;
-        float spead_angle;
+        float spread_angle;
+        float max_spread;
+        float min_spread;
     };
 
 }

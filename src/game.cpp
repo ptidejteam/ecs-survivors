@@ -93,11 +93,12 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
             .set<rendering::HealthBar>({0, 0, 50, 10});
 
     m_world.entity("dagger attack").child_of(player)
+            .add<gameplay::Projectile>()
             .set<core::Attack>({"projectile", "enemy"})
             .set<gameplay::Cooldown>({1.0f, 1})
             .add<gameplay::CooldownCompleted>()
-            .set<gameplay::MultiProj>({3, 45.0f})
-            .set<core::Speed>({150});
+            .set<gameplay::MultiProj>({3, 30.f, 150.f, 30.f})
+            .set<core::Speed>({150.f});
 
     m_world.prefab("projectile")
             .add<gameplay::Projectile>()
@@ -107,7 +108,7 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
                 std::unordered_set<int>()
             })
             .set<gameplay::Split>({std::unordered_set<int>()})
-            .set<core::Damage>({1})
+            .set<core::Damage>({2})
             .set<physics::Velocity2D>({0, 0})
             .set<core::DestroyAfterTime>({5})
             .set<rendering::Renderable>({
@@ -133,10 +134,6 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
     m_world.entity().child_of(vert).set<input::KeyBinding>({KEY_S, 1});
     m_world.entity().child_of(vert).set<input::KeyBinding>({KEY_UP, -1});
     m_world.entity().child_of(vert).set<input::KeyBinding>({KEY_DOWN, 1});
-
-    m_world.entity("collision_records_container");
-
-    std::printf("creating enemy prefab");
 
     m_world.prefab("enemy")
             .set<core::Tag>({"enemy"})

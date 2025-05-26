@@ -18,6 +18,7 @@ namespace debug {
         flecs::system debug_entity_count;
         flecs::system debug_mouse_pos;
         flecs::system debug_grid;
+        flecs::system debug_closest_enemy;
 
         void register_components(flecs::world& world);
 
