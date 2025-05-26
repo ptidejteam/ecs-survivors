@@ -6,6 +6,11 @@ I am taking this opportunity to learn myself about game development with ECS, ta
 
 While developing this game, I will document most of the work through [blog-posts](https://blog.ptidej.net/). Every blog will be contained in separate branches, and the main one will have the most recent changes.
 
+[Part-I: Setup](https://blog.ptidej.net/ecs-survivors-part-i/)
+[Part-II: Rendering Pipeline and GUI](https://blog.ptidej.net/ecs/)
+[Part-III: Player and Enemy Movement](https://blog.ptidej.net/ecs-game/)
+[Part-IV: Collisions](https://blog.ptidej.net/ecs-survivors-part-iv/)
+
 You can also play the latest build on [Itch.io](https://laurent-voisard.itch.io/ecs-survivors)
 
 # Building with CMake for Desktop
