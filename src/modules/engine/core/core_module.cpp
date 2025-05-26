@@ -46,7 +46,7 @@ namespace core {
                 ecs_delete_empty_tables_desc_t desc;
                 desc.delete_generation = true;
                 ecs_delete_empty_tables(world.c_ptr(), &desc);
-                std::printf("Removing empty tables to avoid fragmentation in collision\n");
+                //std::printf("Removing empty tables to avoid fragmentation in collision\n");
             });
     }
 }

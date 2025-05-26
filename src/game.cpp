@@ -107,7 +107,7 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
                 std::unordered_set<int>()
             })
             .set<gameplay::Split>({std::unordered_set<int>()})
-            .set<core::Damage>({10})
+            .set<core::Damage>({1})
             .set<physics::Velocity2D>({0, 0})
             .set<core::DestroyAfterTime>({5})
             .set<rendering::Renderable>({

@@ -92,8 +92,11 @@ namespace gameplay {
 
                     float offset = proj_count % 2 == 0 ? spread_angle / proj_count / 2 : 0;
 
+
+                    auto prefab = world.lookup(attack.attack_prefab_name.c_str());
+
                     for (int i = -proj_count / 2; i < (proj_count + 1) / 2; i++) {
-                        world.entity().is_a(world.lookup(attack.attack_prefab_name.c_str())).child_of(e)
+                        world.entity().is_a(prefab).child_of(e)
                                 .set<core::Position2D>({pos.value + Vector2{0, 0} * i})
                                 .set<rendering::Rotation>({
                                     rot + ((i * (spread_angle / proj_count) + offset))
@@ -103,7 +106,6 @@ namespace gameplay {
                                     Vector2Rotate(Vector2Normalize(target_pos.value - pos.value) * speed.value,
                                                   (i * (spread_angle / proj_count) + offset) * DEG2RAD)
                                 });
-                        DrawLineEx(pos.value, target_pos.value - pos.value, 2,GREEN);
                     }
 
                     e.remove<CooldownCompleted>();
@@ -192,7 +194,8 @@ namespace gameplay {
                     Vector2 left = Vector2Rotate(vel.value, -90 * DEG2RAD);
                     Vector2 right = Vector2Rotate(vel.value, 90 * DEG2RAD);
 
-                    world.entity().is_a(world.lookup(attack.attack_prefab_name.c_str()))
+                    auto prefab = world.lookup(attack.attack_prefab_name.c_str());
+                    world.entity().is_a(prefab).child_of(it.entity(i).parent())
                             .set<core::Position2D>(pos)
                             .set<rendering::Rotation>({
                                 rot.angle - 90.0f
@@ -201,7 +204,7 @@ namespace gameplay {
                                 {left}
                             }).remove<Split>().remove<Chain>().remove<Pierce>();
 
-                    world.entity().is_a(world.lookup(attack.attack_prefab_name.c_str()))
+                    world.entity().is_a(prefab).child_of(it.entity(i).parent())
                             .set<core::Position2D>(pos)
                             .set<rendering::Rotation>({
                                 rot.angle + 90.0f
@@ -228,7 +231,7 @@ namespace gameplay {
                 .each([](flecs::entity e, core::Health &health, TakeDamage &dmg) {
                     health.value -= dmg.damage;
                     if (health.value <= 0)
-                        e.destruct();
+                        e.add<core::DestroyAfterFrame>();
                     e.remove<TakeDamage>();
                 });
 
@@ -243,6 +246,7 @@ namespace gameplay {
                 .with<core::Attack>()
                 .without<MultiProj>()
                 .with(flecs::ChildOf, "player")
+                .immediate()
                 .each([](flecs::entity e) {
                     std::cout << "add multiproj" << std::endl;
                     e.set<MultiProj>({2, 15});
@@ -253,6 +257,7 @@ namespace gameplay {
                 .with<core::Attack>()
                 .with<MultiProj>()
                 .with(flecs::ChildOf, "player")
+                .immediate()
                 .each([](flecs::entity e) {
                     std::cout << "remove muti proj" << std::endl;
                     e.remove<MultiProj>();
@@ -263,6 +268,7 @@ namespace gameplay {
                 .with<Projectile>()
                 .without<Pierce>()
                 .with(flecs::Prefab)
+                .immediate()
                 .each([world](flecs::entity e) {
                     e.remove<Chain>();
                     std::cout << "add pierce" << std::endl;
@@ -277,6 +283,7 @@ namespace gameplay {
                 .with<Projectile>()
                 .with<Pierce>()
                 .with(flecs::Prefab)
+                .immediate()
                 .each([world](flecs::entity e) {
                     std::cout << "remove pierce" << std::endl;
                     e.remove<Pierce>();
@@ -290,6 +297,7 @@ namespace gameplay {
                 .with<Projectile>()
                 .without<Chain>()
                 .with(flecs::Prefab)
+                .immediate()
                 .each([world](flecs::entity e) {
                     e.remove<Pierce>();
                     std::cout << "add chain" << std::endl;
@@ -304,6 +312,7 @@ namespace gameplay {
                 .with<Projectile>()
                 .with<Chain>()
                 .with(flecs::Prefab)
+                .immediate()
                 .each([world](flecs::entity e) {
                     std::cout << "remove chain" << std::endl;
                     e.remove<Chain>();
@@ -317,6 +326,7 @@ namespace gameplay {
                 .with<Projectile>()
                 .without<Split>()
                 .with(flecs::Prefab)
+                .immediate()
                 .each([world](flecs::entity e) {
                     std::cout << "add split" << std::endl;
                     e.set<Split>({std::unordered_set<int>()});
@@ -330,6 +340,7 @@ namespace gameplay {
                 .with<Projectile>()
                 .with<Split>()
                 .with(flecs::Prefab)
+                .immediate()
                 .each([world](flecs::entity e) {
                     std::cout << "remove split" << std::endl;
                     e.remove<Split>();
@@ -400,32 +411,32 @@ namespace gameplay {
                 .set<rendering::gui::MenuBarTab>({"Gameplay Tools", 25});
 
         world.entity().child_of(dropdown)
-                .set<rendering::gui::MenuBarTabItem>({"Add Multi Proj", add_multiproj, rendering::gui::RUN});
+                .set<rendering::gui::MenuBarTabItem>({"Add Multi Proj", add_multiproj, rendering::gui::MenuBarTabItemType::RUN});
         world.entity().child_of(dropdown)
-                .set<rendering::gui::MenuBarTabItem>({"Remove Multi Proj", remove_multiproj, rendering::gui::RUN});
+                .set<rendering::gui::MenuBarTabItem>({"Remove Multi Proj", remove_multiproj, rendering::gui::MenuBarTabItemType::RUN});
         world.entity().child_of(dropdown)
-                .set<rendering::gui::MenuBarTabItem>({"+1 Proj", add_proj, rendering::gui::RUN});
+                .set<rendering::gui::MenuBarTabItem>({"+1 Proj", add_proj, rendering::gui::MenuBarTabItemType::RUN});
         world.entity().child_of(dropdown)
-                .set<rendering::gui::MenuBarTabItem>({"-1 Proj", remove_proj, rendering::gui::RUN});
+                .set<rendering::gui::MenuBarTabItem>({"-1 Proj", remove_proj, rendering::gui::MenuBarTabItemType::RUN});
         world.entity().child_of(dropdown)
-                .set<rendering::gui::MenuBarTabItem>({"Add Pierce", add_pierce, rendering::gui::RUN});
+                .set<rendering::gui::MenuBarTabItem>({"Add Pierce", add_pierce, rendering::gui::MenuBarTabItemType::RUN});
         world.entity().child_of(dropdown)
-                .set<rendering::gui::MenuBarTabItem>({"Remove Pierce", remove_pierce, rendering::gui::RUN});
+                .set<rendering::gui::MenuBarTabItem>({"Remove Pierce", remove_pierce, rendering::gui::MenuBarTabItemType::RUN});
         world.entity().child_of(dropdown)
-                .set<rendering::gui::MenuBarTabItem>({"+1 Pierce", add_pierce_amt, rendering::gui::RUN});
+                .set<rendering::gui::MenuBarTabItem>({"+1 Pierce", add_pierce_amt, rendering::gui::MenuBarTabItemType::RUN});
         world.entity().child_of(dropdown)
-                .set<rendering::gui::MenuBarTabItem>({"-1 Pierce", remove_pierce_amt, rendering::gui::RUN});
+                .set<rendering::gui::MenuBarTabItem>({"-1 Pierce", remove_pierce_amt, rendering::gui::MenuBarTabItemType::RUN});
         world.entity().child_of(dropdown)
-                .set<rendering::gui::MenuBarTabItem>({"Add Chain", add_chain, rendering::gui::RUN});
+                .set<rendering::gui::MenuBarTabItem>({"Add Chain", add_chain, rendering::gui::MenuBarTabItemType::RUN});
         world.entity().child_of(dropdown)
-                .set<rendering::gui::MenuBarTabItem>({"Remove Chain", remove_chain, rendering::gui::RUN});
+                .set<rendering::gui::MenuBarTabItem>({"Remove Chain", remove_chain, rendering::gui::MenuBarTabItemType::RUN});
         world.entity().child_of(dropdown)
-                .set<rendering::gui::MenuBarTabItem>({"+1 Chain", add_chain_amt, rendering::gui::RUN});
+                .set<rendering::gui::MenuBarTabItem>({"+1 Chain", add_chain_amt, rendering::gui::MenuBarTabItemType::RUN});
         world.entity().child_of(dropdown)
-                .set<rendering::gui::MenuBarTabItem>({"-1 Chain", remove_chain_amt, rendering::gui::RUN});
+                .set<rendering::gui::MenuBarTabItem>({"-1 Chain", remove_chain_amt, rendering::gui::MenuBarTabItemType::RUN});
         world.entity().child_of(dropdown)
-                .set<rendering::gui::MenuBarTabItem>({"Add Split", add_split, rendering::gui::RUN});
+                .set<rendering::gui::MenuBarTabItem>({"Add Split", add_split, rendering::gui::MenuBarTabItemType::RUN});
         world.entity().child_of(dropdown)
-                .set<rendering::gui::MenuBarTabItem>({"Remove Split", remove_split, rendering::gui::RUN});
+                .set<rendering::gui::MenuBarTabItem>({"Remove Split", remove_split, rendering::gui::MenuBarTabItemType::RUN});
     }
 }
