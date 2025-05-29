@@ -5,6 +5,7 @@
 #ifndef CORE_COMPONENTS_H
 #define CORE_COMPONENTS_H
 #include <raylib.h>
+#include <string>
 
 namespace core {
     struct Position2D {
