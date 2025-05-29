@@ -24,20 +24,6 @@ namespace core {
         int windowHeight;
     };
 
-    struct Damage {
-        float value;
-    };
-
-    struct Health {
-        float max;
-        float value;
-    };
-
-    struct Attack {
-        std::string attack_prefab_name;
-        std::string target_tag;
-    };
-
     struct Tag {
         std::string name;
     };

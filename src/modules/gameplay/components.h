@@ -11,11 +11,25 @@
 namespace gameplay {
 
     struct Spawner {
-        std::string enemy_prefab_name;
+        flecs::entity enemy_prefab;
     };
 
     struct TakeDamage {
         float damage;
+    };
+
+    struct Damage {
+        float value;
+    };
+
+    struct Health {
+        float max;
+        float value;
+    };
+
+    struct Attack {
+        std::string attack_prefab_name;
+        std::string target_tag;
     };
 
     struct RegenHealth {

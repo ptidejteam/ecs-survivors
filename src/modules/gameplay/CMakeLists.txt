@@ -5,6 +5,8 @@ target_sources(${LIBRARY_NAME} PUBLIC
         ${GAMEPLAY_SOURCES}
         ${GAMEPLAY_HEADERS})
 
+add_subdirectory("systems")
+
 target_link_libraries(${LIBRARY_NAME} PUBLIC
         raylib
         flecs::flecs_static)

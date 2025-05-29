@@ -18,12 +18,14 @@
 #include "systems/remove_empty_tables_system.h"
 
 namespace core {
-    using namespace physics;
-    using namespace input;
 
     void CoreModule::register_components(flecs::world &world) {
         world.component<Position2D>();
         world.component<Speed>();
+        world.component<GameSettings>();
+        world.component<Tag>();
+        world.component<DestroyAfterTime>();
+        world.component<DestroyAfterFrame>();
     }
 
     void CoreModule::register_systems(flecs::world &world) {

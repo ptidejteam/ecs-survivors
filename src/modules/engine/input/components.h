@@ -19,11 +19,6 @@ namespace input {
         int key;
         float value;
     };
-
-    struct BindingSlot1 {};
-    struct BindingSlot2 {};
-    struct BindingSlot3 {};
-    struct BindingSlot4 {};
 }
 
 #endif //INPUT_COMPONENTS_H

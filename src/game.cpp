@@ -70,7 +70,7 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
 
     flecs::entity player = m_world.entity("player")
             .set<core::Tag>({"player"})
-            .set<core::Health>({150, 150})
+            .set<gameplay::Health>({150, 150})
             .set<core::Position2D>({GetScreenWidth() / 2.f, GetScreenHeight() / 2.f})
             .set<core::Speed>({150})
             .set<physics::Velocity2D>({0, 0})
@@ -94,7 +94,7 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
 
     m_world.entity("dagger attack").child_of(player)
             .add<gameplay::Projectile>()
-            .set<core::Attack>({"projectile", "enemy"})
+            .set<gameplay::Attack>({"projectile", "enemy"})
             .set<gameplay::Cooldown>({1.0f, 1})
             .add<gameplay::CooldownCompleted>()
             .set<gameplay::MultiProj>({3, 30.f, 150.f, 30.f})
@@ -102,13 +102,13 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
 
     m_world.prefab("projectile")
             .add<gameplay::Projectile>()
-            .set<core::Attack>({"projectile", "enemy"})
+            .set<gameplay::Attack>({"projectile", "enemy"})
             .set<gameplay::Chain>({
                 6,
                 std::unordered_set<int>()
             })
             .set<gameplay::Split>({std::unordered_set<int>()})
-            .set<core::Damage>({2})
+            .set<gameplay::Damage>({2})
             .set<physics::Velocity2D>({0, 0})
             .set<core::DestroyAfterTime>({5})
             .set<rendering::Renderable>({
@@ -135,10 +135,10 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
     m_world.entity().child_of(vert).set<input::KeyBinding>({KEY_UP, -1});
     m_world.entity().child_of(vert).set<input::KeyBinding>({KEY_DOWN, 1});
 
-    m_world.prefab("enemy")
+    flecs::entity enemy = m_world.prefab("enemy")
             .set<core::Tag>({"enemy"})
-            .set<core::Health>({10, 10})
-            .set<core::Damage>({1})
+            .set<gameplay::Health>({10, 10})
+            .set<gameplay::Damage>({1})
             .set<core::Position2D>({800, 400})
             .set<core::Speed>({25})
             .set<physics::Velocity2D>({0, 0})
@@ -167,7 +167,7 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
     });
 
     m_world.entity("enemy_spawner")
-            .set<gameplay::Spawner>({"enemy"});
+            .set<gameplay::Spawner>({enemy});
 }
 
 
