@@ -57,13 +57,13 @@ namespace physics {
                 .multi_threaded()
                 .each(systems::update_position_system);
 
-        world.system<CollisionRecordList, const core::Position2D, const Collider>(
+        world.system<CollisionRecordList, core::Position2D, Collider>(
                     "Detect Collisions ECS (Naive Record List)")
                 .term_at(0).singleton()
                 .kind<Detection>()
                 .tick_source(m_physicsTick)
                 .multi_threaded()
-                .each(systems::collision_detection_system);
+                .each(systems::collision_detection_system_threadsafe);
 
         world.system<CollisionRecordList>("Add CollidedWith Component")
                 .term_at(0).singleton()
@@ -71,10 +71,10 @@ namespace physics {
                 .tick_source(m_physicsTick)
                 .each(systems::add_collided_with_system);
 
-        world.system<CollisionRecordList>("Collision Resolution ECS (Naive Record List)")
-                .kind<Resolution>()
-                .tick_source(m_physicsTick)
-                .each(systems::collision_resolution_system);
+        // world.system<CollisionRecordList>("Collision Resolution ECS (Naive Record List)")
+        //         .kind<Resolution>()
+        //         .tick_source(m_physicsTick)
+        //         .each(systems::collision_resolution_system);
 
         world.system("Collision Cleanup")
                 .kind<CollisionCleanup>()

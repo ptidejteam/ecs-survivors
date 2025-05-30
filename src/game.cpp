@@ -58,10 +58,6 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
     m_world.import<gameplay::GameplayModule>();
     m_world.import<debug::DebugModule>();
 
-
-
-
-
     m_world.set<core::GameSettings>({
         m_windowName,
         m_windowWidth,
@@ -73,14 +69,14 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
 
     flecs::entity player = m_world.entity("player")
             .set<core::Tag>({"player"})
-            .set<gameplay::Health>({150, 150})
+            //.set<gameplay::Health>({150, 150})
             .set<core::Position2D>({GetScreenWidth() / 2.f, GetScreenHeight() / 2.f})
             .set<core::Speed>({150})
             .set<physics::Velocity2D>({0, 0})
             .set<physics::DesiredVelocity2D>({0, 0})
             .set<physics::AccelerationSpeed>({5.0})
             .set<physics::Collider>({
-                24,
+                8,
                 true,
                 physics::CollisionFilter::player,
                 physics::player_filter
@@ -89,7 +85,7 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
             .set<rendering::Renderable>({
                 LoadTexture("../resources/player.png"), // 8x8
                 {0, 0},
-                3.f,
+                1.f,
                 WHITE
             })
             .set<gameplay::RegenHealth>({2.5f});
@@ -120,10 +116,10 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
             .set<rendering::Renderable>({
                 LoadTexture("../resources/dagger.png"), // 8x8
                 {0, 0},
-                3.f,
+                1.f,
                 WHITE
             }).set<physics::Collider>({
-                24,
+                8,
                 false,
                 physics::CollisionFilter::player,
                 physics::player_filter
@@ -154,7 +150,7 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
             .add<ai::FollowTarget>()
             .set<ai::StoppingDistance>({16.0})
             .set<physics::Collider>({
-                24,
+                8,
                 true,
                 physics::CollisionFilter::enemy,
                 physics::enemy_filter
@@ -162,7 +158,7 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
             .set<rendering::Renderable>({
                 LoadTexture("../resources/ghost.png"), // 8x8
                 {0, 0},
-                3.f,
+                1.f,
                 WHITE
             })
             .set<rendering::Priority>({0});
