@@ -1,0 +1,8 @@
+//
+// Created by laurent on 30/05/25.
+//
+
+#ifndef SCALE_DESIRED_VELOCITY_SYSTEM_H
+#define SCALE_DESIRED_VELOCITY_SYSTEM_H
+
+#endif //SCALE_DESIRED_VELOCITY_SYSTEM_H

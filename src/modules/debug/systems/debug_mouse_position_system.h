@@ -1,0 +1,8 @@
+//
+// Created by laurent on 30/05/25.
+//
+
+#ifndef DEBUG_MOUSE_POSITION_SYSTEM_H
+#define DEBUG_MOUSE_POSITION_SYSTEM_H
+
+#endif //DEBUG_MOUSE_POSITION_SYSTEM_H
