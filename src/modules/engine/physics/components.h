@@ -5,7 +5,6 @@
 #ifndef PHYSICS_COMPONENTS_H
 #define PHYSICS_COMPONENTS_H
 #include <raylib.h>
-#include <unordered_set>
 #include <vector>
 
 namespace physics {
@@ -40,8 +39,14 @@ namespace physics {
         flecs::entity b;
     };
 
+    struct CollisionEvents {
+        flecs::entity a;
+        flecs::entity b;
+    };
+
     struct CollisionRecordList {
         std::vector<CollisionRecord> records;
+        std::vector<CollisionRecord> significant_collisions;
     };
 }
 

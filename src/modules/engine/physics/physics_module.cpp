@@ -14,6 +14,7 @@
 
 #include "modules/engine/core/core_module.h"
 #include "modules/engine/rendering/components.h"
+#include "systems/add_collided_with_system.h"
 #include "systems/collision_cleanup_system.h"
 #include "systems/collision_detection_system.h"
 #include "systems/collision_resolution_system.h"
@@ -63,6 +64,12 @@ namespace physics {
                 .tick_source(m_physicsTick)
                 .multi_threaded()
                 .each(systems::collision_detection_system);
+
+        world.system<CollisionRecordList>("Add CollidedWith Component")
+                .term_at(0).singleton()
+                .kind<Detection>()
+                .tick_source(m_physicsTick)
+                .each(systems::add_collided_with_system);
 
         world.system<CollisionRecordList>("Collision Resolution ECS (Naive Record List)")
                 .kind<Resolution>()

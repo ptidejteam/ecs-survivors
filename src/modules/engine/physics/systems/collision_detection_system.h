@@ -20,6 +20,7 @@ namespace physics::systems {
                                            const core::Position2D &pos,
                                            const Collider &collider) {
         std::vector<CollisionRecord> collisions;
+        std::vector<CollisionRecord> events;
         flecs::world stage_world = self_it.world();
 
         // Build a staged query, and filter
@@ -41,8 +42,7 @@ namespace physics::systems {
                         collisions.push_back({self, other});
 
                     if ((collider.collision_type & other_collider.collision_type) == none) {
-                        self.add<CollidedWith>(other);
-                        other.add<CollidedWith>(self);
+                        events.push_back({self,other});
                     }
                 }
             });
@@ -50,8 +50,10 @@ namespace physics::systems {
 
         list_mutex.lock();
         list.records.insert(list.records.end(), collisions.begin(), collisions.end());
+        list.significant_collisions.insert(list.significant_collisions.end(), events.begin(), events.end());
         list_mutex.unlock();
         collisions.clear();
+        events.clear();
     }
 }
 #endif //COLLISION_DETECTION_SYSTEM_H

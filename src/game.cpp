@@ -46,7 +46,7 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
     // use the flecs explorer when not on browser
     m_world.import<flecs::stats>();
     m_world.set<flecs::Rest>({});
-    //m_world.set_threads(8);
+    m_world.set_threads(8);
 #endif
 
     m_world.import<core::CoreModule>();
