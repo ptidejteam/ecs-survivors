@@ -6,7 +6,7 @@
 #define REMOVE_MULTPROJ_SYSTEM_H
 #include "modules/gameplay/components.h"
 
-namespace gameplay {
+namespace gameplay::systems {
     inline void remove_multiproj_system(flecs::entity e) {
         e.remove<MultiProj>();
     }

@@ -7,7 +7,7 @@
 
 #include <flecs.h>
 #include "modules/engine/core/components.h"
-namespace core {
+namespace core::systems {
     inline void destroy_entity_after_frame_system(flecs::iter& it, size_t i) {
         it.entity(i).destruct();
     }

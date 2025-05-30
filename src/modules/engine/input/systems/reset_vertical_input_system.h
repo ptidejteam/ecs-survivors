@@ -7,7 +7,7 @@
 
 #include "modules/engine/input/components.h"
 
-namespace input {
+namespace input::systems {
     inline void reset_vertical_input_system(InputVertical& vertical) {
         vertical.value = 0.0f;
     }

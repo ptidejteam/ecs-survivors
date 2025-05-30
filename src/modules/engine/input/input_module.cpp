@@ -23,19 +23,19 @@ namespace input {
         world.system<const KeyBinding, InputHorizontal>("set horizontal input")
                 .term_at(1).cascade()
                 .kind(flecs::PreUpdate)
-                .each(set_horizontal_input_system);
+                .each(systems::set_horizontal_input_system);
 
         world.system<const KeyBinding, InputVertical>("set vertical input")
                 .term_at(1).cascade()
                 .kind(flecs::PreUpdate)
-                .each(set_vertical_input_system);
+                .each(systems::set_vertical_input_system);
 
         world.system<InputHorizontal>("Reset Input Horizontal")
                 .kind(flecs::PostUpdate)
-                .each(reset_horizontal_input_system);
+                .each(systems::reset_horizontal_input_system);
 
         world.system<InputVertical>("Reset Input Vertical")
                 .kind(flecs::PostUpdate)
-                .each(reset_vertical_input_system);
+                .each(systems::reset_vertical_input_system);
     }
 }

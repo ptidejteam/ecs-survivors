@@ -8,7 +8,7 @@
 
 #include "modules/gameplay/components.h"
 
-namespace gameplay {
+namespace gameplay::systems {
     inline void add_multiproj_system(flecs::entity e) {
         e.set<MultiProj>({2, 30,150, 30});
     }

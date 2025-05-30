@@ -12,7 +12,7 @@
 #include "modules/engine/core/components.h"
 #include "modules/engine/physics/components.h"
 
-namespace physics {
+namespace physics::systems {
     inline void collision_resolution_system(CollisionRecordList &rec) {
         for (auto &record: rec.records) {
             flecs::entity other = record.b; // Colliding entity

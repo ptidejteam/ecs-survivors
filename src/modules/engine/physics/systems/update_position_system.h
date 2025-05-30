@@ -8,7 +8,7 @@
 #include "modules/engine/physics/physics_module.h"
 #include "modules/engine/physics/components.h"
 
-namespace physics {
+namespace physics::systems {
     inline void update_position_system(const flecs::iter &it, size_t i, core::Position2D &pos, const Velocity2D &vel) {
         pos.value = Vector2Add(
             pos.value, vel.value * std::min(PHYSICS_TICK_LENGTH, it.delta_system_time()));

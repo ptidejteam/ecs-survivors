@@ -19,6 +19,8 @@ namespace core {
     private:
         void register_components(flecs::world &world);
 
+        void register_queries(flecs::world &world);
+
         void register_systems(flecs::world &world);
     };
 }

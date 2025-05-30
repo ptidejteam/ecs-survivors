@@ -1,5 +1,5 @@
 set(CORE_SOURCES "core_module.cpp")
-set(CORE_HEADERS "core_module.h" "components.h")
+set(CORE_HEADERS "core_module.h" "components.h" "queries.h")
 
 target_sources(${LIBRARY_NAME} PUBLIC
         ${CORE_SOURCES}

@@ -1,4 +1,8 @@
-set(PLAYER_SYSTEMS_HEADERS)
+set(PLAYER_SYSTEMS_HEADERS
+        scale_desired_velocity_system.h
+        translate_horizontal_input_to_desired_vel_system.h
+        translate_vertical_input_to_desired_vel_system.h
+)
 
 target_sources(${LIBRARY_NAME} PUBLIC
         ${PLAYER_SYSTEMS_HEADERS})

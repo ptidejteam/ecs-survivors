@@ -9,7 +9,7 @@
 
 #include "modules/gameplay/components.h"
 
-namespace gameplay {
+namespace gameplay::systems {
     inline void regen_health_system(flecs::iter &it, size_t i, Health &health, RegenHealth &regen) {
         health.value = std::min(health.value + regen.rate * it.delta_time(), health.max);
     }

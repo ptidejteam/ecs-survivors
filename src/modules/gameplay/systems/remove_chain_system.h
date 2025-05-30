@@ -6,14 +6,13 @@
 #define REMOVE_CHAIN_SYSTEM_H
 #include <flecs.h>
 
+#include "modules/engine/core/systems/remove_empty_tables_system.h"
 #include "modules/gameplay/components.h"
 
-namespace gameplay {
+namespace gameplay::systems {
     inline void remove_chain_system(const flecs::world& world, flecs::entity e) {
         e.remove<Chain>();
-        ecs_delete_empty_tables_desc_t desc;
-        desc.delete_generation = true;
-        ecs_delete_empty_tables(world.c_ptr(), &desc);
+        core::systems::remove_empty_tables_system(world);
     }
 }
 #endif //REMOVE_CHAIN_SYSTEM_H

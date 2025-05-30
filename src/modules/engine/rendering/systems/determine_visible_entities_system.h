@@ -5,7 +5,7 @@
 #ifndef DETERMINE_VISIBLE_ENTITIES_SYSTEM_H
 #define DETERMINE_VISIBLE_ENTITIES_SYSTEM_H
 
-namespace rendering {
+namespace rendering::systems {
     inline void determine_visible_entities_system(flecs::entity e, const core::Position2D &pos,
                                                   const Renderable &renderable,
                                                   const core::GameSettings &settings) {

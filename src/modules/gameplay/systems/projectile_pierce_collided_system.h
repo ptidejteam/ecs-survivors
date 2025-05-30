@@ -11,7 +11,7 @@
 #include "modules/engine/physics/components.h"
 #include "modules/gameplay/components.h"
 
-namespace gameplay {
+namespace gameplay::systems {
     inline void projectile_pierce_collided_system(flecs::iter &it, size_t i, Pierce &pierce) {
         flecs::entity other = it.pair(1).second();
         if (pierce.hits.contains(other.id())) {

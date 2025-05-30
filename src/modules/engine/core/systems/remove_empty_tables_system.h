@@ -6,7 +6,7 @@
 #define REMOVE_EMPTY_TABLES_SYSTEM_H
 #include <flecs.h>
 
-namespace core {
+namespace core::systems {
     inline void remove_empty_tables_system(const flecs::world& world) {
         ecs_delete_empty_tables_desc_t desc;
         desc.delete_generation = true;

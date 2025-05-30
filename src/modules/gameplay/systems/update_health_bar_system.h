@@ -4,5 +4,12 @@
 
 #ifndef UPDATE_HEALTH_BAR_SYSTEM_H
 #define UPDATE_HEALTH_BAR_SYSTEM_H
+#include "modules/engine/rendering/components.h"
+#include "modules/gameplay/components.h"
 
+namespace gameplay::systems {
+    inline void update_health_bar_system(const Health &health, rendering::ProgressBar &health_bar) {
+        health_bar.current_val = health.value;
+    }
+}
 #endif //UPDATE_HEALTH_BAR_SYSTEM_H

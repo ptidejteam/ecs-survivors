@@ -6,12 +6,10 @@
 #define REMOVE_PIERCE_SYSTEM_H
 #include "modules/gameplay/components.h"
 
-namespace gameplay {
+namespace gameplay::systems {
     inline void remove_pierce_system(const flecs::world& world, flecs::entity e) {
         e.remove<Pierce>();
-        ecs_delete_empty_tables_desc_t desc;
-        desc.delete_generation = true;
-        ecs_delete_empty_tables(world.c_ptr(), &desc);
+        core::systems::remove_empty_tables_system(world);
     }
 }
 #endif //REMOVE_PIERCE_SYSTEM_H

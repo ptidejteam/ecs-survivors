@@ -13,8 +13,8 @@
 #include "modules/engine/rendering/components.h"
 #include "modules/gameplay/components.h"
 
-namespace gameplay {
-    inline void projectile_split_collision_system(const flecs::world& world,flecs::iter &it, size_t i, Split &split, physics::Velocity2D &vel, core::Position2D &pos,
+namespace gameplay::systems {
+    inline void projectile_split_collision_system(flecs::iter &it, size_t i, Split &split, physics::Velocity2D &vel, core::Position2D &pos,
                                   rendering::Rotation &rot, Attack &attack) {
         flecs::entity other = it.pair(5).second();
 
@@ -27,8 +27,8 @@ namespace gameplay {
         Vector2 left = Vector2Rotate(vel.value, -90 * DEG2RAD);
         Vector2 right = Vector2Rotate(vel.value, 90 * DEG2RAD);
 
-        auto prefab = world.lookup(attack.attack_prefab_name.c_str());
-        world.entity().is_a(prefab).child_of(it.entity(i).parent())
+        auto prefab = it.world().lookup(attack.attack_prefab_name.c_str());
+        it.world().entity().is_a(prefab).child_of(it.entity(i).parent())
                 .set<core::Position2D>(pos)
                 .set<rendering::Rotation>({
                     rot.angle - 90.0f
@@ -37,7 +37,7 @@ namespace gameplay {
                     {left}
                 }).remove<Split>().remove<Chain>().remove<Pierce>();
 
-        world.entity().is_a(prefab).child_of(it.entity(i).parent())
+        it.world().entity().is_a(prefab).child_of(it.entity(i).parent())
                 .set<core::Position2D>(pos)
                 .set<rendering::Rotation>({
                     rot.angle + 90.0f

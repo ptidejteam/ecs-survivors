@@ -7,7 +7,7 @@
 
 #include "modules/engine/physics/components.h"
 
-namespace physics {
+namespace physics::systems {
     inline void reset_desired_velocity_system(const Velocity2D &vel, DesiredVelocity2D &desiredVel) {
         desiredVel.value = vel.value;
     }

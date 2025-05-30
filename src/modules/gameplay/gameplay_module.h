@@ -9,7 +9,7 @@
 #include <flecs.h>
 
 namespace gameplay {
-    constexpr float SPAWNER_INTERVAL = 0.1f;
+    constexpr float SPAWNER_INTERVAL = 0.01f;
     class GameplayModule : public BaseModule<GameplayModule> {
     public:
         GameplayModule(flecs::world &world): BaseModule(world) {}
@@ -38,6 +38,8 @@ namespace gameplay {
         void register_systems(flecs::world);
 
         void register_entities(flecs::world);
+
+        void register_pipeline(flecs::world);
 
         friend class BaseModule<GameplayModule>;
     };

@@ -9,9 +9,9 @@
 #include "modules/engine/core/components.h"
 #include "modules/gameplay/components.h"
 
-namespace gameplay {
+namespace gameplay::systems {
     inline bool outside_side_switch = false;
-    inline void spawn_enemies_around_screen_system(const flecs::world& world, flecs::entity self, const Spawner &spawner,
+    inline void spawn_enemies_around_screen_system(flecs::iter& iter, size_t i, const Spawner &spawner,
                                                   const core::GameSettings &settings) {
         float factor = rand() % 2 - 1;
         float neg = rand() % 1 - 1;
@@ -22,7 +22,7 @@ namespace gameplay {
                           ? rand() % settings.windowHeight
                           : neg * factor * settings.windowHeight;
 
-        world.entity().is_a(spawner.enemy_prefab).child_of(self)
+        iter.world().entity().is_a(spawner.enemy_prefab).child_of(iter.entity(i))
                 .set<core::Position2D>({randX, randY});
 
         outside_side_switch = !outside_side_switch;

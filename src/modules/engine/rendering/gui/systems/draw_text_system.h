@@ -9,7 +9,7 @@
 #include "modules/engine/rendering/gui/components.h"
 #include "modules/engine/rendering/gui/gui_module.h"
 
-namespace rendering::gui {
+namespace rendering::gui::systems {
     inline void draw_text_system(const Text &text, const Rectangle &rect) {
         GuiDrawText(text.text.c_str(), rect, text.alignment, GUIModule::font_color());
     }

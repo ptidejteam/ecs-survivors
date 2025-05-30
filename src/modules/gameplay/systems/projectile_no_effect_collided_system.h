@@ -9,7 +9,7 @@
 
 #include "modules/engine/core/components.h"
 
-namespace gameplay {
+namespace gameplay::systems {
     inline void project_no_effect_collided_system(flecs::iter &it, size_t i) {
         it.entity(i).add<core::DestroyAfterFrame>();
     }

@@ -8,7 +8,7 @@
 
 #include "modules/gameplay/components.h"
 
-namespace gameplay {
+namespace gameplay::systems {
     inline void decrement_chain_system(Chain& chain) {
         chain.chain_count = std::max(chain.chain_count - 1, 1);
     }

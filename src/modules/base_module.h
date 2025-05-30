@@ -16,11 +16,12 @@
 template<typename T>
 class BaseModule {
 public:
-    BaseModule(flecs::world &world) {
+    BaseModule(flecs::world &world): m_world(world) {
         std::cout << "Creating Module " << typeid(T).name() << std::endl;
         // Register the instance
         world.module<T>();
         static_cast<T *>(this)->register_components(world);
+        static_cast<T *>(this)->register_queries(world);
         static_cast<T *>(this)->register_pipeline(world);
         static_cast<T *>(this)->register_systems(world);
         static_cast<T *>(this)->register_submodules(world);
@@ -32,7 +33,9 @@ public:
     void print() {
         std::cout << "Base" << std::endl;
     }
-
+    virtual flecs::world get_world() const {return m_world;}
+protected:
+    flecs::world m_world;
 private:
     BaseModule() = delete;
 
@@ -44,6 +47,10 @@ private:
     void register_systems(flecs::world &world) {
         std::cout << "Base systems" << std::endl;
         throw std::runtime_error("Undefined System Registration: Module does not define \"register_systems\"");
+    }
+
+    void register_queries(flecs::world &world) {
+        std::cout << "No query registration implemented" << std::endl;
     }
 
     void register_pipeline(flecs::world &world) {

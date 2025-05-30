@@ -10,7 +10,7 @@
 #include "modules/engine/rendering/gui/components.h"
 
 
-namespace rendering::gui {
+namespace rendering::gui::systems {
     inline void draw_button_system(const Button &button, const Rectangle &rect) {
         GuiSetStyle(BUTTON, TEXT_WRAP_MODE, TEXT_WRAP_WORD);
         if (GuiButton(rect, button.text.c_str())) {

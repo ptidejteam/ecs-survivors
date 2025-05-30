@@ -2,7 +2,14 @@
 // Created by laurent on 30/05/25.
 //
 
-#ifndef QUERIES_H
-#define QUERIES_H
+#ifndef RENDERING_QUERIES_H
+#define RENDERING_QUERIES_H
 
-#endif //QUERIES_H
+#include <flecs.h>
+#include "components.h"
+
+namespace rendering::queries {
+    inline flecs::query<Renderable> entity_count_query;
+    inline flecs::query<Renderable> entity_visible_count_query;
+}
+#endif //RENDERING_QUERIES_H

@@ -5,4 +5,13 @@
 #ifndef DEBUG_FPS_SYSTEM_H
 #define DEBUG_FPS_SYSTEM_H
 
+#include <flecs.h>
+#include <raylib.h>
+
+namespace debug::systems {
+    inline void debug_fps_system(flecs::iter &iter) {
+        DrawRectangleRec({0, 10, 225, 20}, DARKGRAY);
+        DrawFPS(10, 10);
+    }
+}
 #endif //DEBUG_FPS_SYSTEM_H

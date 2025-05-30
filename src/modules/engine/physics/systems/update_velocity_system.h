@@ -9,7 +9,7 @@
 #include "modules/engine/physics/physics_module.h"
 #include "modules/engine/physics/components.h"
 
-namespace physics {
+namespace physics::systems {
 
     inline void update_velocity_system(flecs::iter &it, size_t, Velocity2D &vel, const DesiredVelocity2D &desiredVel,
                           const AccelerationSpeed &acceleration_speed) {

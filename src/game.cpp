@@ -41,7 +41,14 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
 
     InitWindow(m_windowWidth, m_windowHeight, m_windowName.c_str());
     // SetTargetFPS(GetMonitorRefreshRate(0));
-    //m_world.set_threads(4);
+
+#ifndef EMSCRIPTEN
+    // use the flecs explorer when not on browser
+    m_world.import<flecs::stats>();
+    m_world.set<flecs::Rest>({});
+    //m_world.set_threads(8);
+#endif
+
     m_world.import<core::CoreModule>();
     m_world.import<input::InputModule>();
     m_world.import<rendering::RenderingModule>();
@@ -52,11 +59,7 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
     m_world.import<debug::DebugModule>();
 
 
-#ifndef EMSCRIPTEN
-    // use the flecs explorer when not on browser
-    m_world.import<flecs::stats>();
-    m_world.set<flecs::Rest>({});
-#endif
+
 
 
     m_world.set<core::GameSettings>({
@@ -82,15 +85,17 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
                 physics::CollisionFilter::player,
                 physics::player_filter
             })
-            .add<rendering::Priority>(1)
+            .set<rendering::Priority>({2})
             .set<rendering::Renderable>({
                 LoadTexture("../resources/player.png"), // 8x8
                 {0, 0},
                 3.f,
                 WHITE
             })
-            .set<gameplay::RegenHealth>({2.5f})
-            .set<rendering::HealthBar>({0, 0, 50, 10});
+            .set<gameplay::RegenHealth>({2.5f});
+
+
+
 
     m_world.entity("dagger attack").child_of(player)
             .add<gameplay::Projectile>()
@@ -111,6 +116,7 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
             .set<gameplay::Damage>({2})
             .set<physics::Velocity2D>({0, 0})
             .set<core::DestroyAfterTime>({5})
+            .set<rendering::Priority>({1})
             .set<rendering::Renderable>({
                 LoadTexture("../resources/dagger.png"), // 8x8
                 {0, 0},
@@ -159,12 +165,7 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
                 3.f,
                 WHITE
             })
-            .set<rendering::HealthBar>({0, 0, 50, 10});
-
-
-    m_world.entity("gui_canvas").set<Rectangle>({
-        0, 0, static_cast<float>(m_windowWidth), static_cast<float>(m_windowHeight)
-    });
+            .set<rendering::Priority>({0});
 
     m_world.entity("enemy_spawner")
             .set<gameplay::Spawner>({enemy});

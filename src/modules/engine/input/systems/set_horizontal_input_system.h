@@ -9,7 +9,7 @@
 
 #include "modules/engine/input/components.h"
 
-namespace input {
+namespace input::systems {
     inline void set_horizontal_input_system(const KeyBinding &binding, InputHorizontal &horizontal) {
         if (IsKeyDown(binding.key)) {
             horizontal.value += binding.value;

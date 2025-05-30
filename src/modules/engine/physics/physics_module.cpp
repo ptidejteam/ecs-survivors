@@ -9,6 +9,7 @@
 #include <raymath.h>
 
 #include "components.h"
+#include "queries.h"
 #include "modules/engine/core/components.h"
 
 #include "modules/engine/core/core_module.h"
@@ -27,6 +28,10 @@ namespace physics {
         world.component<CollidedWith>();
     }
 
+    void PhysicsModule::register_queries(flecs::world &world) {
+        queries::visible_collision_bodies_query = world.query_builder<core::Position2D, Collider>().with<rendering::Visible>().build();
+    }
+
 
     void PhysicsModule::register_systems(flecs::world &world) {
         m_physicsTick = world.timer().interval(PHYSICS_TICK_LENGTH);
@@ -34,52 +39,48 @@ namespace physics {
         world.system<const Velocity2D, DesiredVelocity2D>("reset desired vel")
                 .kind(flecs::PreUpdate)
                 .tick_source(m_physicsTick)
-                .each(reset_desired_velocity_system);
+                .multi_threaded()
+                .each(systems::reset_desired_velocity_system);
 
         world.system<Velocity2D, const DesiredVelocity2D, const AccelerationSpeed>("Lerp Current to Desired Velocity")
-                .kind(flecs::OnValidate)
+                .kind<UpdateBodies>()
                 .tick_source(m_physicsTick)
                 .write<Velocity2D>()
-                .each(update_velocity_system);
+                .multi_threaded()
+                .each(systems::update_velocity_system);
 
         world.system<core::Position2D, const Velocity2D>("Update Position")
-                .kind(flecs::OnValidate)
+                .kind<UpdateBodies>()
                 .tick_source(m_physicsTick)
                 .write<core::Position2D>()
-                .each(update_position_system);
+                .multi_threaded()
+                .each(systems::update_position_system);
 
-        auto get_all_collision_bodies =
-                world.query_builder<const core::Position2D, const Collider>()
-                .with<rendering::Visible>()
-                .build();
-
-        world.system<CollisionRecordList>(
+        world.system<CollisionRecordList, const core::Position2D, const Collider>(
                     "Detect Collisions ECS (Naive Record List)")
                 .term_at(0).singleton()
-                .kind(flecs::OnValidate)
+                .kind<Detection>()
                 .tick_source(m_physicsTick)
-                .immediate()
-                .each([get_all_collision_bodies](CollisionRecordList &list) {
-                    collision_detection_system(get_all_collision_bodies, list);
-                });
+                .multi_threaded()
+                .each(systems::collision_detection_system);
 
         world.system<CollisionRecordList>("Collision Resolution ECS (Naive Record List)")
-                .kind(flecs::PostUpdate)
+                .kind<Resolution>()
                 .tick_source(m_physicsTick)
-                .each(collision_resolution_system);
+                .each(systems::collision_resolution_system);
 
         world.system("Collision Cleanup")
-                .kind(flecs::OnStore)
+                .kind<CollisionCleanup>()
                 .tick_source(m_physicsTick)
                 .with<CollidedWith>(flecs::Wildcard)
                 .immediate()
-                .each(collision_cleanup_system);
+                .each(systems::collision_cleanup_system);
     }
 
     void PhysicsModule::register_pipeline(flecs::world &world) {
+        world.component<UpdateBodies>().add(flecs::Phase).depends_on(flecs::OnUpdate);
         world.component<Detection>().add(flecs::Phase).depends_on(flecs::OnValidate);
-        world.component<CollisionDetected>().add(flecs::Phase).depends_on(flecs::PostUpdate);
-        world.component<Resolution>().add(flecs::Phase).depends_on<CollisionDetected>();
+        world.component<Resolution>().add(flecs::Phase).depends_on(flecs::PostUpdate); // to use from external modules
         world.component<CollisionCleanup>().add(flecs::Phase).depends_on(flecs::OnStore);
     }
 }

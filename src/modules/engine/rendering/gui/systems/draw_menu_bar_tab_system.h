@@ -10,7 +10,7 @@
 
 #include "modules/engine/rendering/gui/components.h"
 
-namespace rendering::gui {
+namespace rendering::gui::systems {
     inline void draw_menu_bar_tab_system(flecs::iter &it, size_t i, MenuBarTab &tab, MenuBar &bar) {
         Rectangle rec = {
             GetScreenWidth() - (float) (i + 1) * bar.item_width, 0, (float) bar.item_width, (float) 25

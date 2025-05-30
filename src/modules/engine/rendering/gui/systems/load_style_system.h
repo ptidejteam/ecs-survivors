@@ -7,7 +7,7 @@
 
 #include <flecs.h>
 
-namespace rendering::gui {
+namespace rendering::gui::systems {
     inline void load_style_system(flecs::iter &iter) {
         GuiLoadStyle("../resources/styles/style_amber.rgs");
     }

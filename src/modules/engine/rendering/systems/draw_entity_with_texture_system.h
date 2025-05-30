@@ -5,7 +5,7 @@
 #ifndef DRAW_ENTITY_WITH_TEXTURE_SYSTEM_H
 #define DRAW_ENTITY_WITH_TEXTURE_SYSTEM_H
 
-namespace rendering {
+namespace rendering::systems {
     inline void draw_entity_with_texture_system(const Renderable &renderable, const core::Position2D &position, const Rotation *rotation) {
         Rectangle rec{
             0.0f, 0.0f,

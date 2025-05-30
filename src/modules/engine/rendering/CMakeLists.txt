@@ -1,5 +1,5 @@
 set(RENDERING_LIBRARY_SOURCES "rendering_module.cpp")
-set(RENDERING_LIBRARY_HEADERS "rendering_module.h" "components.h")
+set(RENDERING_LIBRARY_HEADERS "rendering_module.h" "components.h" "queries.h")
 
 target_sources(${LIBRARY_NAME} PUBLIC
         ${RENDERING_LIBRARY_SOURCES}

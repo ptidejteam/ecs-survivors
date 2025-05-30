@@ -5,7 +5,7 @@
 #ifndef END_DRAWING_SYSTEM_H
 #define END_DRAWING_SYSTEM_H
 
-namespace rendering {
+namespace rendering::systems {
     inline void end_drawing_system(flecs::iter& it) {
         EndDrawing();
     }

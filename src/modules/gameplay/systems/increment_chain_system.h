@@ -8,7 +8,7 @@
 
 #include "modules/gameplay/components.h"
 
-namespace gameplay {
+namespace gameplay::systems {
     inline void increment_chain_system(Chain& c) {
         c.chain_count = c.chain_count + 1;
     }

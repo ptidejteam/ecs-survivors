@@ -10,17 +10,17 @@
 #include <raylib.h>
 #include <raymath.h>
 #include "modules/engine/core/components.h"
+#include "modules/engine/core/queries.h"
 #include "modules/engine/physics/components.h"
 #include "modules/engine/rendering/components.h"
 #include "modules/gameplay/components.h"
 
-namespace gameplay {
-    inline void fire_projectile_system(const flecs::world &world, flecs::query<core::Tag, core::Position2D> targets,
-                                       flecs::entity e, core::Position2D &pos, Attack &attack,
+namespace gameplay::systems {
+    inline void fire_projectile_system(flecs::iter &iter, size_t index, core::Position2D &pos, Attack &attack,
                                        core::Speed &speed, MultiProj *multi_proj) {
         float shortest_distance_sqr = 1000000;
         core::Position2D target_pos = pos;
-        targets.each([&](flecs::entity o, core::Tag &t, core::Position2D &o_pos) {
+        core::queries::position_and_tag_query.each([&](core::Position2D &o_pos, core::Tag &t) {
             if (attack.target_tag != t.name) return;
             float d = Vector2DistanceSqr(pos.value, o_pos.value);
             if (d > shortest_distance_sqr) return;
@@ -38,21 +38,19 @@ namespace gameplay {
         float offset = proj_count % 2 == 0 ? spread_angle / proj_count / 2 : 0;
 
 
-        auto prefab = world.lookup(attack.attack_prefab_name.c_str());
+        auto prefab = iter.world().lookup(attack.attack_prefab_name.c_str());
 
         for (int i = -proj_count / 2; i < (proj_count + 1) / 2; i++) {
-            world.entity().is_a(prefab).child_of(e)
-                    .set<core::Position2D>({pos.value + Vector2{0, 0} * i})
-                    .set<rendering::Rotation>({
-                        rot + ((i * (spread_angle / proj_count) + offset))
-                    })
+            float angle = i * (spread_angle / proj_count) + offset;
+            iter.world().entity().is_a(prefab).child_of(iter.entity(index))
+                    .set<core::Position2D>({pos.value})
+                    .set<rendering::Rotation>({rot + angle})
                     .set<core::Speed>({150})
                     .set<physics::Velocity2D>({
-                        Vector2Rotate(Vector2Normalize(target_pos.value - pos.value) * speed.value,
-                                      (i * (spread_angle / proj_count) + offset) * DEG2RAD)
+                        Vector2Rotate(Vector2Normalize(target_pos.value - pos.value) * speed.value, angle * DEG2RAD)
                     });
         }
-        e.remove<CooldownCompleted>();
+        iter.entity(index).remove<CooldownCompleted>();
     }
 }
 #endif //FIRE_PROJECTILE_SYSTEM_H

@@ -6,7 +6,7 @@
 #define UPDATE_COOLDOWN_SYSTEM_H
 #include "modules/gameplay/components.h"
 
-namespace gameplay {
+namespace gameplay::systems {
     inline void update_cooldown_system(flecs::iter &it, size_t i, Cooldown &cooldown) {
         cooldown.elapsed_time += it.delta_time();
         if (cooldown.elapsed_time > cooldown.value)

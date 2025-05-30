@@ -9,9 +9,11 @@
 #include <flecs.h>
 #include <raylib.h>
 
-namespace rendering::gui {
-    inline void set_gui_canvas_size_system(const flecs::world& world, core::GameSettings& settings) {
-        world.lookup("gui_canvas").set<Rectangle>({
+#include "modules/engine/rendering/gui/gui_module.h"
+
+namespace rendering::gui::systems {
+    inline void set_gui_canvas_size_system(core::GameSettings& settings) {
+        GUIModule::gui_canvas.set<Rectangle>({
             0, 0, static_cast<float>(GetScreenWidth()), static_cast<float>(GetScreenHeight())
         });
         settings.windowHeight = GetScreenHeight();

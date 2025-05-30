@@ -33,12 +33,7 @@ namespace physics {
         CollisionFilter collision_filter;
     };
 
-    struct OnCollisionDetected {
-        flecs::entity other;
-    };
-
     struct CollidedWith {};
-    struct Test{};
 
     struct CollisionRecord {
         flecs::entity a;

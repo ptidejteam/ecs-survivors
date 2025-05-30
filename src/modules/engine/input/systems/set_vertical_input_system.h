@@ -9,7 +9,7 @@
 
 #include "modules/engine/input/components.h"
 
-namespace input {
+namespace input::systems {
     inline void set_vertical_input_system(const KeyBinding &binding, InputVertical &vertical) {
         if (IsKeyDown(binding.key)) {
             vertical.value += binding.value;

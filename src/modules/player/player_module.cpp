@@ -13,6 +13,9 @@
 #include "modules/engine/core/components.h"
 #include "modules/engine/physics/physics_module.h"
 #include "modules/engine/physics/components.h"
+#include "systems/scale_desired_velocity_system.h"
+#include "systems/translate_horizontal_input_to_desired_vel_system.h"
+#include "systems/translate_vertical_input_to_desired_vel_system.h"
 
 namespace player {
     void PlayerModule::register_components(flecs::world world) {
@@ -22,22 +25,13 @@ namespace player {
         // player movement ================================================
         world.system<const input::InputHorizontal, physics::DesiredVelocity2D>()
                 .term_at(1).parent().cascade()
-                .each([](const input::InputHorizontal &horizontal,
-                         physics::DesiredVelocity2D &desired_vel) {
-                    desired_vel.value.x = horizontal.value;
-                });
+                .each(systems::translate_horizontal_input_to_desired_vel_system);
         
         world.system<const input::InputVertical, physics::DesiredVelocity2D>()
                 .term_at(1).parent().cascade()
-                .each([](const input::InputVertical &vertical,
-                         physics::DesiredVelocity2D &desired_vel) {
-                    desired_vel.value.y = vertical.value;
-                });
+                .each(systems::translate_vertical_input_to_desired_vel_system);
 
         world.system<physics::DesiredVelocity2D, const core::Speed>()
-                .each([](physics::DesiredVelocity2D &velocity,
-                         const core::Speed &speed) {
-                    velocity.value = Vector2Normalize(velocity.value) * speed.value;
-                });
+                .each(systems::scale_desired_velocity_system);
     }
 }

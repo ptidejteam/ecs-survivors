@@ -6,8 +6,8 @@
 #define PHYSICS_PIPELINE_STEPS_H
 
 namespace physics {
+    struct UpdateBodies{};
     struct Detection{};
-    struct CollisionDetected{};
     struct Resolution{};
     struct CollisionCleanup{};
 }

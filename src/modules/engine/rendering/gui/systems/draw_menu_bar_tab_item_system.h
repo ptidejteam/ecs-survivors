@@ -11,7 +11,7 @@
 #include "modules/engine/rendering/gui/components.h"
 
 
-namespace rendering::gui {
+namespace rendering::gui::systems {
     inline void draw_menu_bar_tab_item_system(flecs::iter &it, size_t i, MenuBarTabItem &item, MenuBarTab &tab, Rectangle &rec) {
         //std::cout << i << std::endl;
         if (!tab.active) return;

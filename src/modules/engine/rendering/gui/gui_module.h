@@ -21,6 +21,7 @@ namespace rendering::gui {
         };
 
 
+        inline static flecs::entity gui_canvas;
         inline static flecs::entity menu_bar;
 
         static Color font_color() { return GetColor(GuiGetStyle(TEXTBOX, TEXT_COLOR_NORMAL)); }

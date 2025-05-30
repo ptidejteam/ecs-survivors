@@ -12,8 +12,12 @@
 #include "modules/gameplay/components.h"
 #include <raymath.h>
 
-namespace gameplay {
-    inline void projectile_chain_collided_system(const flecs::query<core::Tag, core::Position2D> &target_type_query, flecs::iter &it, size_t i,
+//#include "modules/engine/core/queries.h"
+#include "modules/engine/core/core_module.h"
+#include "modules/engine/core/queries.h"
+
+namespace gameplay::systems {
+    inline void projectile_chain_collided_system(flecs::iter &it, size_t i,
                                                  Chain &chain, physics::Velocity2D &vel,
                                                  core::Position2D &pos, rendering::Rotation &rot, Attack &attack) {
         flecs::entity other = it.pair(5).second();
@@ -27,7 +31,7 @@ namespace gameplay {
 
         float shortest_distance_sqr = 1000000;
         core::Position2D target_pos = pos;
-        target_type_query.each([&](flecs::entity o, core::Tag &t, core::Position2D &o_pos) {
+        core::queries::position_and_tag_query.each([&](flecs::entity o, core::Position2D &o_pos, core::Tag &t) {
             if (!chain.hits.contains(o.id()) && attack.target_tag == t.name && other.id() != o.id()) {
                 float d = Vector2DistanceSqr(pos.value, o_pos.value);
                 if (d < shortest_distance_sqr) {

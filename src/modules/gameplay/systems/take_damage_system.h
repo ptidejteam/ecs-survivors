@@ -9,7 +9,7 @@
 #include "modules/engine/core/components.h"
 #include "modules/gameplay/components.h"
 
-namespace gameplay {
+namespace gameplay::systems {
     inline void take_damage_system(flecs::entity e, Health &health, TakeDamage &dmg) {
         health.value -= dmg.damage;
         if (health.value <= 0)

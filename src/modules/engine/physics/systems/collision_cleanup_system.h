@@ -9,7 +9,7 @@
 
 #include "modules/engine/physics/components.h"
 
-namespace physics {
+namespace physics::systems {
     inline void collision_cleanup_system(flecs::iter &it, size_t i) {
         flecs::entity self = it.entity(i);
         flecs::entity other = it.pair(0).second();

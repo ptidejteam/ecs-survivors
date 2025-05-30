@@ -7,7 +7,7 @@
 
 #include <flecs.h>
 #include "modules/engine/core/components.h"
-namespace core {
+namespace core::systems {
     void destroy_entity_after_time_system(flecs::iter& it, size_t i, DestroyAfterTime& time) {
         time.time -= it.delta_time();
         if(time.time <= 0.0f) it.entity(i).add<DestroyAfterFrame>();

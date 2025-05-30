@@ -11,10 +11,10 @@
 #include "set_gui_canvas_size_system.h"
 #include "modules/engine/core/components.h"
 
-namespace rendering::gui {
-    inline void check_window_resized_system(const flecs::world &world, core::GameSettings &settings) {
+namespace rendering::gui::systems {
+    inline void check_window_resized_system(core::GameSettings &settings) {
         if (IsWindowResized()) {
-            set_gui_canvas_size_system(world, settings);
+            set_gui_canvas_size_system(settings);
 #ifdef EMSCRIPTEN
                         SetMouseScale(settings.windowWidth / (float) settings.initialWidth,
                                       settings.windowHeight / (float) settings.initialHeight);

@@ -8,7 +8,7 @@
 
 #include "modules/gameplay/components.h"
 
-namespace gameplay {
+namespace gameplay::systems {
     inline void decrement_pierce_system(Pierce& p) {
         p.pierce_count = std::max(1, p.pierce_count - 1);
     }
