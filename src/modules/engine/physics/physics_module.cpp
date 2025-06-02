@@ -47,14 +47,12 @@ namespace physics {
         world.system<Velocity2D, const DesiredVelocity2D, const AccelerationSpeed>("Lerp Current to Desired Velocity")
                 .kind<UpdateBodies>()
                 .tick_source(m_physicsTick)
-                .write<Velocity2D>()
                 .multi_threaded()
                 .each(systems::update_velocity_system);
 
         world.system<core::Position2D, const Velocity2D>("Update Position")
                 .kind<UpdateBodies>()
                 .tick_source(m_physicsTick)
-                .write<core::Position2D>()
                 .multi_threaded()
                 .each(systems::update_position_system);
 
@@ -82,6 +80,7 @@ namespace physics {
                 .kind<CollisionCleanup>()
                 .tick_source(m_physicsTick)
                 .with<CollidedWith>(flecs::Wildcard)
+                .multi_threaded()
                 .each(systems::collision_cleanup_system);
     }
 
