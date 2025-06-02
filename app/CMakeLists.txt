@@ -8,8 +8,6 @@ add_custom_target(copy_resources ALL
 
 add_dependencies(${PROJECT_NAME} copy_resources)
 
-target_compile_definitions(${PROJECT_NAME} PRIVATE TRACY_ENABLE=ON)
-
 target_link_libraries(${PROJECT_NAME} PUBLIC
         ${LIBRARY_NAME}
         raylib

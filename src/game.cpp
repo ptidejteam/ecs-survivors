@@ -20,7 +20,6 @@
 #include "modules/engine/input/input_module.h"
 #include "modules/engine/physics/components.h"
 #include "modules/engine/physics/physics_module.h"
-#include "modules/engine/rendering/gui/components.h"
 #include "modules/player/player_module.h"
 #include "raylib.h"
 #include "modules/debug/debug_module.h"
@@ -29,6 +28,11 @@
 #include "modules/engine/rendering/rendering_module.h"
 #include "modules/gameplay/components.h"
 #include "modules/gameplay/gameplay_module.h"
+
+#include <tmxlite/Map.hpp>
+#include <tmxlite/Layer.hpp>
+#include <tmxlite/TileLayer.hpp>
+#include <tmxlite/ObjectGroup.hpp>
 
 Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(flecs::world()),
                                                                         m_windowName(windowName),
@@ -172,10 +176,55 @@ void Game::run() {
     // ON START
     m_world.progress();
 
+    Texture2D text;
+    tmx::Map map;
+    if (map.load("../resources/tiled/maps/sampleMap.tmx")) {
+        std::cout << "hurray" << std::endl;
+        const auto &layers = map.getLayers();
+        for (const auto &layer: layers) {
+            if (layer->getType() == tmx::Layer::Type::Object) {
+                const auto &objectLayer = layer->getLayerAs<tmx::ObjectGroup>();
+                const auto &objects = objectLayer.getObjects();
+                for (const auto &object: objects) {
+                    //do stuff with object properties
+                }
+            } else if (layer->getType() == tmx::Layer::Type::Tile) {
+                const auto &tileLayer = layer->getLayerAs<tmx::TileLayer>();
+                //read out tile layer properties etc...
+            }
+        }
+
+        const auto &tilesets = map.getTilesets();
+        for (const auto &tileset: tilesets) {
+            std::cout << tileset.getImagePath() << std::endl;
+            text = LoadTexture(tileset.getImagePath().c_str());
+            //read out tile set properties, load textures etc...
+        }
+    }
+
     // Main game loop
     while (!WindowShouldClose()) // Detect window close button or ESC key
     {
         m_world.progress(GetFrameTime());
+        const auto &tilesets = map.getTilesets();
+        for (const auto &tileset: tilesets) {
+            //std::cout << tileset.getImagePath() << std::endl;
+            for (const auto &tile: tileset.getTiles()) {
+                //tile.imagePosition
+                DrawTextureRec(
+                    text, {
+                        (float) tile.imagePosition.x,
+                        (float) tile.imagePosition.y,
+                        (float) tile.imageSize.x,
+                        (float) tile.imageSize.y
+                    }, {
+                        (float) tile.imagePosition.x,
+                        (float) tile.imagePosition.y
+                    }, WHITE);
+            }
+            //read out tile set properties, load textures etc...
+        }
+        //DrawTexture(text, 0,0, WHITE);
     }
     // De-Initialization
     //--------------------------------------------------------------------------------------

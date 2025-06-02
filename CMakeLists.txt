@@ -11,7 +11,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Web Configurations
 if (EMSCRIPTEN)
-    set(CMAKE_EXE_LINKER_FLAGS  "\
+    set(CMAKE_EXE_LINKER_FLAGS "\
         ${CMAKE_EXE_LINKER_FLAGS} \
         --embed-file resources \
         -s USE_GLFW=3 \
@@ -24,7 +24,6 @@ if (EMSCRIPTEN)
         -s EXPORTED_RUNTIME_METHODS=cwrap")
     set(CMAKE_EXECUTABLE_SUFFIX ".html") # This line is used to set your executable to build with the emscripten html template so taht you can directly open it.
 endif ()
-
 set(RAYLIB_VERSION 5.5)
 find_package(raylib ${RAYLIB_VERSION} QUIET) # QUIET or REQUIRED
 if (NOT raylib_FOUND) # If there's none, fetch and build raylib
@@ -39,8 +38,8 @@ if (NOT raylib_FOUND) # If there's none, fetch and build raylib
         set(FETCHCONTENT_QUIET NO)
         FetchContent_MakeAvailable(raylib)
         set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE) # don't build the supplied examples
-    endif()
-endif()
+    endif ()
+endif ()
 
 set(FLECS_VERSION 4.0.5)
 find_package(flecs ${FLECS_VERSION} QUIET) # QUIET or REQUIRED
@@ -55,20 +54,21 @@ if (NOT flecs_FOUND) # If there's none, fetch and build flecs
     if (NOT flecs_POPULATED) # Have we downloaded raylib yet?
         set(FETCHCONTENT_QUIET NO)
         FetchContent_MakeAvailable(flecs)
-    endif()
-endif()
-
-
-link_directories("./libs")
+    endif ()
+endif ()
 
 # Our Project
+
 add_subdirectory("src")
+add_subdirectory("external/tmxlite/tmxlite")
 add_subdirectory("include")
 add_subdirectory("app")
 
 
-target_link_libraries(${LIBRARY_NAME} PUBLIC
+target_link_libraries(${LIBRARY_NAME} PRIVATE
         raylib
         flecs::flecs_static
+        tmxlite
 )
+
 
