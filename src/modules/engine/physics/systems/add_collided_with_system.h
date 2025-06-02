@@ -8,11 +8,13 @@
 #include "modules/engine/physics/components.h"
 
 namespace physics::systems {
-    inline void add_collided_with_system(const CollisionRecordList& list) {
+    inline void add_collided_with_system(CollisionRecordList& list) {
         for (CollisionRecord rec: list.significant_collisions) {
             rec.a.add<CollidedWith>(rec.b);
             rec.b.add<CollidedWith>(rec.a);
         }
+
+        list.significant_collisions.clear();
     }
 }
 #endif //ADD_COLLIDED_WITH_SYSTEM_H

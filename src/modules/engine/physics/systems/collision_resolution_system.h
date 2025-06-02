@@ -38,7 +38,6 @@ namespace physics::systems {
             other.set<core::Position2D>({otherPos + move / 2.f}); // Move the other entity
         }
         rec.records.clear();
-        rec.significant_collisions.clear();
     }
 }
 #endif //COLLISION_RESOLUTION_SYSTEM_H

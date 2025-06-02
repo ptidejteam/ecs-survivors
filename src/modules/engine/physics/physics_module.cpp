@@ -30,7 +30,8 @@ namespace physics {
     }
 
     void PhysicsModule::register_queries(flecs::world &world) {
-        queries::visible_collision_bodies_query = world.query_builder<core::Position2D, Collider>().with<rendering::Visible>().build();
+        queries::visible_collision_bodies_query = world.query_builder<core::Position2D, Collider>().with<
+            rendering::Visible>().build();
     }
 
 
@@ -57,30 +58,30 @@ namespace physics {
                 .multi_threaded()
                 .each(systems::update_position_system);
 
-        world.system<CollisionRecordList, core::Position2D, Collider>(
+        world.system<CollisionRecordList, const core::Position2D, const Collider>(
                     "Detect Collisions ECS (Naive Record List)")
                 .term_at(0).singleton()
                 .kind<Detection>()
                 .tick_source(m_physicsTick)
                 .multi_threaded()
-                .each(systems::collision_detection_system_threadsafe);
+                .each(systems::collision_detection_system);
 
         world.system<CollisionRecordList>("Add CollidedWith Component")
                 .term_at(0).singleton()
-                .kind<Detection>()
+                .kind<Resolution>()
                 .tick_source(m_physicsTick)
                 .each(systems::add_collided_with_system);
 
-        // world.system<CollisionRecordList>("Collision Resolution ECS (Naive Record List)")
-        //         .kind<Resolution>()
-        //         .tick_source(m_physicsTick)
-        //         .each(systems::collision_resolution_system);
+        world.system<CollisionRecordList>("Collision Resolution ECS (Naive Record List)")
+                .term_at(0).singleton()
+                .kind<Resolution>()
+                .tick_source(m_physicsTick)
+                .each(systems::collision_resolution_system);
 
         world.system("Collision Cleanup")
                 .kind<CollisionCleanup>()
                 .tick_source(m_physicsTick)
                 .with<CollidedWith>(flecs::Wildcard)
-                .immediate()
                 .each(systems::collision_cleanup_system);
     }
 
@@ -88,6 +89,6 @@ namespace physics {
         world.component<UpdateBodies>().add(flecs::Phase).depends_on(flecs::OnUpdate);
         world.component<Detection>().add(flecs::Phase).depends_on(flecs::OnValidate);
         world.component<Resolution>().add(flecs::Phase).depends_on(flecs::PostUpdate); // to use from external modules
-        world.component<CollisionCleanup>().add(flecs::Phase).depends_on(flecs::OnStore);
+        world.component<CollisionCleanup>().add(flecs::Phase).depends_on<Resolution>();
     }
 }

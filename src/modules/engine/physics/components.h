@@ -39,11 +39,6 @@ namespace physics {
         flecs::entity b;
     };
 
-    struct CollisionEvents {
-        flecs::entity a;
-        flecs::entity b;
-    };
-
     struct CollisionRecordList {
         std::vector<CollisionRecord> records;
         std::vector<CollisionRecord> significant_collisions;

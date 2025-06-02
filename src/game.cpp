@@ -10,6 +10,8 @@
 #include <emscripten/emscripten.h>
 #endif
 
+#include <thread>
+
 #include "modules/ai/ai_module.h"
 #include "modules/ai/components.h"
 #include "modules/engine/core/components.h"
@@ -46,7 +48,7 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
     // use the flecs explorer when not on browser
     m_world.import<flecs::stats>();
     m_world.set<flecs::Rest>({});
-    m_world.set_threads(8);
+    m_world.set_threads(static_cast<int>(std::thread::hardware_concurrency()));
 #endif
 
     m_world.import<core::CoreModule>();
@@ -69,14 +71,13 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
 
     flecs::entity player = m_world.entity("player")
             .set<core::Tag>({"player"})
-            //.set<gameplay::Health>({150, 150})
             .set<core::Position2D>({GetScreenWidth() / 2.f, GetScreenHeight() / 2.f})
             .set<core::Speed>({150})
             .set<physics::Velocity2D>({0, 0})
             .set<physics::DesiredVelocity2D>({0, 0})
             .set<physics::AccelerationSpeed>({5.0})
             .set<physics::Collider>({
-                8,
+                24,
                 true,
                 physics::CollisionFilter::player,
                 physics::player_filter
@@ -85,13 +86,11 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
             .set<rendering::Renderable>({
                 LoadTexture("../resources/player.png"), // 8x8
                 {0, 0},
-                1.f,
+                3.f,
                 WHITE
             })
+            .set<gameplay::Health>({150, 150})
             .set<gameplay::RegenHealth>({2.5f});
-
-
-
 
     m_world.entity("dagger attack").child_of(player)
             .add<gameplay::Projectile>()
@@ -111,19 +110,20 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
             .set<gameplay::Split>({std::unordered_set<int>()})
             .set<gameplay::Damage>({2})
             .set<physics::Velocity2D>({0, 0})
-            .set<core::DestroyAfterTime>({5})
+            .set<physics::Collider>({
+                24,
+                false,
+                physics::CollisionFilter::player,
+                physics::player_filter
+            })
             .set<rendering::Priority>({1})
             .set<rendering::Renderable>({
                 LoadTexture("../resources/dagger.png"), // 8x8
                 {0, 0},
-                1.f,
+                3.f,
                 WHITE
-            }).set<physics::Collider>({
-                8,
-                false,
-                physics::CollisionFilter::player,
-                physics::player_filter
-            });
+            })
+            .set<core::DestroyAfterTime>({5});
 
     auto hori = m_world.entity("player_horizontal_input").child_of(player).set<input::InputHorizontal>({});
     m_world.entity().child_of(hori).set<input::KeyBinding>({KEY_A, -1});
@@ -139,18 +139,18 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
 
     flecs::entity enemy = m_world.prefab("enemy")
             .set<core::Tag>({"enemy"})
-            .set<gameplay::Health>({10, 10})
-            .set<gameplay::Damage>({1})
             .set<core::Position2D>({800, 400})
             .set<core::Speed>({25})
-            .set<physics::Velocity2D>({0, 0})
-            .set<physics::DesiredVelocity2D>({0, 0})
-            .set<physics::AccelerationSpeed>({5.0})
+            .set<gameplay::Health>({10, 10})
+            .set<gameplay::Damage>({1})
             .add<ai::Target>(player)
             .add<ai::FollowTarget>()
             .set<ai::StoppingDistance>({16.0})
+            .set<physics::Velocity2D>({0, 0})
+            .set<physics::DesiredVelocity2D>({0, 0})
+            .set<physics::AccelerationSpeed>({5.0})
             .set<physics::Collider>({
-                8,
+                24,
                 true,
                 physics::CollisionFilter::enemy,
                 physics::enemy_filter
@@ -158,7 +158,7 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
             .set<rendering::Renderable>({
                 LoadTexture("../resources/ghost.png"), // 8x8
                 {0, 0},
-                1.f,
+                3.f,
                 WHITE
             })
             .set<rendering::Priority>({0});

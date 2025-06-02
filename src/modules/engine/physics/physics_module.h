@@ -32,7 +32,7 @@ namespace physics {
         // do not add implementation to the constructor
         PhysicsModule(flecs::world &world): BaseModule(world) {};
 
-        inline static flecs::entity m_physicsTick;
+        flecs::entity m_physicsTick;
     private:
 
 
