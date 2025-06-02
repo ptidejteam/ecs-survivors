@@ -6,6 +6,7 @@
 #ifndef CORE_MODULE_H
 #define CORE_MODULE_H
 
+#include "components.h"
 #include "modules/base_module.h"
 
 namespace core {
@@ -17,6 +18,9 @@ namespace core {
         CoreModule(flecs::world& world): BaseModule(world) {}
     private:
         void register_components(flecs::world &world);
+
+        void register_queries(flecs::world &world);
+
         void register_systems(flecs::world &world);
     };
 }

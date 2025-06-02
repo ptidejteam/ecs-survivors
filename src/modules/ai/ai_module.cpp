@@ -10,6 +10,8 @@
 #include "components.h"
 #include "modules/engine/core/components.h"
 #include "modules/engine/physics/components.h"
+#include "systems/follow_target_system.h"
+#include "systems/stop_when_arrived_at_target_system.h"
 
 namespace ai {
     void AIModule::register_components(flecs::world world) {
@@ -22,34 +24,11 @@ namespace ai {
         world.system<const core::Position2D, const core::Speed, physics::DesiredVelocity2D>("Follow Target")
                 .with<Target>(flecs::Wildcard)
                 .with<FollowTarget>()
-                .each([world](flecs::iter &it, size_t i,
-                              const core::Position2D &position,
-                              const core::Speed &speed,
-                              physics::DesiredVelocity2D &velocity) {
-                    const flecs::entity target = it.pair(3).second();
-                    if (target.id() == 0) return;
-                    const Vector2 dir = Vector2Normalize(target.get<core::Position2D>()->value - position.value);
-                    velocity.value = dir * speed.value;
-                });
+                .each(systems::follow_target_system);
 
         world.system<const StoppingDistance, const core::Position2D, physics::DesiredVelocity2D>(
                     "Stop when arrived at distance of target")
                 .with<Target>(flecs::Wildcard)
-                .each([world](flecs::iter &it, size_t i,
-                              const StoppingDistance &distance,
-                              const core::Position2D &pos,
-                              physics::DesiredVelocity2D &velocity) {
-                    const flecs::entity target = it.pair(3).second();
-                    if (target.id() == 0) return;
-                    const Vector2 ab = target.get<core::Position2D>()->value - pos.value;
-
-                    // using the squared length is faster computationally
-                    const float distSquared = Vector2LengthSqr(ab);
-
-                    // square the distance
-                    if (distSquared < distance.value * distance.value) {
-                        velocity.value = {0, 0};
-                    }
-                });
+                .each(systems::stop_when_arrived_at_target_system);
     }
 }

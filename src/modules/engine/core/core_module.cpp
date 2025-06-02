@@ -1,5 +1,5 @@
 //
-// Created by Laurent Voisardnt Voisard on 12/21/2024.
+// Created by Laurent Voisard on 12/21/2024.
 //
 
 // ReSharper disable CppMemberFunctionMayBeStatic
@@ -13,40 +13,44 @@
 
 #include <raymath.h>
 
+#include "queries.h"
+#include "systems/destroy_entity_after_frame_system.h"
+#include "systems/destroy_entity_after_time_system.h"
+#include "systems/remove_empty_tables_system.h"
+
 namespace core {
-    using namespace physics;
-    using namespace input;
 
     void CoreModule::register_components(flecs::world &world) {
         world.component<Position2D>();
         world.component<Speed>();
+        world.component<GameSettings>();
+        world.component<Tag>();
+        world.component<DestroyAfterTime>();
+        world.component<DestroyAfterFrame>();
+    }
+
+    void CoreModule::register_queries(flecs::world &world) {
+        queries::position_and_tag_query = world.query<Position2D, Tag>();
     }
 
     void CoreModule::register_systems(flecs::world &world) {
         std::cout << "Registering core systems" << std::endl;
 
         world.system<DestroyAfterTime>("Destroy entities after time")
-            .kind(flecs::PostFrame)
-            .write<DestroyAfterFrame>()
-            .each([](flecs::iter& it, size_t i, DestroyAfterTime& time) {
-                time.time -= it.delta_time();
-                if(time.time <= 0.0f) it.entity(i).add<DestroyAfterFrame>();
-            });
+                .kind(flecs::PostFrame)
+                .write<DestroyAfterFrame>()
+                .multi_threaded()
+                .each(systems::destroy_entity_after_time_system);
 
-        world.system<DestroyAfterFrame>("Destroy entities after frame")
-           .kind(flecs::PostFrame)
-           .each([](flecs::iter& it, size_t i, DestroyAfterFrame f) {
-                it.entity(i).destruct();
-           });
+        world.system("Destroy entities after frame")
+                .with<DestroyAfterFrame>()
+                .kind(flecs::PostFrame)
+                .multi_threaded()
+                .each(systems::destroy_entity_after_frame_system);
 
         world.system("Remove empty tables to avoid fragmentation in collision (CHANGE TO DONTFRAGMENT WHEN FEATURE IS OUT)")
-            //.interval(0.25f)
-            .kind(flecs::PostFrame)
-            .run([world](flecs::iter& it) {
-                ecs_delete_empty_tables_desc_t desc;
-                desc.delete_generation = true;
-                ecs_delete_empty_tables(world.c_ptr(), &desc);
-                //std::printf("Removing empty tables to avoid fragmentation in collision\n");
-            });
+                //.interval(0.25f)
+                .kind(flecs::PostFrame)
+                .run([world](flecs::iter &it) { systems::remove_empty_tables_system(world); });
     }
 }

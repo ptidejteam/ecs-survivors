@@ -5,6 +5,7 @@
 #ifndef CORE_COMPONENTS_H
 #define CORE_COMPONENTS_H
 #include <raylib.h>
+#include <string>
 
 namespace core {
     struct Position2D {
@@ -21,20 +22,6 @@ namespace core {
         int initialHeight;
         int windowWidth;
         int windowHeight;
-    };
-
-    struct Damage {
-        float value;
-    };
-
-    struct Health {
-        float max;
-        float value;
-    };
-
-    struct Attack {
-        std::string attack_prefab_name;
-        std::string target_tag;
     };
 
     struct Tag {

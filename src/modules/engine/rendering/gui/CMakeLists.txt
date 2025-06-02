@@ -5,6 +5,8 @@ target_sources(${LIBRARY_NAME} PUBLIC
         ${GUI_LIBRARY_SOURCES}
         ${GUI_LIBRARY_HEADERS})
 
+add_subdirectory("systems")
+
 target_link_libraries(${LIBRARY_NAME} PUBLIC
         raylib
         flecs::flecs_static)

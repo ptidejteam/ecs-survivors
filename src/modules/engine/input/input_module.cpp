@@ -6,11 +6,16 @@
 
 #include "components.h"
 #include "raylib.h"
+#include "systems/reset_horizontal_input_system.h"
+#include "systems/reset_vertical_input_system.h"
+#include "systems/set_horizontal_input_system.h"
+#include "systems/set_vertical_input_system.h"
 
 namespace input {
     void InputModule::register_components(flecs::world &world) {
         world.component<InputHorizontal>();
         world.component<InputVertical>();
+        world.component<KeyBinding>();
     }
 
     void InputModule::register_systems(flecs::world &world) {
@@ -18,31 +23,19 @@ namespace input {
         world.system<const KeyBinding, InputHorizontal>("set horizontal input")
                 .term_at(1).cascade()
                 .kind(flecs::PreUpdate)
-                .each([](const KeyBinding &binding, InputHorizontal &horizontal) {
-                    if (IsKeyDown(binding.key)) {
-                        horizontal.value += binding.value;
-                    }
-                });
+                .each(systems::set_horizontal_input_system);
 
         world.system<const KeyBinding, InputVertical>("set vertical input")
                 .term_at(1).cascade()
                 .kind(flecs::PreUpdate)
-                .each([](const KeyBinding &binding, InputVertical &vertical) {
-                    if (IsKeyDown(binding.key)) {
-                        vertical.value += binding.value;
-                    }
-                });
+                .each(systems::set_vertical_input_system);
 
         world.system<InputHorizontal>("Reset Input Horizontal")
                 .kind(flecs::PostUpdate)
-                .each([](InputHorizontal &horizontal) {
-                    horizontal.value = 0;
-                });
+                .each(systems::reset_horizontal_input_system);
 
         world.system<InputVertical>("Reset Input Vertical")
                 .kind(flecs::PostUpdate)
-                .each([](InputVertical &vertical) {
-                    vertical.value = 0;
-                });
+                .each(systems::reset_vertical_input_system);
     }
 }

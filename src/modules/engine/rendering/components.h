@@ -5,12 +5,10 @@
 #ifndef RENDERING_COMPONENTS_H
 #define RENDERING_COMPONENTS_H
 
-namespace rendering {
-    struct Circle {
-        float radius;
-    };
+#include <raylib.h>
 
-    struct Priority {};
+namespace rendering {
+    struct Priority {int priority;};
     struct Visible {};
 
     struct Renderable {
@@ -24,7 +22,10 @@ namespace rendering {
         float angle;
     };
 
-    struct HealthBar {
+    struct ProgressBar {
+        float min_val;
+        float max_val;
+        float current_val;
         Rectangle rectangle;
     };
 }

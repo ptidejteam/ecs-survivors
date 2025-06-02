@@ -5,8 +5,8 @@
 #ifndef GUI_MODULE_H
 #define GUI_MODULE_H
 
-#include <raygui.h>
 #include <raylib.h>
+#include <raygui.h>
 
 #include "components.h"
 #include "modules/base_module.h"
@@ -21,8 +21,10 @@ namespace rendering::gui {
         };
 
 
+        inline static flecs::entity gui_canvas;
         inline static flecs::entity menu_bar;
 
+        static Color font_color() { return GetColor(GuiGetStyle(TEXTBOX, TEXT_COLOR_NORMAL)); }
     private:
         void register_components(flecs::world &world);
 
@@ -30,7 +32,6 @@ namespace rendering::gui {
 
         void register_entities(flecs::world &world);
 
-        static Color font_color() { return GetColor(GuiGetStyle(TEXTBOX, TEXT_COLOR_NORMAL)); }
 
 
         friend class BaseModule<GUIModule>;

@@ -12,8 +12,14 @@
 #include "modules/engine/rendering/gui/components.h"
 
 #include "modules/engine/rendering/gui/gui_module.h"
-#include "raygui.h"
 #include <raymath.h>
+
+#include "systems/debug_closest_enemy_to_player_system.h"
+#include "systems/debug_colliders_system.h"
+#include "systems/debug_entity_count_system.h"
+#include "systems/debug_fps_system.h"
+#include "systems/debug_grid_system.h"
+#include "systems/debug_mouse_position_system.h"
 
 
 namespace debug {
@@ -25,70 +31,32 @@ namespace debug {
                 .kind<rendering::Render>()
                 .with<rendering::Visible>()
                 .group_by<rendering::Priority>()
-                .each([](const physics::Collider &collider, const core::Position2D &position) {
-                    DrawCircleLines(position.value.x, position.value.y, collider.radius, GREEN);
-                });
+                .each(systems::debug_colliders_system);
         debug_colliders.disable();
 
         debug_FPS = world.system("Draw FPS")
                 .kind<rendering::RenderGUI>()
-                .run([](flecs::iter &iter) {
-                    DrawRectangleRec({0, 10, 225, 20}, DARKGRAY);
-                    DrawFPS(10, 10);
-                });
+                .run(systems::debug_fps_system);
         debug_FPS.disable();
 
-        auto entity_count_query = world.query_builder<rendering::Renderable>().build();
-        auto entity_visible_count_query = world.query_builder<rendering::Renderable>().with<rendering::Visible>().
-                build();
         debug_entity_count = world.system("Draw Entity Count")
                 .kind<rendering::RenderGUI>()
-                .run([entity_count_query, entity_visible_count_query](flecs::iter &iter) {
-                    DrawRectangleRec({0, 30, 225, 40}, DARKGRAY);
-                    DrawText(std::string(std::to_string(entity_count_query.count()) + " entities").c_str(), 10, 30, 20,
-                             GREEN);
-                    DrawText(
-                        std::string(std::to_string(entity_visible_count_query.count()) + " visible entities").c_str(),
-                        10, 50, 20, GREEN);
-                });
+                .run(systems::debug_entity_count_system);
         debug_entity_count.disable();
 
         debug_mouse_pos = world.system("Draw Mouse Position")
                 .kind<rendering::RenderGUI>()
-                .run([](flecs::iter &iter) {
-                    DrawCircle(GetMouseX(), GetMouseY(), 10, RED);
-                });
+                .run(systems::debug_mouse_position_system);
         debug_mouse_pos.disable();
 
         debug_grid = world.system("Draw Grid")
                 .kind<rendering::RenderGUI>()
-                .run([](flecs::iter &iter) {
-                    GuiGrid({0, 0, (float) GetScreenWidth(), (float) GetScreenHeight()}, "grid", 32, 1, nullptr);
-                });
+                .run(systems::debug_grid_system);
         debug_grid.disable();
-
-        auto target_type_query = world.query_builder<core::Tag, core::Position2D>().build();
 
         debug_closest_enemy = world.system("Draw Ray to closest target")
                 .kind<rendering::RenderGUI>()
-                .run([world, target_type_query](flecs::iter &iter) {
-                    auto player = world.lookup("player");
-                    auto pos = player.get<core::Position2D>();
-                    float shortest_distance_sqr = 10000000;
-                    core::Position2D target_pos{pos->value};
-                    target_type_query.each([&](const core::Tag &tag, const core::Position2D &other_pos) {
-                        if ("enemy" != tag.name) return;
-                        float d = Vector2DistanceSqr(pos->value, other_pos.value);
-                        if (d > shortest_distance_sqr) return;
-                        shortest_distance_sqr = d;
-                        target_pos = other_pos;
-                    });
-
-                    if (target_pos.value == pos->value) return;
-
-                    DrawLineEx(Vector2{pos->value.x, pos->value.y}, Vector2{target_pos.value.x, target_pos.value.y}, 1,
-                               GREEN);
-                });
+                .run(systems::debug_closest_enemy_to_player_system);
         debug_closest_enemy.disable();
     }
 

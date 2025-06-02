@@ -12,6 +12,7 @@ namespace debug {
     public:
         DebugModule(flecs::world world): BaseModule(world) {
         };
+
     private:
         flecs::system debug_colliders;
         flecs::system debug_FPS;
