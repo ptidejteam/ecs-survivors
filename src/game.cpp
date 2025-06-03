@@ -178,6 +178,8 @@ void Game::run() {
 
     Texture2D text;
     tmx::Map map;
+
+    //std::vector<>
     if (map.load("../resources/tiled/maps/sampleMap.tmx")) {
         std::cout << "hurray" << std::endl;
         const auto &layers = map.getLayers();
@@ -202,28 +204,75 @@ void Game::run() {
         }
     }
 
+
     // Main game loop
     while (!WindowShouldClose()) // Detect window close button or ESC key
     {
         m_world.progress(GetFrameTime());
         const auto &tilesets = map.getTilesets();
         for (const auto &tileset: tilesets) {
-            //std::cout << tileset.getImagePath() << std::endl;
-            for (const auto &tile: tileset.getTiles()) {
-                //tile.imagePosition
-                DrawTextureRec(
-                    text, {
-                        (float) tile.imagePosition.x,
-                        (float) tile.imagePosition.y,
-                        (float) tile.imageSize.x,
-                        (float) tile.imageSize.y
-                    }, {
-                        (float) tile.imagePosition.x,
-                        (float) tile.imagePosition.y
-                    }, WHITE);
+            const auto &layers = map.getLayers();
+            for (const auto &layer: layers) {
+                if (layer->getType() == tmx::Layer::Type::Object) {
+                    const auto &objectLayer = layer->getLayerAs<tmx::ObjectGroup>();
+                    const auto &objects = objectLayer.getObjects();
+                    for (const auto &object: objects) {
+                        //do stuff with object properties
+                    }
+                } else if (layer->getType() == tmx::Layer::Type::Tile) {
+                    if (layer->getName() != "Dungeon") continue;
+                    const auto &tileLayer = layer->getLayerAs<tmx::TileLayer>();
+                    //read out tile layer properties etc...
+                    tmx::Vector2u size = layer->getSize();
+
+                    const auto &tiles = tileLayer.getTiles();
+                    for (int x = 0; x < size.x; x++) {
+                        for (int y = 0; y < size.y; y++) {
+                            int index = y * size.x + x;
+                            auto tile = tileset.getTile(tiles[index].ID);
+
+                            float rotation = 0;
+                            //if (tiles[index].flipFlags == tmx::TileLayer::FlipFlag::Horizontal)
+                            //    rotation = 180.f;
+
+                            DrawTexturePro(
+                                text,
+                                {
+                                    (float) tile->imagePosition.x,
+                                    (float) tile->imagePosition.y,
+                                    (float) tile->imageSize.x,
+                                    (float) tile->imageSize.y
+                                },
+                                {
+                                    (float) 0 + x * 4.f * tile->imageSize.x,
+                                    (float) 0 + y * 4.f * tile->imageSize.y,
+                                    (float) tile->imageSize.x * 4.f,
+                                    (float) tile->imageSize.y * 4.f
+                                }, {0, 0}, rotation, WHITE);
+                        }
+                    }
+                }
             }
-            //read out tile set properties, load textures etc...
         }
+
+        // for (const auto &tileset: tilesets) {
+        //     //std::cout << tileset.getImagePath() << std::endl;
+        //     for (const auto &tile: tileset.getTiles()) {
+        //         //std::cout << tile.ID << std::endl;
+        //         //tile.imagePosition
+        //         DrawTextureRec(
+        //             text, {
+        //                 (float) tile.imagePosition.x,
+        //                 (float) tile.imagePosition.y,
+        //                 (float) tile.imageSize.x,
+        //                 (float) tile.imageSize.y
+        //             }, {
+        //                 (float) tile.imagePosition.x,
+        //                 (float) tile.imagePosition.y
+        //             }, WHITE);
+        //     }
+        //     //read out tile set properties, load textures etc...
+        // }
         //DrawTexture(text, 0,0, WHITE);
     }
     // De-Initialization
