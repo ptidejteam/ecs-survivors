@@ -28,7 +28,7 @@ namespace debug {
 
     void DebugModule::register_systems(flecs::world &world) {
         debug_colliders = world.system<const physics::Collider, const core::Position2D>("Debug colliders")
-                .kind<rendering::Render>()
+                .kind<rendering::RenderGizmos>()
                 .with<rendering::Visible>()
                 .group_by<rendering::Priority>()
                 .each(systems::debug_colliders_system);
@@ -50,7 +50,7 @@ namespace debug {
         debug_mouse_pos.disable();
 
         debug_grid = world.system("Draw Grid")
-                .kind<rendering::RenderGUI>()
+                .kind<rendering::RenderGizmos>()
                 .run(systems::debug_grid_system);
         debug_grid.disable();
 

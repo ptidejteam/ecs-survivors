@@ -12,16 +12,18 @@
 namespace gameplay::systems {
     inline bool outside_side_switch = false;
     inline void spawn_enemies_around_screen_system(flecs::iter& iter, size_t i, const Spawner &spawner,
-                                                  const core::GameSettings &settings) {
+                                                  const core::GameSettings &settings,
+                                                  const rendering::TrackingCamera &camera) {
         float factor = rand() % 2 - 1;
         float neg = rand() % 1 - 1;
         float randX = outside_side_switch
                           ? neg * factor * settings.windowWidth
                           : rand() % settings.windowWidth;
+        randX += camera.camera.target.x - camera.camera.offset.x;
         float randY = outside_side_switch
                           ? rand() % settings.windowHeight
                           : neg * factor * settings.windowHeight;
-
+        randY += camera.camera.target.y - camera.camera.offset.y;
         iter.world().entity().is_a(spawner.enemy_prefab).child_of(iter.entity(i))
                 .set<core::Position2D>({randX, randY});
 

@@ -35,8 +35,30 @@ void rendering::RenderingModule::register_systems(flecs::world world) {
             .kind<PreRender>()
             .run(systems::begin_drawing_system);
 
-    world.system<const core::Position2D, const Renderable, const core::GameSettings>("Determine Visible Entities")
+    world.system<TrackingCamera>("on start begin camera mode")
+            .term_at(0).singleton()
+            .kind(flecs::OnStart)
+            .each([](TrackingCamera &camera) {
+                camera.camera.target = camera.target.get<core::Position2D>()->value;
+                camera.camera.offset = {GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f};
+                camera.camera.zoom = 1.0f;
+                camera.camera.rotation = 0;
+            });
+
+    world.system<TrackingCamera, core::GameSettings>("begin camera mode")
+            .term_at(0).singleton()
+            .term_at(1).singleton()
+            .kind<PreRender>()
+            .each([](TrackingCamera &camera, core::GameSettings &settings) {
+                camera.camera.target = camera.target.get<core::Position2D>()->value;
+                camera.camera.offset.x = settings.windowWidth / 2.0f;
+                camera.camera.offset.y = settings.windowHeight / 2.0f;
+                BeginMode2D(camera.camera);
+            });
+
+    world.system<const core::Position2D, const Renderable, const core::GameSettings, const TrackingCamera>("Determine Visible Entities")
             .term_at(2).singleton()
+            .term_at(3).singleton()
             .write<Visible>()
             .kind<PreRender>()
             .multi_threaded()
@@ -54,9 +76,15 @@ void rendering::RenderingModule::register_systems(flecs::world world) {
             })
             .each(systems::draw_entity_with_texture_system);
 
+
     world.system<ProgressBar, const core::Position2D, const Renderable>("show healthbar")
             .kind<Render>()
             .each(systems::draw_health_bar_system);
+
+    world.system("end camera mode")
+            .kind<Render>().run([&](flecs::iter &it) {
+                EndMode2D();
+            });
 
     world.system("After Draw")
             .kind<PostRender>()
@@ -65,7 +93,9 @@ void rendering::RenderingModule::register_systems(flecs::world world) {
 
 void rendering::RenderingModule::register_pipeline(flecs::world world) {
     world.component<PreRender>().add(flecs::Phase).depends_on(flecs::OnStore);
-    world.component<Render>().add(flecs::Phase).depends_on<PreRender>();
+    world.component<RenderBackground>().add(flecs::Phase).depends_on<PreRender>();
+    world.component<RenderGizmos>().add(flecs::Phase).depends_on<RenderBackground>();
+    world.component<Render>().add(flecs::Phase).depends_on<RenderGizmos>();
     world.component<RenderGUI>().add(flecs::Phase).depends_on<Render>();
     world.component<PostRender>().add(flecs::Phase).depends_on<RenderGUI>();
 }

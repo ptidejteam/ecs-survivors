@@ -6,6 +6,7 @@
 #define RENDERING_COMPONENTS_H
 
 #include <raylib.h>
+#include <modules/engine/core/components.h>
 
 namespace rendering {
     struct Priority {int priority;};
@@ -16,6 +17,11 @@ namespace rendering {
         Vector2 draw_offset;
         float scale;
         Color tint;
+    };
+
+    struct TrackingCamera {
+        flecs::entity target;
+        Camera2D camera {0};
     };
 
     struct Rotation {

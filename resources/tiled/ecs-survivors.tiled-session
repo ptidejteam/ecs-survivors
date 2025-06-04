@@ -3,8 +3,9 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "",
+    "activeFile": "maps/sampleMap.tmx",
     "expandedProjectPaths": [
+        "maps",
         "."
     ],
     "file.lastUsedOpenFilter": "All Files (*)",
@@ -27,10 +28,10 @@
         },
         "maps/sampleMap.tmx": {
             "scale": 3,
-            "selectedLayer": 2,
+            "selectedLayer": 0,
             "viewCenter": {
-                "x": 244.99999999999997,
-                "y": 177.66666666666663
+                "x": 576.3333333333333,
+                "y": 241.83333333333331
             }
         },
         "maps/sampleSheet.tsx": {
@@ -45,7 +46,7 @@
             }
         },
         "sheets/sampleSheet.tsx": {
-            "scaleInDock": 1,
+            "scaleInDock": 2.1302,
             "scaleInEditor": 1
         }
     },
@@ -60,7 +61,7 @@
     "map.tileWidth": 16,
     "map.width": 10,
     "openFiles": [
-        "dungeon.tsx"
+        "maps/sampleMap.tmx"
     ],
     "project": "ecs-survivors.tiled-project",
     "recentFiles": [

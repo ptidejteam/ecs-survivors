@@ -8,11 +8,12 @@
 namespace rendering::systems {
     inline void determine_visible_entities_system(flecs::entity e, const core::Position2D &pos,
                                                   const Renderable &renderable,
-                                                  const core::GameSettings &settings) {
-        if (pos.value.x > settings.windowWidth + renderable.texture.width || pos.value.x < -renderable.texture.
-            width ||
-            pos.value.y > settings.windowHeight + renderable.texture.height || pos.value.y < -renderable.texture
-            .height) {
+                                                  const core::GameSettings &settings,
+                                                  const TrackingCamera& camera) {
+        if (pos.value.x - camera.camera.target.x > settings.windowWidth + renderable.texture.width - camera.camera.offset.x|| pos.value.x - camera.camera.target.x < -renderable.texture.
+            width - camera.camera.offset.x ||
+            pos.value.y - camera.camera.target.y > settings.windowHeight + renderable.texture.height - camera.camera.offset.y || pos.value.y - camera.camera.target.y < -renderable.texture
+            .height - camera.camera.offset.y) {
             e.remove<Visible>();
         } else if (!e.has<Visible>()) {
             e.add<Visible>();

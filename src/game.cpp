@@ -34,6 +34,9 @@
 #include <tmxlite/TileLayer.hpp>
 #include <tmxlite/ObjectGroup.hpp>
 
+#include "modules/tilemap/components.h"
+#include "modules/tilemap/tilemap_module.h"
+
 Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(flecs::world()),
                                                                         m_windowName(windowName),
                                                                         m_windowHeight(windowHeight),
@@ -63,6 +66,7 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
     m_world.import<ai::AIModule>();
     m_world.import<gameplay::GameplayModule>();
     m_world.import<debug::DebugModule>();
+    m_world.import<tilemap::TilemapModule>();
 
     m_world.set<core::GameSettings>({
         m_windowName,
@@ -169,6 +173,17 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
 
     m_world.entity("enemy_spawner")
             .set<gameplay::Spawner>({enemy});
+
+    m_world.entity("tilemap_1")
+        .set<tilemap::Tilemap>({
+            "../resources/tiled/maps/sampleMap.tmx",
+            3.0f
+        });
+
+    m_world.set<rendering::TrackingCamera>({
+        player,
+        Camera2D {0}
+    });
 }
 
 
@@ -176,104 +191,10 @@ void Game::run() {
     // ON START
     m_world.progress();
 
-    Texture2D text;
-    tmx::Map map;
-
-    //std::vector<>
-    if (map.load("../resources/tiled/maps/sampleMap.tmx")) {
-        std::cout << "hurray" << std::endl;
-        const auto &layers = map.getLayers();
-        for (const auto &layer: layers) {
-            if (layer->getType() == tmx::Layer::Type::Object) {
-                const auto &objectLayer = layer->getLayerAs<tmx::ObjectGroup>();
-                const auto &objects = objectLayer.getObjects();
-                for (const auto &object: objects) {
-                    //do stuff with object properties
-                }
-            } else if (layer->getType() == tmx::Layer::Type::Tile) {
-                const auto &tileLayer = layer->getLayerAs<tmx::TileLayer>();
-                //read out tile layer properties etc...
-            }
-        }
-
-        const auto &tilesets = map.getTilesets();
-        for (const auto &tileset: tilesets) {
-            std::cout << tileset.getImagePath() << std::endl;
-            text = LoadTexture(tileset.getImagePath().c_str());
-            //read out tile set properties, load textures etc...
-        }
-    }
-
-
     // Main game loop
     while (!WindowShouldClose()) // Detect window close button or ESC key
     {
         m_world.progress(GetFrameTime());
-        const auto &tilesets = map.getTilesets();
-        for (const auto &tileset: tilesets) {
-            const auto &layers = map.getLayers();
-            for (const auto &layer: layers) {
-                if (layer->getType() == tmx::Layer::Type::Object) {
-                    const auto &objectLayer = layer->getLayerAs<tmx::ObjectGroup>();
-                    const auto &objects = objectLayer.getObjects();
-                    for (const auto &object: objects) {
-                        //do stuff with object properties
-                    }
-                } else if (layer->getType() == tmx::Layer::Type::Tile) {
-                    if (layer->getName() != "Dungeon") continue;
-                    const auto &tileLayer = layer->getLayerAs<tmx::TileLayer>();
-                    //read out tile layer properties etc...
-                    tmx::Vector2u size = layer->getSize();
-
-                    const auto &tiles = tileLayer.getTiles();
-                    for (int x = 0; x < size.x; x++) {
-                        for (int y = 0; y < size.y; y++) {
-                            int index = y * size.x + x;
-                            auto tile = tileset.getTile(tiles[index].ID);
-
-                            float rotation = 0;
-                            //if (tiles[index].flipFlags == tmx::TileLayer::FlipFlag::Horizontal)
-                            //    rotation = 180.f;
-
-                            DrawTexturePro(
-                                text,
-                                {
-                                    (float) tile->imagePosition.x,
-                                    (float) tile->imagePosition.y,
-                                    (float) tile->imageSize.x,
-                                    (float) tile->imageSize.y
-                                },
-                                {
-                                    (float) 0 + x * 4.f * tile->imageSize.x,
-                                    (float) 0 + y * 4.f * tile->imageSize.y,
-                                    (float) tile->imageSize.x * 4.f,
-                                    (float) tile->imageSize.y * 4.f
-                                }, {0, 0}, rotation, WHITE);
-                        }
-                    }
-                }
-            }
-        }
-
-        // for (const auto &tileset: tilesets) {
-        //     //std::cout << tileset.getImagePath() << std::endl;
-        //     for (const auto &tile: tileset.getTiles()) {
-        //         //std::cout << tile.ID << std::endl;
-        //         //tile.imagePosition
-        //         DrawTextureRec(
-        //             text, {
-        //                 (float) tile.imagePosition.x,
-        //                 (float) tile.imagePosition.y,
-        //                 (float) tile.imageSize.x,
-        //                 (float) tile.imageSize.y
-        //             }, {
-        //                 (float) tile.imagePosition.x,
-        //                 (float) tile.imagePosition.y
-        //             }, WHITE);
-        //     }
-        //     //read out tile set properties, load textures etc...
-        // }
-        //DrawTexture(text, 0,0, WHITE);
     }
     // De-Initialization
     //--------------------------------------------------------------------------------------

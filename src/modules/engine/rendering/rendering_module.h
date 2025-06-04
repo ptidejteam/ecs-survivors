@@ -5,6 +5,8 @@
 #ifndef RENDERING_MODULE_H
 #define RENDERING_MODULE_H
 
+#include <raylib.h>
+
 #include "modules/base_module.h"
 
 namespace rendering {
@@ -13,7 +15,6 @@ namespace rendering {
         RenderingModule(flecs::world world): BaseModule(world) {}
 
     private:
-        //Camera2D m_worldSpaceCamera = { 0, 0 };  // Game world camera
         void register_components(flecs::world world);
         void register_queries(flecs::world world);
         void register_systems(flecs::world world);
