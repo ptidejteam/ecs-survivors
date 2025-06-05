@@ -79,11 +79,11 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
 
     flecs::entity player = m_world.entity("player")
             .set<core::Tag>({"player"})
-            .set<core::Position2D>({GetScreenWidth() / 2.f, GetScreenHeight() / 2.f})
-            .set<core::Speed>({150})
+            .set<core::Position2D>({2300.0f, 1200.0f})
+            .set<core::Speed>({300})
             .set<physics::Velocity2D>({0, 0})
             .set<physics::DesiredVelocity2D>({0, 0})
-            .set<physics::AccelerationSpeed>({5.0})
+            .set<physics::AccelerationSpeed>({15.0})
             .set<physics::Collider>({
                 24,
                 true,
@@ -119,7 +119,7 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
             .set<gameplay::Damage>({2})
             .set<physics::Velocity2D>({0, 0})
             .set<physics::Collider>({
-                24,
+                18,
                 false,
                 physics::CollisionFilter::player,
                 physics::player_filter
@@ -190,6 +190,8 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
 void Game::run() {
     // ON START
     m_world.progress();
+
+
 
     // Main game loop
     while (!WindowShouldClose()) // Detect window close button or ESC key

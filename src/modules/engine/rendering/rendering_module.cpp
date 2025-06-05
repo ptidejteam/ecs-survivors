@@ -49,8 +49,8 @@ void rendering::RenderingModule::register_systems(flecs::world world) {
             .term_at(0).singleton()
             .term_at(1).singleton()
             .kind<PreRender>()
-            .each([](TrackingCamera &camera, core::GameSettings &settings) {
-                camera.camera.target = camera.target.get<core::Position2D>()->value;
+            .each([](flecs::iter& it, size_t, TrackingCamera &camera, core::GameSettings &settings) {
+                camera.camera.target = Vector2Lerp(camera.camera.target , camera.target.get<core::Position2D>()->value, it.delta_time() * 2.0f);
                 camera.camera.offset.x = settings.windowWidth / 2.0f;
                 camera.camera.offset.y = settings.windowHeight / 2.0f;
                 BeginMode2D(camera.camera);

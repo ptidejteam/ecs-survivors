@@ -20,9 +20,14 @@ namespace tilemap {
                 .kind(flecs::OnStart)
                 .each(systems::create_tilemap_system);
 
+        world.system<TilemapLayer>("Draw Tilemap layer")
+                .kind<rendering::RenderBackground>()
+                .each(systems::draw_tilemap_layers_system);
+
         world.system<TilemapLayerTile>("Draw Tilemap layer tiles")
                 .with<TilemapLayer>().parent()
                 .kind<rendering::RenderBackground>()
-                .each(systems::draw_tilemap_layer_tiles_system);
+                .each(systems::draw_tilemap_layer_tiles_system)
+                .disable();
     }
 }

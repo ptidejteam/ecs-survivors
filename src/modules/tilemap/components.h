@@ -17,10 +17,11 @@ namespace tilemap {
     };
 
     struct TilemapTileset {
-        Texture texture;
+        Texture2D texture;
     };
 
     struct TilemapLayer {
+        Texture2D texture;
     };
 
     struct TilemapLayerTile {

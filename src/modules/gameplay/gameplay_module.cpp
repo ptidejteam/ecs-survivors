@@ -108,7 +108,6 @@ namespace gameplay {
                 .kind<OnCollisionDetected>()
                 .each(systems::deal_damage_on_collision_system);
 
-
         world.system<Health, TakeDamage>("take damage")
                 .kind<PostCollisionDetected>()
                 .each(systems::take_damage_system);

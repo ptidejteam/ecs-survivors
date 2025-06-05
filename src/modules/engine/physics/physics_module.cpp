@@ -32,6 +32,8 @@ namespace physics {
     void PhysicsModule::register_queries(flecs::world &world) {
         queries::visible_collision_bodies_query = world.query_builder<core::Position2D, Collider>().with<
             rendering::Visible>().build();
+
+        queries::box_collider_query = world.query_builder<BoxCollider>().build();
     }
 
 
@@ -63,6 +65,93 @@ namespace physics {
                 .tick_source(m_physicsTick)
                 .multi_threaded()
                 .each(systems::collision_detection_system);
+
+        world.system<CollisionRecordList, const BoxCollider>(
+                    "Detect Collisions Environment ECS (Naive Record List)")
+                .term_at(0).singleton()
+                .kind<Detection>()
+                .tick_source(m_physicsTick)
+                .multi_threaded()
+                .each([](flecs::iter &self_it, size_t self_id, CollisionRecordList &list,
+                         const BoxCollider &collider) {
+                    flecs::world stage_world = self_it.world();
+
+                    // Build a staged query, and filter
+                    auto visible_query = stage_world.query_builder<const core::Position2D, const Collider>()
+                            .with<rendering::Visible>().build();
+
+                    visible_query.each(
+                        [&](flecs::iter &other_it, size_t other_id, const core::Position2D &other_pos,
+                            const Collider &other_collider) {
+                            //if (self_id > other_id) return;
+
+                            float recCenterX = collider.rec.x + collider.rec.width / 2.0f;
+                            float recCenterY = collider.rec.y + collider.rec.height / 2.0f;
+
+                            float halfWidth = collider.rec.width / 2.0f;
+                            float halfHeight = collider.rec.height / 2.0f;
+
+                            float dx = other_pos.value.x - recCenterX;
+                            float dy = other_pos.value.y - recCenterY;
+
+                            float absDx = fabsf(dx);
+                            float absDy = fabsf(dy);
+
+                            if (absDx > (halfWidth + other_collider.radius)) return;
+                            if (absDy > (halfHeight + other_collider.radius)) return;
+
+
+                            flecs::entity other = other_it.entity(other_id);
+                            if (absDx <= halfWidth || absDy <= halfHeight) {
+                                //std::cout << "collided 1" << std::endl;
+                                // Side collision — resolve with axis-aligned MTV
+                                float overlapX = (halfWidth + other_collider.radius) - absDx;
+                                float overlapY = (halfHeight + other_collider.radius) - absDy;
+
+                                if (overlapX < overlapY) {
+                                    other.set<core::Position2D>({
+                                        other_pos.value.x + ((dx < 0) ? -overlapX : overlapX), other_pos.value.y
+                                    });
+                                } else {
+                                    other.set<core::Position2D>({
+                                        other_pos.value.x, other_pos.value.y + ((dy < 0) ? -overlapY : overlapY)
+                                    });
+                                }
+
+                                if (!other_collider.correct_position) {
+                                    other.add<core::DestroyAfterFrame>();
+                                }
+
+                                return;
+                            }
+
+                            // Corner collision
+                            float cornerDx = absDx - halfWidth;
+                            float cornerDy = absDy - halfHeight;
+
+                            float cornerDistSq = cornerDx * cornerDx + cornerDy * cornerDy;
+                            float radius = other_collider.radius;
+
+                            if (cornerDistSq < radius * radius) {
+                                //std::cout << "collided 2" << std::endl;
+                                float dist = sqrtf(cornerDistSq);
+
+                                if (dist == 0.0f) dist = 0.01f; // Avoid divide by zero
+
+                                float overlap = radius - dist;
+                                float nx = cornerDx / dist;
+                                float ny = cornerDy / dist;
+
+                                other.set<core::Position2D>({
+                                    other_pos.value.x + nx * overlap * ((dx < 0) ? -1.0f : 1.0f),
+                                    other_pos.value.y + ny * overlap * ((dy < 0) ? -1.0f : 1.0f)
+                                });
+                                if (!other_collider.correct_position) {
+                                    other.add<core::DestroyAfterFrame>();
+                                }
+                            }
+                        });
+                });
 
         world.system<CollisionRecordList>("Add CollidedWith Component")
                 .term_at(0).singleton()

@@ -32,6 +32,10 @@ namespace physics {
         CollisionFilter collision_filter;
     };
 
+    struct BoxCollider {
+        Rectangle rec;
+    };
+
     struct CollidedWith {};
 
     struct CollisionRecord {

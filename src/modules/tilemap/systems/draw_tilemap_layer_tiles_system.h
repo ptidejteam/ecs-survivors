@@ -21,6 +21,17 @@ namespace tilemap::systems {
             },
             tile.rotation, WHITE);
     }
+
+    inline void draw_tilemap_layers_system(flecs::entity e, TilemapLayer &layer) {
+        DrawTexturePro(
+            layer.texture,
+            {0, 0, (float) layer.texture.width, -(float) layer.texture.height}, // <-- flip Y
+            {0, 0, (float) layer.texture.width, (float) layer.texture.height},
+            {0, 0},
+            0.0f,
+            WHITE
+        );
+    }
 }
 
 #endif //DRAW_TILEMAP_LAYER_TILES_SYSTEM_H
