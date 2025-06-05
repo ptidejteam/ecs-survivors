@@ -8,7 +8,6 @@
 #include "modules/engine/rendering/pipeline_steps.h"
 #include "modules/engine/rendering/rendering_module.h"
 #include "systems/create_tilemap_system.h"
-#include "systems/draw_tilemap_layer_tiles_system.h"
 
 
 namespace tilemap {
@@ -20,14 +19,5 @@ namespace tilemap {
                 .kind(flecs::OnStart)
                 .each(systems::create_tilemap_system);
 
-        world.system<TilemapLayer>("Draw Tilemap layer")
-                .kind<rendering::RenderBackground>()
-                .each(systems::draw_tilemap_layers_system);
-
-        world.system<TilemapLayerTile>("Draw Tilemap layer tiles")
-                .with<TilemapLayer>().parent()
-                .kind<rendering::RenderBackground>()
-                .each(systems::draw_tilemap_layer_tiles_system)
-                .disable();
     }
 }

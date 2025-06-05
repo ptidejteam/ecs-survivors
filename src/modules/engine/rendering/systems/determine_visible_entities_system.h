@@ -10,6 +10,7 @@ namespace rendering::systems {
                                                   const Renderable &renderable,
                                                   const core::GameSettings &settings,
                                                   const TrackingCamera& camera) {
+        //if (!camera.target.is_alive()) return;
         if (pos.value.x - camera.camera.target.x > settings.windowWidth + renderable.texture.width - camera.camera.offset.x|| pos.value.x - camera.camera.target.x < -renderable.texture.
             width - camera.camera.offset.x ||
             pos.value.y - camera.camera.target.y > settings.windowHeight + renderable.texture.height - camera.camera.offset.y || pos.value.y - camera.camera.target.y < -renderable.texture

@@ -39,6 +39,7 @@ void rendering::RenderingModule::register_systems(flecs::world world) {
             .term_at(0).singleton()
             .kind(flecs::OnStart)
             .each([](TrackingCamera &camera) {
+                if (!camera.target.is_alive()) return;
                 camera.camera.target = camera.target.get<core::Position2D>()->value;
                 camera.camera.offset = {GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f};
                 camera.camera.zoom = 1.0f;
@@ -50,7 +51,11 @@ void rendering::RenderingModule::register_systems(flecs::world world) {
             .term_at(1).singleton()
             .kind<PreRender>()
             .each([](flecs::iter& it, size_t, TrackingCamera &camera, core::GameSettings &settings) {
-                camera.camera.target = Vector2Lerp(camera.camera.target , camera.target.get<core::Position2D>()->value, it.delta_time() * 2.0f);
+                Vector2 pos = camera.camera.target;
+                if (camera.target.is_alive()) {
+                    pos = camera.target.get<core::Position2D>()->value;
+                };
+                camera.camera.target = Vector2Lerp(camera.camera.target ,pos , it.delta_time() * 2.0f);
                 camera.camera.offset.x = settings.windowWidth / 2.0f;
                 camera.camera.offset.y = settings.windowHeight / 2.0f;
                 BeginMode2D(camera.camera);
@@ -64,6 +69,18 @@ void rendering::RenderingModule::register_systems(flecs::world world) {
             .multi_threaded()
             .each(systems::determine_visible_entities_system);
 
+    world.system<const Renderable>("Draw Background Textures")
+            .kind<RenderBackground>()
+            .without<core::Position2D>()
+            .with<Priority>()
+            .order_by<Priority>([](flecs::entity_t e1, const Priority *p1, flecs::entity_t e2, const Priority *p2) {
+                int order = p1->priority - p2->priority;
+                if (order == 0)
+                    return static_cast<int>(e1 - e2);
+                return p1->priority - p2->priority;
+            })
+            .each(systems::draw_background_textures_system);
+
     world.system<const Renderable, const core::Position2D, const Rotation *>("Draw Entities with Textures")
             .kind<Render>()
             .with<Visible>()
@@ -75,6 +92,7 @@ void rendering::RenderingModule::register_systems(flecs::world world) {
                 return p1->priority - p2->priority;
             })
             .each(systems::draw_entity_with_texture_system);
+
 
 
     world.system<ProgressBar, const core::Position2D, const Renderable>("show healthbar")

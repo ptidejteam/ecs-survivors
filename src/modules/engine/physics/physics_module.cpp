@@ -77,8 +77,7 @@ namespace physics {
                     flecs::world stage_world = self_it.world();
 
                     // Build a staged query, and filter
-                    auto visible_query = stage_world.query_builder<const core::Position2D, const Collider>()
-                            .with<rendering::Visible>().build();
+                    auto visible_query = stage_world.query_builder<const core::Position2D, const Collider>().build();
 
                     visible_query.each(
                         [&](flecs::iter &other_it, size_t other_id, const core::Position2D &other_pos,
