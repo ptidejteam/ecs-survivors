@@ -14,6 +14,7 @@ if (EMSCRIPTEN)
     set(CMAKE_EXE_LINKER_FLAGS "\
         ${CMAKE_EXE_LINKER_FLAGS} \
         --embed-file resources \
+        --shell-file _deps/raylib-src/src/minshell.html \
         -s USE_GLFW=3 \
         -s ASSERTIONS=1 \
         -s WASM=1 \
