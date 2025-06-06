@@ -175,31 +175,46 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
             .set<gameplay::Spawner>({enemy});
 
     m_world.entity("tilemap_1")
-        .set<tilemap::Tilemap>({
-            "../resources/tiled/maps/sampleMap.tmx",
-            3.0f
-        });
+            .set<tilemap::Tilemap>({
+                "../resources/tiled/maps/sampleMap.tmx",
+                3.0f
+            });
 
     m_world.set<rendering::TrackingCamera>({
         player,
-        Camera2D {0}
+        Camera2D{0}
     });
 }
+
 
 
 void Game::run() {
     // ON START
     m_world.progress();
 
-
+#if defined(EMSCRIPTEN)
+    emscripten_set_main_loop_arg(UpdateDrawFrameWeb, this, 0, 1);
+#else
 
     // Main game loop
     while (!WindowShouldClose()) // Detect window close button or ESC key
     {
-        m_world.progress(GetFrameTime());
+        UpdateDrawFrameDesktop();
     }
+#endif
     // De-Initialization
     //--------------------------------------------------------------------------------------
     CloseWindow(); // Close window and OpenGL context
     //--------------------------------------------------------------------------------------
 }
+
+void Game::UpdateDrawFrameDesktop() {
+    m_world.progress(GetFrameTime());
+}
+
+void Game::UpdateDrawFrameWeb(void* game) {
+    Game* instance = static_cast<Game*>(game);
+    instance->m_world.progress(GetFrameTime());
+}
+
+

@@ -15,6 +15,9 @@ public:
     void run();
 
 private:
+
+    void UpdateDrawFrameDesktop();
+    static void UpdateDrawFrameWeb(void* world);
     flecs::world m_world;
     std::string m_windowName;
     int m_windowHeight;
