@@ -33,4 +33,4 @@ Thankfully Raylib and Flecs can both be compiled to web assembly and Raylib prov
 When the build is complete, navigate to the .html file and run this command: ```python -m http.server 8080```
 
 # Contact
-laurent.voisard@mail.concordia
+laurent.voisard@mail.concordia.ca
