@@ -31,3 +31,6 @@ Thankfully Raylib and Flecs can both be compiled to web assembly and Raylib prov
 -DPLATFORM="Web" -DCMAKE_TOOLCHAIN_FILE=<path_to_emsdk>/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake
 
 When the build is complete, navigate to the .html file and run this command: ```python -m http.server 8080```
+
+# Contact
+laurent.voisard@mail.concordia
