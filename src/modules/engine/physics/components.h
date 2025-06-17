@@ -8,35 +8,45 @@
 #include <vector>
 
 namespace physics {
+    struct CircleCollider;
+    struct BoxCollider;
+
     enum CollisionFilter {
         none = 0x00,
         player = 0x01,
         enemy = 0x02,
-        more = 0x04,
+        environment = 0x04,
     };
 
     struct Velocity2D {
-      Vector2 value;
+        Vector2 value;
     };
+
     struct DesiredVelocity2D {
         Vector2 value;
     };
+
     struct AccelerationSpeed {
         float value;
     };
 
     struct Collider {
-        float radius;
         bool correct_position;
+        bool static_body;
+        Rectangle bounds;
         CollisionFilter collision_type;
         CollisionFilter collision_filter;
     };
 
-    struct BoxCollider {
-        Rectangle rec;
+    struct CircleCollider {
+        float radius;
     };
 
-    struct CollidedWith {};
+    struct BoxCollider {
+    };
+
+    struct CollidedWith {
+    };
 
     struct CollisionRecord {
         flecs::entity a;

@@ -100,7 +100,7 @@ void rendering::RenderingModule::register_systems(flecs::world world) {
             .each(systems::draw_health_bar_system);
 
     world.system("end camera mode")
-            .kind<Render>().run([&](flecs::iter &it) {
+            .kind<RenderGUI>().run([&](flecs::iter &it) {
                 EndMode2D();
             });
 
@@ -112,9 +112,9 @@ void rendering::RenderingModule::register_systems(flecs::world world) {
 void rendering::RenderingModule::register_pipeline(flecs::world world) {
     world.component<PreRender>().add(flecs::Phase).depends_on(flecs::OnStore);
     world.component<RenderBackground>().add(flecs::Phase).depends_on<PreRender>();
-    world.component<RenderGizmos>().add(flecs::Phase).depends_on<RenderBackground>();
-    world.component<Render>().add(flecs::Phase).depends_on<RenderGizmos>();
-    world.component<RenderGUI>().add(flecs::Phase).depends_on<Render>();
+    world.component<Render>().add(flecs::Phase).depends_on<RenderBackground>();
+    world.component<RenderGizmos>().add(flecs::Phase).depends_on<Render>();
+    world.component<RenderGUI>().add(flecs::Phase).depends_on<RenderGizmos>();
     world.component<PostRender>().add(flecs::Phase).depends_on<RenderGUI>();
 }
 

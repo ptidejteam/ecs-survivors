@@ -13,6 +13,7 @@
 
 #include "modules/engine/core/components.h"
 #include "modules/engine/physics/components.h"
+#include "modules/engine/physics/physics_module.h"
 #include "modules/engine/rendering/components.h"
 #include "modules/tilemap/components.h"
 
@@ -162,7 +163,7 @@ namespace tilemap::systems {
                     while (rect_x + rect_width < map.getTileCount().x &&
                            collision_map[y * map.getTileCount().x + (rect_x + rect_width)]) {
                         rect_width++;
-                           }
+                    }
 
                     // 2. Extend downwards to find maximum height
                     // We need to check if the entire proposed row below is clear (collidable)
@@ -199,7 +200,16 @@ namespace tilemap::systems {
             }
 
             for (auto col: merged_colliders) {
-                e.world().entity().set<physics::BoxCollider>({col});
+                e.world().entity()
+                        .set<core::Position2D>({col.x, col.y})
+                        .set<physics::Collider>({
+                            false,
+                            true,
+                            {0, 0, col.width, col.height},
+                            physics::environment, physics::environment_filter
+                        })
+                        .add<physics::BoxCollider>()
+                        .add<rendering::Visible>();
             }
         }
     }

@@ -12,6 +12,6 @@
 
 namespace physics::queries {
     inline flecs::query<core::Position2D, Collider> visible_collision_bodies_query;
-    inline flecs::query<BoxCollider> box_collider_query;
+    inline flecs::query<core::Position2D, Collider> box_collider_query;
 }
 #endif //PHYSICS_QUERIES_H

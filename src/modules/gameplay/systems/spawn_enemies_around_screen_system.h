@@ -16,7 +16,7 @@ namespace gameplay::systems {
     inline void spawn_enemies_around_screen_system(flecs::iter &iter, size_t i, const Spawner &spawner,
                                                    const core::GameSettings &settings,
                                                    const rendering::TrackingCamera &camera) {
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 1; i++) {
             float factor = rand() % 2 - 1;
             float neg = rand() % 1 - 1;
             float randX = outside_side_switch
@@ -32,9 +32,11 @@ namespace gameplay::systems {
             physics::queries::box_collider_query.run([&](flecs::iter &it) {
                 while (it.next()) {
                     if (!is_valid) break;
-                    auto box = it.field<physics::BoxCollider>(0);
+                    auto pos = it.field<core::Position2D>(0);
+                    auto box = it.field<physics::Collider>(1);
                     for (auto j: it) {
-                        if (CheckCollisionPointRec({randX, randY}, box[j].rec)) {
+                        const Rectangle rec = {pos[j].value.x + box[j].bounds.x, pos[j].value.y + box[j].bounds.y, box[j].bounds.width, box[j].bounds.height};
+                        if (CheckCollisionPointRec({randX, randY}, rec)) {
                             is_valid = false;
                             break;
                         }

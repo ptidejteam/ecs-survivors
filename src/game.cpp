@@ -85,11 +85,13 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
             .set<physics::DesiredVelocity2D>({0, 0})
             .set<physics::AccelerationSpeed>({15.0})
             .set<physics::Collider>({
-                24,
                 true,
+                false,
+                {-24, -24, 48, 48},
                 physics::CollisionFilter::player,
                 physics::player_filter
             })
+            .set<physics::CircleCollider>({24})
             .set<rendering::Priority>({2})
             .set<rendering::Renderable>({
                 LoadTexture("../resources/player.png"), // 8x8
@@ -119,11 +121,13 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
             .set<gameplay::Damage>({2})
             .set<physics::Velocity2D>({0, 0})
             .set<physics::Collider>({
-                18,
                 false,
+                false,
+                {-18, -18, 36, 36},
                 physics::CollisionFilter::player,
-                physics::player_filter
+                physics::player_filter,
             })
+            .set<physics::CircleCollider>({18})
             .set<rendering::Priority>({1})
             .set<rendering::Renderable>({
                 LoadTexture("../resources/dagger.png"), // 8x8
@@ -158,11 +162,12 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
             .set<physics::DesiredVelocity2D>({0, 0})
             .set<physics::AccelerationSpeed>({5.0})
             .set<physics::Collider>({
-                24,
                 true,
-                physics::CollisionFilter::enemy,
-                physics::enemy_filter
+                false,
+                {-24, -24, 48, 48},
+                physics::CollisionFilter::enemy, physics::enemy_filter,
             })
+            .set<physics::CircleCollider>({24})
             .set<rendering::Renderable>({
                 LoadTexture("../resources/ghost.png"), // 8x8
                 {0, 0},
@@ -185,7 +190,6 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
         Camera2D{0}
     });
 }
-
 
 
 void Game::run() {
@@ -212,9 +216,7 @@ void Game::UpdateDrawFrameDesktop() {
     m_world.progress(GetFrameTime());
 }
 
-void Game::UpdateDrawFrameWeb(void* game) {
-    Game* instance = static_cast<Game*>(game);
+void Game::UpdateDrawFrameWeb(void *game) {
+    Game *instance = static_cast<Game *>(game);
     instance->m_world.progress(GetFrameTime());
 }
-
-

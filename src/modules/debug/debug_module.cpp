@@ -27,15 +27,35 @@ namespace debug {
     }
 
     void DebugModule::register_systems(flecs::world &world) {
-        debug_circle_colliders = world.system<const physics::Collider, const core::Position2D>("Debug circle colliders")
+
+        world.system<const core::Position2D, const physics::Collider>("Show ID")
+                .kind<rendering::RenderGizmos>()
+                .each([](flecs::entity e,const core::Position2D& pos, const physics::Collider &collider) {
+                        DrawText(
+                            std::to_string(e.id()).c_str(),
+                            pos.value.x + collider.bounds.x + 12,
+                            pos.value.y + collider.bounds.y + 12, 16, GREEN);
+                }).disable();
+
+        world.system<const core::Position2D, const physics::Collider>("Debug colliders")
+                .kind<rendering::RenderGizmos>()
+                .each([](const core::Position2D &pos, const physics::Collider &collider) {
+                    DrawRectangleLines(pos.value.x + collider.bounds.x, pos.value.y + collider.bounds.y,
+                                       collider.bounds.width, collider.bounds.height, GREEN);
+                });
+
+        debug_circle_colliders = world.system<const physics::CircleCollider, const core::Position2D>(
+                    "Debug circle colliders")
                 .kind<rendering::RenderGizmos>()
                 .with<rendering::Visible>()
                 .group_by<rendering::Priority>()
                 .each(systems::debug_circle_colliders_system);
         debug_circle_colliders.disable();
 
-        debug_square_colliders = world.system<const physics::BoxCollider>("Debug square colliders")
+        debug_square_colliders = world.system<const core::Position2D, const physics::Collider>(
+                    "Debug square colliders")
                 .kind<rendering::RenderGizmos>()
+                .with<physics::BoxCollider>()
                 .each(systems::debug_static_colliders_system);
         debug_square_colliders.disable();
 
@@ -73,7 +93,7 @@ namespace debug {
                 .set<rendering::gui::MenuBarTabItem>({
                     "Toggle Circle Colliders", debug_circle_colliders, rendering::gui::TOGGLE
                 });
-            world.entity("debug_collisions_item_1_2").child_of(dropdown)
+        world.entity("debug_collisions_item_1_2").child_of(dropdown)
                 .set<rendering::gui::MenuBarTabItem>({
                     "Toggle Square Colliders", debug_square_colliders, rendering::gui::TOGGLE
                 });

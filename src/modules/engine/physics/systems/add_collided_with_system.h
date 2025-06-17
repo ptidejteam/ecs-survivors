@@ -9,6 +9,7 @@
 
 namespace physics::systems {
     inline void add_collided_with_system(CollisionRecordList& list) {
+
         for (CollisionRecord rec: list.significant_collisions) {
             rec.a.add<CollidedWith>(rec.b);
             rec.b.add<CollidedWith>(rec.a);

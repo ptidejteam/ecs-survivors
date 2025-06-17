@@ -12,7 +12,7 @@ namespace gameplay::systems {
     inline void deal_damage_on_collision_system(flecs::iter &it, size_t i, Damage &dmg) {
         flecs::entity other = it.pair(1).second();
 
-        if (other.has<TakeDamage>() && !other.has<Health>()) return;
+        if (other.has<TakeDamage>() || !other.has<Health>()) return;
         other.set<TakeDamage>({dmg.value});
     }
 }
