@@ -14,56 +14,59 @@
 #include "modules/gameplay/components.h"
 
 namespace physics::systems {
+    inline bool handle_circle_circle(flecs::entity &a, const Collider *base_col, flecs::entity &b,
+                                     const Collider *other_base_col) {
+        Vector2 mypos = a.get<core::Position2D>()->value;
+        Vector2 otherPos = b.get<core::Position2D>()->value;
+
+        const CircleCollider *col = a.get<CircleCollider>();
+        const CircleCollider *other_col = b.get<CircleCollider>();
+
+        if (!CheckCollisionCircles(mypos, col->radius, otherPos, other_col->radius)) return false;
+        if (!base_col->correct_position || !other_base_col->correct_position) return true;
+        PhysicsModule::collide_circles(
+            col, a.get_mut<core::Position2D>(), base_col->correct_position,
+            other_col, b.get_mut<core::Position2D>(), other_base_col->correct_position);
+        return true;
+    }
+
+    inline bool handle_circle_rec_collision(flecs::entity &circle, const Collider *base_col, flecs::entity &b,
+                                            const Collider *other_base_col) {
+        Vector2 mypos = circle.get<core::Position2D>()->value;
+        Vector2 otherPos = b.get<core::Position2D>()->value;
+        const CircleCollider *circle_col = circle.get<CircleCollider>();
+        if (!CheckCollisionCircleRec(mypos, circle_col->radius, {
+                                         otherPos.x + other_base_col->bounds.x,
+                                         otherPos.y + other_base_col->bounds.y, other_base_col->bounds.width,
+                                         other_base_col->bounds.height
+                                     })) {
+            return false;
+        }
+
+        PhysicsModule::collide_circle_rec(
+            circle_col, circle.get_mut<core::Position2D>(), base_col->correct_position,
+            other_base_col, b.get_mut<core::Position2D>(), other_base_col->correct_position);
+        return true;
+    }
+
     inline void collision_resolution_system(CollisionRecordList &rec) {
         //std::cout << rec.records.size() << std::endl;
         for (auto &record: rec.records) {
             flecs::entity other = record.b; // Colliding entity
             flecs::entity self = record.a; // Current entity
-            Vector2 mypos = self.get<core::Position2D>()->value;
-            Vector2 otherPos = other.get<core::Position2D>()->value;
 
             const Collider *base_col = self.get<Collider>();
             const Collider *other_base_col = other.get<Collider>();
 
+
             bool collided = false;
 
             if (self.has<CircleCollider>() && other.has<CircleCollider>()) {
-                const CircleCollider *col = self.get<CircleCollider>();
-                const CircleCollider *other_col = other.get<CircleCollider>();
-                if (!CheckCollisionCircles(mypos, col->radius, otherPos, other_col->radius)) continue;
-                PhysicsModule::collide_circles(
-                    col, self.get_mut<core::Position2D>(), base_col->correct_position,
-                    other_col, other.get_mut<core::Position2D>(), other_base_col->correct_position);
-
-                collided = true;
+                collided = handle_circle_circle(self, base_col, other, base_col);
             } else if (self.has<BoxCollider>() && other.has<CircleCollider>()) {
-                const CircleCollider *circle_col = other.get<CircleCollider>();
-                if (!CheckCollisionCircleRec(otherPos, circle_col->radius, {
-                                                 mypos.x + base_col->bounds.x, mypos.y + base_col->bounds.y,
-                                                 base_col->bounds.width, base_col->bounds.height
-                                             })) {
-                    continue;
-                }
-                PhysicsModule::collide_circle_rec(
-                    circle_col, other.get_mut<core::Position2D>(), other_base_col->correct_position,
-                    base_col, self.get_mut<core::Position2D>(), base_col->correct_position);
-
-                collided = true;
+                collided = handle_circle_rec_collision(other, other_base_col, self, base_col);
             } else if (self.has<CircleCollider>() && other.has<BoxCollider>()) {
-                const CircleCollider *circle_col = self.get<CircleCollider>();
-                if (!CheckCollisionCircleRec(mypos, circle_col->radius, {
-                                                 otherPos.x + other_base_col->bounds.x,
-                                                 otherPos.y + other_base_col->bounds.y, other_base_col->bounds.width,
-                                                 other_base_col->bounds.height
-                                             })) {
-                    continue;
-                }
-
-                PhysicsModule::collide_circle_rec(
-                    circle_col, self.get_mut<core::Position2D>(), base_col->correct_position,
-                    other_base_col, other.get_mut<core::Position2D>(), other_base_col->correct_position);
-
-                collided = true;
+                collided = handle_circle_rec_collision(self, base_col, other, other_base_col);
             } else if (self.has<BoxCollider>() && other.has<BoxCollider>()) {
                 collided = true;
             }

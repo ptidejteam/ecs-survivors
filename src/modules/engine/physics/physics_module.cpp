@@ -44,29 +44,30 @@ namespace physics {
 
         world.system<const Velocity2D, DesiredVelocity2D>("reset desired vel")
                 .kind(flecs::PreUpdate)
-                .tick_source(m_physicsTick)
                 .multi_threaded()
+                .tick_source(m_physicsTick)
                 .each(systems::reset_desired_velocity_system);
 
         world.system<Velocity2D, const DesiredVelocity2D, const AccelerationSpeed>("Lerp Current to Desired Velocity")
                 .kind<UpdateBodies>()
-                .tick_source(m_physicsTick)
                 .multi_threaded()
+                .tick_source(m_physicsTick)
                 .each(systems::update_velocity_system);
 
         world.system<core::Position2D, const Velocity2D>("Update Position")
                 .kind<UpdateBodies>()
-                .tick_source(m_physicsTick)
                 .multi_threaded()
+                .tick_source(m_physicsTick)
                 .each(systems::update_position_system);
 
         world.system<CollisionRecordList, const core::Position2D, const Collider>(
                     "Detect Collisions ECS (Naive Record List)")
                 .term_at(0).singleton()
-                .kind<Detection>().with<rendering::Visible>()
-                .tick_source(m_physicsTick)
+                .with<rendering::Visible>()
+                .kind<Detection>()
                 .multi_threaded()
-                .each(systems::collision_detection_all_system);
+                .tick_source(m_physicsTick)
+                .each(systems::collision_detection_system);
 
         world.system<CollisionRecordList>("Collision Resolution ECS (Naive Record List)")
                 .term_at(0).singleton()
@@ -82,9 +83,9 @@ namespace physics {
 
         world.system("Collision Cleanup")
                 .kind<CollisionCleanup>()
-                .tick_source(m_physicsTick)
                 .with<CollidedWith>(flecs::Wildcard)
                 .multi_threaded()
+                .tick_source(m_physicsTick)
                 .each(systems::collision_cleanup_system);
     }
 

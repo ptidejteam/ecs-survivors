@@ -75,6 +75,19 @@ namespace gameplay {
                 .term_at(0).parent()
                 .each(systems::fire_projectile_system);
 
+            world.system("check if hit walls")
+                .with<Projectile>()
+                .with<physics::CollidedWith>(flecs::Wildcard)
+                .kind<OnCollisionDetected>()
+                .immediate()
+                .each([](flecs::iter& it, size_t i) {
+                        flecs::entity other = it.pair(1).second();
+                        if (other.get<physics::Collider>()->collision_type == physics::environment) {
+                                it.entity(i).remove<physics::CollidedWith>(other);
+                                it.entity(i).add<core::DestroyAfterFrame>();
+                        }
+                });
+
         world.system("no pierce or chain")
                 .with<Projectile>()
                 .without<Pierce>().without<Chain>()
@@ -94,7 +107,6 @@ namespace gameplay {
                 .kind<OnCollisionDetected>()
                 .immediate()
                 .each(systems::projectile_chain_collided_system);
-
 
         world.system<Split, physics::Velocity2D, core::Position2D, rendering::Rotation, Attack>("apply split mod")
                 .with<physics::CollidedWith>(flecs::Wildcard)
