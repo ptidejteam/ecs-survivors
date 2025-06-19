@@ -89,7 +89,8 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
                 false,
                 {-24, -24, 48, 48},
                 physics::CollisionFilter::player,
-                physics::player_filter
+                physics::player_filter,
+                physics::ColliderType::Circle,
             })
             .set<physics::CircleCollider>({24})
             .set<rendering::Priority>({2})
@@ -100,7 +101,7 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
                 WHITE
             })
             .set<gameplay::Health>({150, 150})
-            .set<gameplay::RegenHealth>({2.5f});
+            .set<gameplay::RegenHealth>({250.0f});
 
     m_world.entity("dagger attack").child_of(player)
             .add<gameplay::Projectile>()
@@ -126,6 +127,7 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
                 {-18, -18, 36, 36},
                 physics::CollisionFilter::player,
                 physics::player_filter,
+                physics::ColliderType::Circle,
             })
             .set<physics::CircleCollider>({18})
             .set<rendering::Priority>({1})
@@ -166,6 +168,7 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
                 false,
                 {-24, -24, 48, 48},
                 physics::CollisionFilter::enemy, physics::enemy_filter,
+                physics::ColliderType::Circle
             })
             .set<physics::CircleCollider>({24})
             .set<rendering::Renderable>({

@@ -206,10 +206,11 @@ namespace tilemap::systems {
                             false,
                             true,
                             {0, 0, col.width, col.height},
-                            physics::environment, physics::environment_filter
+                            physics::environment, physics::environment_filter,
+                            physics::ColliderType::Box
                         })
                         .add<physics::BoxCollider>()
-                        .add<rendering::Visible>();
+                        .add<physics::StaticCollider>();
             }
         }
     }

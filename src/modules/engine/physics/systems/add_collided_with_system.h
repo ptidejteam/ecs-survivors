@@ -13,6 +13,8 @@ namespace physics::systems {
         for (CollisionRecord rec: list.significant_collisions) {
             rec.a.add<CollidedWith>(rec.b);
             rec.b.add<CollidedWith>(rec.a);
+            list.collisions_info[rec.a.id()] = {{0,0}, {0,0}};
+            list.collisions_info[rec.b.id()] = {{0,0}, {0,0}};
         }
 
         list.significant_collisions.clear();

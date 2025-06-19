@@ -11,9 +11,9 @@ namespace rendering::systems {
                                                   const core::GameSettings &settings,
                                                   const TrackingCamera& camera) {
         //if (!camera.target.is_alive()) return;
-        if (pos.value.x - camera.camera.target.x > settings.windowWidth + renderable.texture.width - camera.camera.offset.x|| pos.value.x - camera.camera.target.x < -renderable.texture.
+        if (pos.value.x - camera.camera.target.x > settings.windowWidth * 1.05f + renderable.texture.width - camera.camera.offset.x|| pos.value.x - camera.camera.target.x + settings.windowWidth * 0.05f < -renderable.texture.
             width - camera.camera.offset.x ||
-            pos.value.y - camera.camera.target.y > settings.windowHeight + renderable.texture.height - camera.camera.offset.y || pos.value.y - camera.camera.target.y < -renderable.texture
+            pos.value.y - camera.camera.target.y > settings.windowHeight * 1.05f + renderable.texture.height - camera.camera.offset.y || pos.value.y - camera.camera.target.y + settings.windowHeight * 0.05f < -renderable.texture
             .height - camera.camera.offset.y) {
             e.remove<Visible>();
         } else if (!e.has<Visible>()) {

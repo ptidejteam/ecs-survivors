@@ -60,14 +60,24 @@ namespace physics {
                 .tick_source(m_physicsTick)
                 .each(systems::update_position_system);
 
+        // need a second pass to collide static colliders. Even when static objects are out of the screen we compute the collision
         world.system<CollisionRecordList, const core::Position2D, const Collider>(
-                    "Detect Collisions ECS (Naive Record List)")
+                    "Detect Collisions ECS (Naive Record List) static")
+                .term_at(0).singleton()
+                .with<StaticCollider>()
+                .kind<Detection>()
+                .multi_threaded()
+                .tick_source(m_physicsTick)
+                .each(systems::collision_detection_static_system);
+
+        world.system<CollisionRecordList, const core::Position2D, const Collider>(
+                    "Detect Collisions ECS (Naive Record List) non-static")
                 .term_at(0).singleton()
                 .with<rendering::Visible>()
                 .kind<Detection>()
                 .multi_threaded()
                 .tick_source(m_physicsTick)
-                .each(systems::collision_detection_system);
+                .each(systems::collision_detection_non_static_system);
 
         world.system<CollisionRecordList>("Collision Resolution ECS (Naive Record List)")
                 .term_at(0).singleton()
@@ -87,6 +97,14 @@ namespace physics {
                 .multi_threaded()
                 .tick_source(m_physicsTick)
                 .each(systems::collision_cleanup_system);
+
+        world.system<CollisionRecordList>("Collision Cleanup List")
+                .term_at(0).singleton()
+                .kind<CollisionCleanup>()
+                .tick_source(m_physicsTick)
+                .each([](CollisionRecordList& list) {
+                    list.collisions_info.clear();
+                });
     }
 
     void PhysicsModule::register_pipeline(flecs::world &world) {

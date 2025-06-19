@@ -27,22 +27,23 @@ namespace debug {
     }
 
     void DebugModule::register_systems(flecs::world &world) {
-
-        world.system<const core::Position2D, const physics::Collider>("Show ID")
+        debug_entity_ids = world.system<const core::Position2D, const physics::Collider>("Show Collidable ID")
                 .kind<rendering::RenderGizmos>()
-                .each([](flecs::entity e,const core::Position2D& pos, const physics::Collider &collider) {
-                        DrawText(
-                            std::to_string(e.id()).c_str(),
-                            pos.value.x + collider.bounds.x + 12,
-                            pos.value.y + collider.bounds.y + 12, 16, GREEN);
-                }).disable();
+                .each([](flecs::entity e, const core::Position2D &pos, const physics::Collider &collider) {
+                    DrawText(
+                        std::to_string(e.id()).c_str(),
+                        pos.value.x + collider.bounds.x + 12,
+                        pos.value.y + collider.bounds.y + 12, 16, GREEN);
+                });
+        debug_entity_ids.disable();
 
-        world.system<const core::Position2D, const physics::Collider>("Debug colliders")
+        debug_collider_bounds = world.system<const core::Position2D, const physics::Collider>("Debug collider bounds")
                 .kind<rendering::RenderGizmos>()
                 .each([](const core::Position2D &pos, const physics::Collider &collider) {
                     DrawRectangleLines(pos.value.x + collider.bounds.x, pos.value.y + collider.bounds.y,
-                                       collider.bounds.width, collider.bounds.height, GREEN);
+                                       collider.bounds.width, collider.bounds.height, MAGENTA);
                 });
+        debug_collider_bounds.disable();
 
         debug_circle_colliders = world.system<const physics::CircleCollider, const core::Position2D>(
                     "Debug circle colliders")
@@ -56,6 +57,7 @@ namespace debug {
                     "Debug square colliders")
                 .kind<rendering::RenderGizmos>()
                 .with<physics::BoxCollider>()
+                .group_by<rendering::Priority>()
                 .each(systems::debug_static_colliders_system);
         debug_square_colliders.disable();
 
@@ -89,7 +91,15 @@ namespace debug {
         auto dropdown = world.entity("debug_dropdown").child_of(rendering::gui::GUIModule::menu_bar)
                 .set<rendering::gui::MenuBarTab>({"Debug Tools", 25});
 
-        world.entity("debug_collisions_item_1").child_of(dropdown)
+        world.entity("debug_collisions_item_0").child_of(dropdown)
+                .set<rendering::gui::MenuBarTabItem>({
+                    "Toggle Collidable Entity Ids", debug_entity_ids, rendering::gui::TOGGLE
+                });
+        world.entity("debug_collisions_item_1_0").child_of(dropdown)
+                .set<rendering::gui::MenuBarTabItem>({
+                    "Toggle Collider Bounds", debug_collider_bounds, rendering::gui::TOGGLE
+                });
+        world.entity("debug_collisions_item_1_1").child_of(dropdown)
                 .set<rendering::gui::MenuBarTabItem>({
                     "Toggle Circle Colliders", debug_circle_colliders, rendering::gui::TOGGLE
                 });

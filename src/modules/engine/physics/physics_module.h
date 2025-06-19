@@ -34,10 +34,9 @@ namespace physics {
         PhysicsModule(flecs::world &world): BaseModule(world) {
         };
 
-        static void collide_circles(const CircleCollider *a, core::Position2D *a_pos, bool correct,
-                            const CircleCollider *b, core::Position2D *b_pos, bool other_correct) {
-            float combinedRadius = a->radius +
-                                   b->radius;
+        static Vector2 collide_circles(const CircleCollider *a, const core::Position2D *a_pos,
+                                       const CircleCollider *b, const core::Position2D *b_pos) {
+            float combinedRadius = a->radius + b->radius;
 
             // Find the distance and adjust to resolve the overlap
             Vector2 direction = b_pos->value - a_pos->value;
@@ -45,17 +44,11 @@ namespace physics {
             float overlap = combinedRadius - Vector2Length(direction);
 
             // Move the entities apart by the amount of overlap
-            Vector2 move = moveDirection * overlap * 0.5f;
-
-            // Resolve by adjusting positions
-            if (correct && other_correct) {
-                a_pos->value = a_pos->value - move;
-                b_pos->value = b_pos->value + move;
-            }
+            return moveDirection * overlap;
         }
 
-        static void collide_circle_rec(const CircleCollider *a, core::Position2D *a_pos, bool correct,
-                            const Collider *b, core::Position2D *b_pos, bool other_correct) {
+        static Vector2 collide_circle_rec(const CircleCollider *a, core::Position2D *a_pos, bool correct,
+                                          const Collider *b, core::Position2D *b_pos, bool other_correct) {
             float recCenterX = b_pos->value.x + b->bounds.x + b->bounds.width / 2.0f;
             float recCenterY = b_pos->value.y + b->bounds.y + b->bounds.height / 2.0f;
 
@@ -68,21 +61,23 @@ namespace physics {
             float absDx = fabsf(dx);
             float absDy = fabsf(dy);
 
-            if (absDx > (halfWidth + a->radius)) return;
-            if (absDy > (halfHeight + a->radius)) return;
+            Vector2 overlap = {0, 0};
+
+            if (absDx > (halfWidth + a->radius)) return overlap;
+            if (absDy > (halfHeight + a->radius)) return overlap;
 
             if (absDx <= halfWidth || absDy <= halfHeight) {
-                //std::cout << "collided 1" << std::endl;
                 // Side collision — resolve with axis-aligned MTV
                 float overlapX = (halfWidth + a->radius) - absDx;
                 float overlapY = (halfHeight + a->radius) - absDy;
 
+
                 if (overlapX < overlapY) {
-                    a_pos->value = {a_pos->value.x + ((dx < 0) ? -overlapX : overlapX), a_pos->value.y};
+                    overlap.x = dx < 0 ? overlapX : -overlapX;
                 } else {
-                    a_pos->value = {a_pos->value.x, a_pos->value.y + ((dy < 0) ? -overlapY : overlapY)};
+                    overlap.y = dy < 0 ? overlapY : -overlapY;
                 }
-                return;
+                return overlap;
             }
 
             // Corner collision
@@ -98,15 +93,17 @@ namespace physics {
 
                 if (dist == 0.0f) dist = 0.01f; // Avoid divide by zero
 
-                float overlap = radius - dist;
+                float overlap_length = radius - dist;
                 float nx = cornerDx / dist;
                 float ny = cornerDy / dist;
 
-                a_pos->value.x = a_pos->value.x + nx * overlap * ((dx < 0) ? -1.0f : 1.0f);
-                a_pos->value.y = a_pos->value.y + ny * overlap * ((dy < 0) ? -1.0f : 1.0f);
-
-                return;
+                return {
+                    nx * overlap_length * ((dx < 0) ? 1.0f : -1.0f),
+                    ny * overlap_length * ((dy < 0) ? 1.0f : -1.0f)
+                };
             }
+
+            return overlap;
         }
 
         flecs::entity m_physicsTick;

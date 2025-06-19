@@ -131,7 +131,6 @@ namespace gameplay {
                 .each(systems::create_health_bar_system);
 
         world.system<const Health, rendering::ProgressBar>("update health bar on take damage")
-                .with<TakeDamage>()
                 .kind<PostCollisionDetected>()
                 .each(systems::update_health_bar_system);
 
