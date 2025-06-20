@@ -34,8 +34,8 @@ namespace physics {
         PhysicsModule(flecs::world &world): BaseModule(world) {
         };
 
-        static Vector2 collide_circles(const CircleCollider *a, const core::Position2D *a_pos,
-                                       const CircleCollider *b, const core::Position2D *b_pos) {
+        static Vector2 collide_circles(const CircleCollider *a, const core::Position2D *a_pos, CollisionInfo& a_info,
+                                       const CircleCollider *b, const core::Position2D *b_pos, CollisionInfo& b_info) {
             float combinedRadius = a->radius + b->radius;
 
             // Find the distance and adjust to resolve the overlap
@@ -43,12 +43,14 @@ namespace physics {
             Vector2 moveDirection = Vector2Normalize(direction);
             float overlap = combinedRadius - Vector2Length(direction);
 
-            // Move the entities apart by the amount of overlap
+            a_info.normal = Vector2Negate(moveDirection);
+            b_info.normal = moveDirection;
+
             return moveDirection * overlap;
         }
 
-        static Vector2 collide_circle_rec(const CircleCollider *a, core::Position2D *a_pos, bool correct,
-                                          const Collider *b, core::Position2D *b_pos, bool other_correct) {
+        static Vector2 collide_circle_rec(const CircleCollider *a, core::Position2D *a_pos, CollisionInfo& a_info,
+                                          const Collider *b, core::Position2D *b_pos, CollisionInfo& b_info) {
             float recCenterX = b_pos->value.x + b->bounds.x + b->bounds.width / 2.0f;
             float recCenterY = b_pos->value.y + b->bounds.y + b->bounds.height / 2.0f;
 
@@ -77,6 +79,8 @@ namespace physics {
                 } else {
                     overlap.y = dy < 0 ? overlapY : -overlapY;
                 }
+                a_info.normal = Vector2Normalize(Vector2Negate(overlap));
+                b_info.normal = Vector2Normalize(overlap);
                 return overlap;
             }
 
@@ -97,10 +101,13 @@ namespace physics {
                 float nx = cornerDx / dist;
                 float ny = cornerDy / dist;
 
-                return {
+                overlap = {
                     nx * overlap_length * ((dx < 0) ? 1.0f : -1.0f),
                     ny * overlap_length * ((dy < 0) ? 1.0f : -1.0f)
                 };
+
+                a_info.normal = Vector2Normalize(Vector2Negate(overlap));
+                b_info.normal = Vector2Normalize(overlap);
             }
 
             return overlap;

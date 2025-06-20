@@ -46,7 +46,8 @@ namespace physics {
         ColliderType type;
     };
 
-    struct StaticCollider {};
+    struct StaticCollider {
+    };
 
     struct CircleCollider {
         float radius;
@@ -68,12 +69,32 @@ namespace physics {
         flecs::entity b;
     };
 
+    struct SignificantCollisionRecord {
+        flecs::entity a;
+        flecs::entity b;
+        CollisionInfo a_info;
+        CollisionInfo b_info;
+    };
+
+    struct IdPairHash {
+        std::size_t operator () (const std::pair<long,long>& h) const {
+            auto h1 = std::hash<long>{}(h.first);
+            auto h2 = std::hash<long>{}(h.second);
+
+            // A common way to combine hashes is to use XOR and a bit shift.
+            // The choice of shift value can impact distribution, but 0x9e3779b9 is a common
+            // constant derived from the golden ratio, used in boost::hash_combine.
+            return h1 ^ (h2 << 1); // Or h1 ^ (h2 + 0x9e3779b9 + (h1 << 6) + (h1 >> 2)); for better distribution
+        }
+    };
 
     struct CollisionRecordList {
         std::vector<CollisionRecord> records;
-        std::vector<CollisionRecord> significant_collisions;
-        std::unordered_map<long, CollisionInfo> collisions_info;
+        std::vector<SignificantCollisionRecord> significant_collisions;
+        std::unordered_map<std::pair<long,long>, CollisionInfo, IdPairHash> collisions_info;
     };
+
+
 }
 
 #endif //PHYSICS_COMPONENTS_H

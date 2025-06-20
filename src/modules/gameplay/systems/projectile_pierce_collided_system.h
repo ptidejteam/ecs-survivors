@@ -20,8 +20,8 @@ namespace gameplay::systems {
         }
         pierce.hits.insert(other.id());
         pierce.pierce_count -= 1;
-        if (pierce.pierce_count < 0) {
-            it.entity(i).add<core::DestroyAfterFrame>();
+        if (pierce.pierce_count <= 0) {
+            it.entity(i).remove<Pierce>();
         }
     }
 }

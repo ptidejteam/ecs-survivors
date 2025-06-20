@@ -35,7 +35,7 @@ namespace gameplay::systems {
                 })
                 .set<physics::Velocity2D>({
                     {left}
-                }).remove<Split>().remove<Chain>().remove<Pierce>();
+                }).remove<Split>().remove<Chain>().remove<Pierce>().remove<Bounce>();
 
         it.world().entity().is_a(prefab).child_of(it.entity(i).parent())
                 .set<core::Position2D>(pos)
@@ -44,7 +44,7 @@ namespace gameplay::systems {
                 })
                 .set<physics::Velocity2D>({
                     {right}
-                }).remove<Split>().remove<Chain>().remove<Pierce>();
+                }).remove<Split>().remove<Chain>().remove<Pierce>().remove<Bounce>();
     }
 }
 #endif //PROJECTILE_SPLIT_COLLISION_SYSTEM_H

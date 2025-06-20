@@ -15,6 +15,7 @@
 #include <raymath.h>
 
 #include "systems/debug_closest_enemy_to_player_system.h"
+#include "systems/debug_collidable_entities_system.h"
 #include "systems/debug_colliders_system.h"
 #include "systems/debug_entity_count_system.h"
 #include "systems/debug_fps_system.h"
@@ -29,20 +30,12 @@ namespace debug {
     void DebugModule::register_systems(flecs::world &world) {
         debug_entity_ids = world.system<const core::Position2D, const physics::Collider>("Show Collidable ID")
                 .kind<rendering::RenderGizmos>()
-                .each([](flecs::entity e, const core::Position2D &pos, const physics::Collider &collider) {
-                    DrawText(
-                        std::to_string(e.id()).c_str(),
-                        pos.value.x + collider.bounds.x + 12,
-                        pos.value.y + collider.bounds.y + 12, 16, GREEN);
-                });
+                .each(systems::debug_collidable_entities_system);
         debug_entity_ids.disable();
 
         debug_collider_bounds = world.system<const core::Position2D, const physics::Collider>("Debug collider bounds")
                 .kind<rendering::RenderGizmos>()
-                .each([](const core::Position2D &pos, const physics::Collider &collider) {
-                    DrawRectangleLines(pos.value.x + collider.bounds.x, pos.value.y + collider.bounds.y,
-                                       collider.bounds.width, collider.bounds.height, MAGENTA);
-                });
+                .each(systems::debug_collider_bounds_system);
         debug_collider_bounds.disable();
 
         debug_circle_colliders = world.system<const physics::CircleCollider, const core::Position2D>(
@@ -58,7 +51,7 @@ namespace debug {
                 .kind<rendering::RenderGizmos>()
                 .with<physics::BoxCollider>()
                 .group_by<rendering::Priority>()
-                .each(systems::debug_static_colliders_system);
+                .each(systems::debug_box_colliders_system);
         debug_square_colliders.disable();
 
         debug_FPS = world.system("Draw FPS")
