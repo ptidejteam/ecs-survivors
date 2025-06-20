@@ -31,8 +31,8 @@
             "scale": 2,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 512,
-                "y": 255.5
+                "x": 1024,
+                "y": 512
             }
         },
         "maps/sampleSheet.tsx": {
@@ -42,7 +42,7 @@
             "scale": 3,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 79.99999999999999,
+                "x": 92.83333333333333,
                 "y": 80
             }
         },

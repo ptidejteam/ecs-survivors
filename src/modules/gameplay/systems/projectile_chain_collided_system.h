@@ -47,8 +47,8 @@ namespace gameplay::systems {
         rot.angle = rad * RAD2DEG;
         vel.value = Vector2Normalize(target_pos.value - pos.value) * Vector2Length(vel.value);
 
-        if (chain.chain_count < 0) {
-            it.entity(i).add<core::DestroyAfterFrame>();
+        if (chain.chain_count <= 0) {
+            it.entity(i).remove<Chain>();
         }
     }
 }

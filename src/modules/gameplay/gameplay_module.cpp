@@ -16,24 +16,30 @@
 #include "modules/engine/physics/physics_module.h"
 #include "modules/engine/physics/pipeline_steps.h"
 #include "modules/engine/rendering/gui/gui_module.h"
+#include "systems/add_bounce_system.h"
 #include "systems/add_chain_system.h"
 #include "systems/add_multiproj_system.h"
 #include "systems/add_pierce_system.h"
 #include "systems/add_split_system.h"
 #include "systems/create_health_bar_system.h"
 #include "systems/deal_damage_on_collision_system.h"
+#include "systems/decrement_bounce_system.h"
 #include "systems/decrement_chain_system.h"
 #include "systems/decrement_multiproj_system.h"
 #include "systems/decrement_pierce_system.h"
 #include "systems/fire_projectile_system.h"
+#include "systems/increment_bounce_system.h"
 #include "systems/increment_chain_system.h"
 #include "systems/increment_multiproj_system.h"
 #include "systems/increment_pierce_system.h"
+#include "systems/projectile_bounce_collided_system.h"
 #include "systems/projectile_chain_collided_system.h"
+#include "systems/projectile_no_bounce_collided_system.h"
 #include "systems/projectile_no_effect_collided_system.h"
 #include "systems/projectile_pierce_collided_system.h"
 #include "systems/projectile_split_collision_system.h"
 #include "systems/regen_health_system.h"
+#include "systems/remove_bounce_system.h"
 #include "systems/remove_chain_system.h"
 #include "systems/remove_multproj_system.h"
 #include "systems/remove_pierce_system.h"
@@ -75,18 +81,21 @@ namespace gameplay {
                 .term_at(0).parent()
                 .each(systems::fire_projectile_system);
 
-            world.system("check if hit walls")
-                .with<Projectile>()
+        world.system("delete if hit wall and no bounce")
                 .with<physics::CollidedWith>(flecs::Wildcard)
+                .with<Projectile>()
+                .without<Bounce>()
                 .kind<OnCollisionDetected>()
                 .immediate()
-                .each([](flecs::iter& it, size_t i) {
-                        flecs::entity other = it.pair(1).second();
-                        if (other.get<physics::Collider>()->collision_type == physics::environment) {
-                                it.entity(i).remove<physics::CollidedWith>(other);
-                                it.entity(i).add<core::DestroyAfterFrame>();
-                        }
-                });
+                .each(systems::projectile_no_bounce_collided_system);
+
+        world.system<physics::CollisionRecordList, Bounce, physics::Velocity2D, rendering::Rotation>("Bounce if hit wall")
+                .with<physics::CollidedWith>(flecs::Wildcard)
+                .with<Projectile>()
+                .kind<OnCollisionDetected>()
+                .term_at(0).singleton()
+                .immediate()
+                .each(systems::projectile_bounce_collided_system);
 
         world.system("no pierce or chain")
                 .with<Projectile>()
@@ -249,10 +258,39 @@ namespace gameplay {
                 .with<Projectile>()
                 .with(flecs::Prefab)
                 .each(systems::decrement_chain_system);
+
+        add_bounce = world.system("add bounce")
+                .kind(0)
+                .with<Projectile>()
+                .without<Bounce>()
+                .with(flecs::Prefab)
+                .immediate()
+                .each(systems::add_bounce_system);
+        remove_bounce = world.system("remove bounce")
+                .kind(0)
+                .with<Projectile>()
+                .with<Bounce>()
+                .with(flecs::Prefab)
+                .immediate()
+                .each(systems::remove_bounce_system);
+
+        add_bounce_amt = world.system<Bounce>("+1 Bounce")
+                .kind(0)
+                .with<Projectile>()
+                .with(flecs::Prefab)
+                .immediate()
+                .each(systems::increment_bounce_system);
+
+        remove_bounce_amt = world.system<Bounce>("-1 Bounce")
+                .kind(0)
+                .with<Projectile>()
+                .with(flecs::Prefab)
+                .immediate()
+                .each(systems::decrement_bounce_system);
     }
 
     void GameplayModule::register_entities(flecs::world world) {
-        auto dropdown = world.entity("more_dropdown").child_of(rendering::gui::GUIModule::menu_bar)
+        auto dropdown = world.entity("gameplay_dropdown").child_of(rendering::gui::GUIModule::menu_bar)
                 .set<rendering::gui::MenuBarTab>({"Gameplay Tools", 25});
 
         world.entity().child_of(dropdown)
@@ -301,6 +339,22 @@ namespace gameplay {
         world.entity().child_of(dropdown)
                 .set<rendering::gui::MenuBarTabItem>({
                     "Remove Split", remove_split, rendering::gui::MenuBarTabItemType::RUN
+                });
+        world.entity().child_of(dropdown)
+                .set<rendering::gui::MenuBarTabItem>({
+                    "Add Bounce", add_bounce, rendering::gui::MenuBarTabItemType::RUN
+                });
+        world.entity().child_of(dropdown)
+                .set<rendering::gui::MenuBarTabItem>({
+                    "Remove Bounce", remove_bounce, rendering::gui::MenuBarTabItemType::RUN
+                });
+        world.entity().child_of(dropdown)
+                .set<rendering::gui::MenuBarTabItem>({
+                    "+1 Bounce", add_bounce_amt, rendering::gui::MenuBarTabItemType::RUN
+                });
+        world.entity().child_of(dropdown)
+                .set<rendering::gui::MenuBarTabItem>({
+                    "-1 Bounce", remove_bounce_amt, rendering::gui::MenuBarTabItemType::RUN
                 });
     }
 

@@ -1,4 +1,5 @@
 set(TILEMAP_SYSTEMS_HEADERS
+        create_tilemap_system.h
 )
 
 target_sources(${LIBRARY_NAME} PUBLIC

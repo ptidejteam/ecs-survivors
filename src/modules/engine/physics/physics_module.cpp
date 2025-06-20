@@ -91,7 +91,8 @@ namespace physics {
                 .tick_source(m_physicsTick)
                 .each(systems::add_collided_with_system);
 
-        world.system<Collider>("Collision Cleanup")
+        world.system("Collision Cleanup")
+                .with<Collider>()
                 .kind<CollisionCleanup>()
                 .tick_source(m_physicsTick)
                 .each(systems::collision_cleanup_system);
@@ -100,9 +101,7 @@ namespace physics {
                 .term_at(0).singleton()
                 .kind<CollisionCleanup>()
                 .tick_source(m_physicsTick)
-                .each([](CollisionRecordList& list) {
-                    list.collisions_info.clear();
-                });
+                .each(systems::collision_cleanup_list_system);
     }
 
     void PhysicsModule::register_pipeline(flecs::world &world) {

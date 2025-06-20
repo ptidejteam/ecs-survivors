@@ -49,7 +49,6 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
 
 
     InitWindow(m_windowWidth, m_windowHeight, m_windowName.c_str());
-    // SetTargetFPS(GetMonitorRefreshRate(0));
 
 #ifndef EMSCRIPTEN
     // use the flecs explorer when not on browser
@@ -119,6 +118,7 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
                 std::unordered_set<int>()
             })
             .set<gameplay::Split>({std::unordered_set<int>()})
+            .set<gameplay::Bounce>({2})
             .set<gameplay::Damage>({2})
             .set<physics::Velocity2D>({0, 0})
             .set<physics::Collider>({
@@ -137,7 +137,7 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
                 3.f,
                 WHITE
             })
-            .set<core::DestroyAfterTime>({5});
+            .set<core::DestroyAfterTime>({15});
 
     auto hori = m_world.entity("player_horizontal_input").child_of(player).set<input::InputHorizontal>({});
     m_world.entity().child_of(hori).set<input::KeyBinding>({KEY_A, -1});

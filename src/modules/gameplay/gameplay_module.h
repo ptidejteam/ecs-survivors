@@ -9,7 +9,7 @@
 #include <flecs.h>
 
 namespace gameplay {
-    constexpr float SPAWNER_INTERVAL = 0.1f;
+    constexpr float SPAWNER_INTERVAL = 0.05f;
     class GameplayModule : public BaseModule<GameplayModule> {
     public:
         GameplayModule(flecs::world &world): BaseModule(world) {}
@@ -32,6 +32,11 @@ namespace gameplay {
         flecs::system remove_pierce_amt;
         flecs::system add_chain_amt;
         flecs::system remove_chain_amt;
+
+        flecs::system add_bounce;
+        flecs::system remove_bounce;
+        flecs::system add_bounce_amt;
+        flecs::system remove_bounce_amt;
 
         void register_components(flecs::world);
 

@@ -25,6 +25,12 @@ set(GAMEPLAY_SYSTEMS_HEADERS
         spawn_enemies_around_screen_system.h
         take_damage_system.h
         update_cooldown_system.h
+        add_bounce_system.h
+        remove_bounce_system.h
+        increment_bounce_system.h
+        decrement_bounce_system.h
+        projectile_bounce_collided_system.h
+        projectile_no_bounce_collided_system.h
 )
 
 target_sources(${LIBRARY_NAME} PUBLIC
