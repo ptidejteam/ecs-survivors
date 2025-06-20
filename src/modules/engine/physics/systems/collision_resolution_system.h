@@ -45,8 +45,8 @@ namespace physics::systems {
             b_move_ratio = 0.0f;
         }
 
-        a_pos->value = a_pos->value - overlap * a_move_ratio;
-        b_pos->value = b_pos->value + overlap * b_move_ratio;
+        a_pos->value = a_pos->value - overlap * a_move_ratio * 0.5;
+        b_pos->value = b_pos->value + overlap * b_move_ratio * 0.5;
     }
 
     /**
@@ -57,8 +57,8 @@ namespace physics::systems {
      * @param other_base_col circle 2 entity
      * @return if the circles collided
      */
-    inline bool handle_circle_circle(flecs::entity &a, const Collider *a_col, CollisionInfo& info, flecs::entity &b,
-               const Collider *b_col,CollisionInfo& b_info) {
+    inline bool handle_circle_circle(flecs::entity &a, const Collider *a_col, flecs::entity &b,
+               const Collider *b_col) {
         Vector2 mypos = a.get<core::Position2D>()->value;
         Vector2 otherPos = b.get<core::Position2D>()->value;
 
@@ -132,8 +132,8 @@ namespace physics::systems {
         return true;
     }
 
-    using CollisionHandler = std::function<bool(flecs::entity &, const Collider *, CollisionInfo& a_info, flecs::entity &,
-                                                const Collider *, CollisionInfo& b_info)>;
+    using CollisionHandler = std::function<bool(flecs::entity &, const Collider *, flecs::entity &,
+                                                const Collider *)>;
 
     /**
      * Map for collision type handling, we point to the correct position in the array with the Collider type enum
@@ -142,26 +142,26 @@ namespace physics::systems {
         // Circle = 0
         {
             // Circle vs Circle
-            [](flecs::entity &a, const Collider *a_col, CollisionInfo& a_info, flecs::entity &b,
-               const Collider *b_col,CollisionInfo& b_info) {
-                return handle_circle_circle(a, a_col, a_info, b, b_col, b_info);
+            [](flecs::entity &a, const Collider *a_col, flecs::entity &b,
+               const Collider *b_col) {
+                return handle_circle_circle(a, a_col, b, b_col);
             },
             // Circle vs Box
-            [](flecs::entity &a, const Collider *a_col, CollisionInfo& info, flecs::entity &b,
-               const Collider *b_col,CollisionInfo& b_info) {
+            [](flecs::entity &a, const Collider *a_col, flecs::entity &b,
+               const Collider *b_col) {
                 return handle_circle_rec_collision(a, a_col, b, b_col);
             },
         },
         // Box = 1
         {
             // Box vs Circle
-            [](flecs::entity &a, const Collider *a_col, CollisionInfo& a_info, flecs::entity &b,
-               const Collider *b_col,CollisionInfo& b_info) {
+            [](flecs::entity &a, const Collider *a_col, flecs::entity &b,
+               const Collider *b_col) {
                 return handle_circle_rec_collision(b, b_col, a, a_col);
             },
             // Box vs Box
-            [](flecs::entity &a, const Collider *a_col, CollisionInfo& info, flecs::entity &b,
-               const Collider *b_col,CollisionInfo& b_info) {
+            [](flecs::entity &a, const Collider *a_col, flecs::entity &b,
+               const Collider *b_col) {
                 return handle_boxes_collision(a, a_col, b, b_col);
             },
         }
@@ -177,9 +177,9 @@ namespace physics::systems {
             const Collider *b_col = b.get<Collider>();
 
             // are the entities colliding?
-            CollisionInfo a_info;
-            CollisionInfo b_info;
-            if (!collision_handler[a_col->type][b_col->type](a, a_col,a_info, b, b_col, b_info)) continue;
+            //CollisionInfo a_info;
+           // CollisionInfo b_info;
+            if (!collision_handler[a_col->type][b_col->type](a, a_col, b, b_col)) continue;
 
             // if the entities are of different types (player & enemy) we report it a significant collision
             // enemy vs environment should not be significant. (too many tables)

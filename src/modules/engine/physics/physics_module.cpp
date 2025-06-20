@@ -91,10 +91,8 @@ namespace physics {
                 .tick_source(m_physicsTick)
                 .each(systems::add_collided_with_system);
 
-        world.system("Collision Cleanup")
+        world.system<Collider>("Collision Cleanup")
                 .kind<CollisionCleanup>()
-                .with<CollidedWith>(flecs::Wildcard)
-                .multi_threaded()
                 .tick_source(m_physicsTick)
                 .each(systems::collision_cleanup_system);
 
