@@ -10,10 +10,8 @@
 #include "modules/engine/physics/components.h"
 
 namespace physics::systems {
-    inline void collision_cleanup_system(flecs::iter &it, size_t i) {
-        flecs::entity self = it.entity(i);
-        flecs::entity other = it.pair(0).second();
-        self.remove<CollidedWith>(other);
+    inline void collision_cleanup_system(flecs::iter &it, size_t i, Collider& collider) {
+        it.world().remove_all<CollidedWith>(it.entity(i));
     }
 }
 

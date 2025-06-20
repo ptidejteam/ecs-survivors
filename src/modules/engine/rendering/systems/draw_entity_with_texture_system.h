@@ -29,7 +29,32 @@ namespace rendering::systems {
         };
 
         float r = rotation ? rotation->angle : 0.0f;
-        DrawTexturePro(renderable.texture, rec, source, origin, r, renderable.tint);
+        DrawTexturePro(renderable.texture, rec, source, origin + renderable.draw_offset, r, renderable.tint);
+    }
+
+    inline void draw_background_textures_system(const Renderable &renderable) {
+        Rectangle rec{
+            0.0f, 0.0f,
+            (float) renderable.texture.width,
+            (float) renderable.texture.height
+        };
+
+        float scaledWidth = renderable.texture.width * renderable.scale;
+        float scaledHeight = renderable.texture.height * renderable.scale;
+
+        Rectangle source{
+            renderable.draw_offset.x * renderable.scale,
+            renderable.draw_offset.y * renderable.scale,
+            scaledWidth,
+            scaledHeight
+        };
+
+        Vector2 origin = Vector2{
+            scaledWidth / 2.0f,
+            scaledHeight / 2.0f
+        };
+
+        DrawTexture(renderable.texture, 0, 0, renderable.tint);
     }
 }
 #endif //DRAW_ENTITY_WITH_TEXTURE_SYSTEM_H

@@ -14,9 +14,9 @@ namespace physics::systems {
     inline void update_velocity_system(flecs::iter &it, size_t, Velocity2D &vel, const DesiredVelocity2D &desiredVel,
                           const AccelerationSpeed &acceleration_speed) {
         // eventually I want to use spherical linear interpolation for a smooth transition
-        vel.value = Vector2Lerp(vel.value, desiredVel.value,
-                                std::min(PHYSICS_TICK_LENGTH, it.delta_system_time()) * acceleration_speed.
-                                value);
+        float dt = std::min(PHYSICS_TICK_LENGTH, it.delta_system_time());
+        vel.value = Vector2Lerp(vel.value, desiredVel.value,acceleration_speed.value * dt);
+        if (Vector2Length(vel.value) < 0.001) vel.value = {0,0};
     }
 
 }

@@ -13,7 +13,7 @@
 namespace debug::systems {
     inline void debug_entity_count_system(flecs::iter &iter) {
         DrawRectangleRec({0, 30, 225, 40}, DARKGRAY);
-        DrawText(std::string(std::to_string(rendering::queries::entity_count_query.count()) + " entities").c_str(), 10,
+        DrawText(std::string(std::to_string(iter.world().query<physics::Collider>().count()) + " entities").c_str(), 10,
                  30, 20,
                  GREEN);
         DrawText(

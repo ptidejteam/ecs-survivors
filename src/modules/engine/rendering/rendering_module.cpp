@@ -35,12 +35,51 @@ void rendering::RenderingModule::register_systems(flecs::world world) {
             .kind<PreRender>()
             .run(systems::begin_drawing_system);
 
-    world.system<const core::Position2D, const Renderable, const core::GameSettings>("Determine Visible Entities")
+    world.system<TrackingCamera>("on start begin camera mode")
+            .term_at(0).singleton()
+            .kind(flecs::OnStart)
+            .each([](TrackingCamera &camera) {
+                if (!camera.target.is_alive()) return;
+                camera.camera.target = camera.target.get<core::Position2D>()->value;
+                camera.camera.offset = {GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f};
+                camera.camera.zoom = 1.0f;
+                camera.camera.rotation = 0;
+            });
+
+    world.system<TrackingCamera, core::GameSettings>("begin camera mode")
+            .term_at(0).singleton()
+            .term_at(1).singleton()
+            .kind<PreRender>()
+            .each([](flecs::iter& it, size_t, TrackingCamera &camera, core::GameSettings &settings) {
+                Vector2 pos = camera.camera.target;
+                if (camera.target.is_alive()) {
+                    pos = camera.target.get<core::Position2D>()->value;
+                };
+                camera.camera.target = Vector2Lerp(camera.camera.target ,pos , it.delta_time() * 2.0f);
+                camera.camera.offset.x = settings.windowWidth / 2.0f;
+                camera.camera.offset.y = settings.windowHeight / 2.0f;
+                BeginMode2D(camera.camera);
+            });
+
+    world.system<const core::Position2D, const Renderable, const core::GameSettings, const TrackingCamera>("Determine Visible Entities")
             .term_at(2).singleton()
+            .term_at(3).singleton()
             .write<Visible>()
             .kind<PreRender>()
             .multi_threaded()
             .each(systems::determine_visible_entities_system);
+
+    world.system<const Renderable>("Draw Background Textures")
+            .kind<RenderBackground>()
+            .without<core::Position2D>()
+            .with<Priority>()
+            .order_by<Priority>([](flecs::entity_t e1, const Priority *p1, flecs::entity_t e2, const Priority *p2) {
+                int order = p1->priority - p2->priority;
+                if (order == 0)
+                    return static_cast<int>(e1 - e2);
+                return p1->priority - p2->priority;
+            })
+            .each(systems::draw_background_textures_system);
 
     world.system<const Renderable, const core::Position2D, const Rotation *>("Draw Entities with Textures")
             .kind<Render>()
@@ -54,9 +93,16 @@ void rendering::RenderingModule::register_systems(flecs::world world) {
             })
             .each(systems::draw_entity_with_texture_system);
 
+
+
     world.system<ProgressBar, const core::Position2D, const Renderable>("show healthbar")
             .kind<Render>()
             .each(systems::draw_health_bar_system);
+
+    world.system("end camera mode")
+            .kind<RenderGUI>().run([&](flecs::iter &it) {
+                EndMode2D();
+            });
 
     world.system("After Draw")
             .kind<PostRender>()
@@ -65,8 +111,10 @@ void rendering::RenderingModule::register_systems(flecs::world world) {
 
 void rendering::RenderingModule::register_pipeline(flecs::world world) {
     world.component<PreRender>().add(flecs::Phase).depends_on(flecs::OnStore);
-    world.component<Render>().add(flecs::Phase).depends_on<PreRender>();
-    world.component<RenderGUI>().add(flecs::Phase).depends_on<Render>();
+    world.component<RenderBackground>().add(flecs::Phase).depends_on<PreRender>();
+    world.component<Render>().add(flecs::Phase).depends_on<RenderBackground>();
+    world.component<RenderGizmos>().add(flecs::Phase).depends_on<Render>();
+    world.component<RenderGUI>().add(flecs::Phase).depends_on<RenderGizmos>();
     world.component<PostRender>().add(flecs::Phase).depends_on<RenderGUI>();
 }
 

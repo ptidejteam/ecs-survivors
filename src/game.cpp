@@ -20,7 +20,6 @@
 #include "modules/engine/input/input_module.h"
 #include "modules/engine/physics/components.h"
 #include "modules/engine/physics/physics_module.h"
-#include "modules/engine/rendering/gui/components.h"
 #include "modules/player/player_module.h"
 #include "raylib.h"
 #include "modules/debug/debug_module.h"
@@ -29,6 +28,14 @@
 #include "modules/engine/rendering/rendering_module.h"
 #include "modules/gameplay/components.h"
 #include "modules/gameplay/gameplay_module.h"
+
+#include <tmxlite/Map.hpp>
+#include <tmxlite/Layer.hpp>
+#include <tmxlite/TileLayer.hpp>
+#include <tmxlite/ObjectGroup.hpp>
+
+#include "modules/tilemap/components.h"
+#include "modules/tilemap/tilemap_module.h"
 
 Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(flecs::world()),
                                                                         m_windowName(windowName),
@@ -59,6 +66,7 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
     m_world.import<ai::AIModule>();
     m_world.import<gameplay::GameplayModule>();
     m_world.import<debug::DebugModule>();
+    m_world.import<tilemap::TilemapModule>();
 
     m_world.set<core::GameSettings>({
         m_windowName,
@@ -71,17 +79,20 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
 
     flecs::entity player = m_world.entity("player")
             .set<core::Tag>({"player"})
-            .set<core::Position2D>({GetScreenWidth() / 2.f, GetScreenHeight() / 2.f})
-            .set<core::Speed>({150})
+            .set<core::Position2D>({2300.0f, 1300.0f})
+            .set<core::Speed>({300})
             .set<physics::Velocity2D>({0, 0})
             .set<physics::DesiredVelocity2D>({0, 0})
-            .set<physics::AccelerationSpeed>({5.0})
+            .set<physics::AccelerationSpeed>({15.0})
             .set<physics::Collider>({
-                24,
                 true,
+                false,
+                {-24, -24, 48, 48},
                 physics::CollisionFilter::player,
-                physics::player_filter
+                physics::player_filter,
+                physics::ColliderType::Circle,
             })
+            .set<physics::CircleCollider>({24})
             .set<rendering::Priority>({2})
             .set<rendering::Renderable>({
                 LoadTexture("../resources/player.png"), // 8x8
@@ -90,7 +101,7 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
                 WHITE
             })
             .set<gameplay::Health>({150, 150})
-            .set<gameplay::RegenHealth>({2.5f});
+            .set<gameplay::RegenHealth>({250.0f});
 
     m_world.entity("dagger attack").child_of(player)
             .add<gameplay::Projectile>()
@@ -111,11 +122,14 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
             .set<gameplay::Damage>({2})
             .set<physics::Velocity2D>({0, 0})
             .set<physics::Collider>({
-                24,
                 false,
+                false,
+                {-18, -18, 36, 36},
                 physics::CollisionFilter::player,
-                physics::player_filter
+                physics::player_filter,
+                physics::ColliderType::Circle,
             })
+            .set<physics::CircleCollider>({18})
             .set<rendering::Priority>({1})
             .set<rendering::Renderable>({
                 LoadTexture("../resources/dagger.png"), // 8x8
@@ -150,11 +164,13 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
             .set<physics::DesiredVelocity2D>({0, 0})
             .set<physics::AccelerationSpeed>({5.0})
             .set<physics::Collider>({
-                24,
                 true,
-                physics::CollisionFilter::enemy,
-                physics::enemy_filter
+                false,
+                {-24, -24, 48, 48},
+                physics::CollisionFilter::enemy, physics::enemy_filter,
+                physics::ColliderType::Circle
             })
+            .set<physics::CircleCollider>({24})
             .set<rendering::Renderable>({
                 LoadTexture("../resources/ghost.png"), // 8x8
                 {0, 0},
@@ -165,6 +181,17 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
 
     m_world.entity("enemy_spawner")
             .set<gameplay::Spawner>({enemy});
+
+    m_world.entity("tilemap_1")
+            .set<tilemap::Tilemap>({
+                "../resources/tiled/maps/sampleMap.tmx",
+                3.0f
+            });
+
+    m_world.set<rendering::TrackingCamera>({
+        player,
+        Camera2D{0}
+    });
 }
 
 
@@ -172,13 +199,27 @@ void Game::run() {
     // ON START
     m_world.progress();
 
+#if defined(EMSCRIPTEN)
+    emscripten_set_main_loop_arg(UpdateDrawFrameWeb, this, 0, 1);
+#else
+
     // Main game loop
     while (!WindowShouldClose()) // Detect window close button or ESC key
     {
-        m_world.progress(GetFrameTime());
+        UpdateDrawFrameDesktop();
     }
+#endif
     // De-Initialization
     //--------------------------------------------------------------------------------------
     CloseWindow(); // Close window and OpenGL context
     //--------------------------------------------------------------------------------------
+}
+
+void Game::UpdateDrawFrameDesktop() {
+    m_world.progress(GetFrameTime());
+}
+
+void Game::UpdateDrawFrameWeb(void *game) {
+    Game *instance = static_cast<Game *>(game);
+    instance->m_world.progress(GetFrameTime());
 }

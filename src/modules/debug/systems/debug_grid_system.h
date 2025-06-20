@@ -10,7 +10,7 @@
 
 namespace debug::systems {
     inline void debug_grid_system(flecs::iter &iter) {
-        GuiGrid({0, 0, (float) GetScreenWidth(), (float) GetScreenHeight()}, "grid", 32, 1, nullptr);
+        GuiGrid({0, 0, (float) GetScreenWidth(), (float) GetScreenHeight()}, "grid", 48, 1, nullptr);
     }
 }
 #endif //DEBUG_GRID_SYSTEM_H

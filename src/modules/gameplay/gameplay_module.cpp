@@ -53,9 +53,10 @@ namespace gameplay {
         m_spawner_tick = world.timer().interval(SPAWNER_INTERVAL);
 
 
-        world.system<const Spawner, const core::GameSettings>("Spawn Enemies")
+        world.system<const Spawner, const core::GameSettings, const rendering::TrackingCamera>("Spawn Enemies")
                 .tick_source(m_spawner_tick)
                 .term_at(1).singleton()
+                .term_at(2).singleton()
                 .each(systems::spawn_enemies_around_screen_system);
 
         world.system<Cooldown>("Update Cooldown")
@@ -73,6 +74,19 @@ namespace gameplay {
                 .write<CooldownCompleted>()
                 .term_at(0).parent()
                 .each(systems::fire_projectile_system);
+
+            world.system("check if hit walls")
+                .with<Projectile>()
+                .with<physics::CollidedWith>(flecs::Wildcard)
+                .kind<OnCollisionDetected>()
+                .immediate()
+                .each([](flecs::iter& it, size_t i) {
+                        flecs::entity other = it.pair(1).second();
+                        if (other.get<physics::Collider>()->collision_type == physics::environment) {
+                                it.entity(i).remove<physics::CollidedWith>(other);
+                                it.entity(i).add<core::DestroyAfterFrame>();
+                        }
+                });
 
         world.system("no pierce or chain")
                 .with<Projectile>()
@@ -94,7 +108,6 @@ namespace gameplay {
                 .immediate()
                 .each(systems::projectile_chain_collided_system);
 
-
         world.system<Split, physics::Velocity2D, core::Position2D, rendering::Rotation, Attack>("apply split mod")
                 .with<physics::CollidedWith>(flecs::Wildcard)
                 .kind<OnCollisionDetected>()
@@ -107,7 +120,6 @@ namespace gameplay {
                 .kind<OnCollisionDetected>()
                 .each(systems::deal_damage_on_collision_system);
 
-
         world.system<Health, TakeDamage>("take damage")
                 .kind<PostCollisionDetected>()
                 .each(systems::take_damage_system);
@@ -119,7 +131,6 @@ namespace gameplay {
                 .each(systems::create_health_bar_system);
 
         world.system<const Health, rendering::ProgressBar>("update health bar on take damage")
-                .with<TakeDamage>()
                 .kind<PostCollisionDetected>()
                 .each(systems::update_health_bar_system);
 

@@ -14,7 +14,10 @@ namespace debug {
         };
 
     private:
-        flecs::system debug_colliders;
+        flecs::system debug_entity_ids;
+        flecs::system debug_collider_bounds;
+        flecs::system debug_circle_colliders;
+        flecs::system debug_square_colliders;
         flecs::system debug_FPS;
         flecs::system debug_entity_count;
         flecs::system debug_mouse_pos;
