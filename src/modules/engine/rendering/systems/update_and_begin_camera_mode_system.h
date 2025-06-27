@@ -17,8 +17,8 @@ namespace rendering::systems {
             pos = camera.target.get<core::Position2D>()->value;
         };
         camera.camera.target = Vector2Lerp(camera.camera.target ,pos , it.delta_time() * 2.0f);
-        camera.camera.offset.x = settings.windowWidth / 2.0f;
-        camera.camera.offset.y = settings.windowHeight / 2.0f;
+        camera.camera.offset.x = settings.window_width / 2.0f;
+        camera.camera.offset.y = settings.window_height / 2.0f;
         BeginMode2D(camera.camera);
     }
 

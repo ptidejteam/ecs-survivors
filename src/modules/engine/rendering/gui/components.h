@@ -83,6 +83,8 @@ namespace rendering::gui {
             this->vertical_anchor = vertical_anchor;
         };
     };
+
+    struct WindowResizedEvent{};
 }
 
 #endif //GUI_COMPONENTS_H

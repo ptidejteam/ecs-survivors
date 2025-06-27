@@ -25,6 +25,8 @@ namespace physics {
     static CollisionFilter enemy_filter = static_cast<CollisionFilter>(player | enemy | environment);
     static CollisionFilter environment_filter = static_cast<CollisionFilter>(player | enemy);
 
+    inline flecs::system m_collision_detection_spatial_hashing_system;
+    inline flecs::system m_collision_detection_naive_system;
 
     class PhysicsModule : public BaseModule<PhysicsModule> {
         friend class BaseModule<PhysicsModule>;
@@ -114,6 +116,7 @@ namespace physics {
         }
 
         flecs::entity m_physicsTick;
+
 
     private:
         void register_components(flecs::world &world);

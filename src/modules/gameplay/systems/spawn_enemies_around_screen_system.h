@@ -20,13 +20,13 @@ namespace gameplay::systems {
             float factor = rand() % 2 - 1;
             float neg = rand() % 1 - 1;
             float randX = outside_side_switch
-                              ? neg * factor * settings.windowWidth
-                              : rand() % settings.windowWidth;
-            randX += camera.camera.target.x - camera.camera.offset.x;
+                              ? neg * factor * (settings.window_width + 200)
+                              : rand() % (settings.window_width + 200);
+            randX += camera.camera.target.x - camera.camera.offset.x - 100;
             float randY = outside_side_switch
-                              ? rand() % settings.windowHeight
-                              : neg * factor * settings.windowHeight;
-            randY += camera.camera.target.y - camera.camera.offset.y;
+                              ? rand() % (settings.window_height + 200)
+                              : neg * factor * (settings.window_height + 200);
+            randY += camera.camera.target.y - camera.camera.offset.y - 100;
             bool is_valid = true;
 
             physics::queries::box_collider_query.run([&](flecs::iter &it) {

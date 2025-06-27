@@ -16,8 +16,8 @@ namespace rendering::gui::systems {
         GUIModule::gui_canvas.set<Rectangle>({
             0, 0, static_cast<float>(GetScreenWidth()), static_cast<float>(GetScreenHeight())
         });
-        settings.windowHeight = GetScreenHeight();
-        settings.windowWidth = GetScreenWidth();
+        settings.window_height = GetScreenHeight();
+        settings.window_width = GetScreenWidth();
     }
 }
 #endif //SET_GUI_CANVAS_SIZE_SYSTEM_H

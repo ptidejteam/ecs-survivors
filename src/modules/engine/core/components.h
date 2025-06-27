@@ -20,8 +20,8 @@ namespace core {
         std::string windowName;
         int initialWidth;
         int initialHeight;
-        int windowWidth;
-        int windowHeight;
+        int window_width;
+        int window_height;
     };
 
     struct Tag {
