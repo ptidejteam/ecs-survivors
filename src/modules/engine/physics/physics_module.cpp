@@ -49,9 +49,10 @@ namespace physics {
                 .term_at(1).singleton()
                 .kind(flecs::OnStart)
                 .each([](flecs::iter &it, size_t i, SpatialHashingGrid &hashing_grid, core::GameSettings &settings) {
-                    for (int y = -2; y < std::ceil((float) settings.window_height / (float) hashing_grid.cell_size) + 2;
+                    m_cell_query.clear();
+                    for (int y = -1; y < std::ceil((float) settings.window_height / (float) hashing_grid.cell_size) + 1;
                          y++) {
-                        for (int x = -2; x < std::ceil(settings.window_width / hashing_grid.cell_size) + 2; x++) {
+                        for (int x = -1; x < std::ceil(settings.window_width / hashing_grid.cell_size) + 1; x++) {
                             flecs::entity e = it.world().entity().set<GridCell>({x, y});
                             hashing_grid.cells[std::make_pair(x, y)] = e;
                         }
@@ -68,14 +69,31 @@ namespace physics {
                             cell.second.destruct();
                         }
                         hashing_grid.cells.clear();
-                        for (int y = -2; y < std::ceil((float) settings.window_height / (float) hashing_grid.cell_size)
-                                         + 2; y++) {
-                            for (int x = -2; x < std::ceil(settings.window_width / hashing_grid.cell_size) + 2; x++) {
+                        for (int y = -1; y < std::ceil((float) settings.window_height / (float) hashing_grid.cell_size)+ 1; y++) {
+                            for (int x = -1; x < std::ceil(settings.window_width / hashing_grid.cell_size) + 1; x++) {
                                 flecs::entity e = it.world().entity().set<GridCell>({x, y});
                                 hashing_grid.cells[std::make_pair(x, y)] = e;
                             }
                         }
                     }
+                });
+
+        world.observer<SpatialHashingGrid, core::GameSettings>("update grid on grid set")
+                .term_at(1).singleton()
+                .event(flecs::OnSet)
+                .each([](flecs::iter &it, size_t i, SpatialHashingGrid &hashing_grid, core::GameSettings &settings) {
+                    for (auto cell: hashing_grid.cells) {
+                        cell.second.destruct();
+                    }
+                    hashing_grid.cells.clear();
+                    m_cell_query.clear();
+                    for (int y = -1; y < std::ceil((float) settings.window_height / (float) hashing_grid.cell_size)+ 1; y++) {
+                            for (int x = -1; x < std::ceil(settings.window_width / hashing_grid.cell_size) + 1; x++) {
+                                flecs::entity e = it.world().entity().set<GridCell>({x, y});
+                                hashing_grid.cells[std::make_pair(x, y)] = e;
+                            }
+                        }
+                    std::cout << "Updating Grid" << std::endl;
                 });
 
         world.system<SpatialHashingGrid, rendering::TrackingCamera, core::GameSettings, GridCell>("update grid")
@@ -125,18 +143,9 @@ namespace physics {
 
                     flecs::entity cell = grid.cells[std::make_pair(cell_pos_x, cell_pos_y)];
                     cell.get_mut<GridCell>()->entities.push_back(e);
+                    //e.add<ContainedIn>(cell);
                 });
 
-
-        // need a second pass to collide static colliders. Even when static objects are out of the screen we compute the collision
-        world.system<CollisionRecordList, const core::Position2D, const Collider>(
-                    "Detect Collisions ECS (Naive Record List) static")
-                .term_at(0).singleton()
-                .with<StaticCollider>()
-                .kind<Detection>()
-                .multi_threaded()
-                .tick_source(m_physicsTick)
-                .each(systems::collision_detection_static_system);
 
         m_collision_detection_naive_system = world.system<CollisionRecordList, const core::Position2D, const Collider>(
                     "Detect Collisions ECS (Naive Record List) non-static")
@@ -147,6 +156,16 @@ namespace physics {
                 .tick_source(m_physicsTick)
                 .each(systems::collision_detection_non_static_system);
         m_collision_detection_naive_system.disable();
+
+        // need a second pass to collide static colliders. Even when static objects are out of the screen we compute the collision
+        world.system<CollisionRecordList, const core::Position2D, const Collider>(
+                    "Detect Collisions ECS (Naive Record List) static")
+                .term_at(0).singleton()
+                .with<StaticCollider>()
+                .kind<Detection>()
+                .multi_threaded()
+                .tick_source(m_physicsTick)
+                .each(systems::collision_detection_static_system);
 
         m_collision_detection_spatial_hashing_system = world.system<CollisionRecordList, SpatialHashingGrid, GridCell>(
                     "Detect Collisions ECS non-static with spatial hashing")
@@ -204,6 +223,65 @@ namespace physics {
                     systems::list_mutex.unlock();
                 });
         m_collision_detection_spatial_hashing_system.disable();
+
+        m_collision_detection_spatial_ecs = world.system<CollisionRecordList, SpatialHashingGrid, GridCell>(
+                    "test collision with relationship")
+                .term_at(0).singleton()
+                .term_at(1).singleton()
+                .kind<Detection>()
+                //.multi_threaded()
+                .tick_source(m_physicsTick)
+                .each([](flecs::iter &it, size_t i, CollisionRecordList &list, SpatialHashingGrid &grid,
+                         GridCell &cell) {
+                    flecs::entity current_cell = it.entity(i);
+
+                    std::vector<CollisionRecord> collisions;
+                    for (int offset_y = -1; offset_y <= 1; offset_y++) {
+                        for (int offset_x = -1; offset_x <= 1; offset_x++) {
+                            int x = cell.x + offset_x;
+                            int y = cell.y + offset_y;
+                            if (!grid.cells.contains(std::make_pair(x, y))) continue;
+
+                            auto pair = std::make_pair(x, y);
+                            flecs::entity neighbour_cell = grid.cells[pair];
+
+
+                            m_cell_query[std::make_pair(cell.x, cell.y)].each([&](
+                            flecs::iter &self_it, size_t self_i, const core::Position2D &pos,
+                            const Collider &collider) {
+                                    flecs::entity self = self_it.entity(self_i);
+                                    m_cell_query[pair].each([&](flecs::iter &other_it, size_t other_i,
+                                                                const core::Position2D &other_pos,
+                                                                const Collider &other_collider) {
+                                        flecs::entity other = other_it.entity(other_i);
+                                        if (other.id() <= self.id()) return;
+
+                                        if ((collider.collision_filter & other_collider.collision_type) == none) return;
+
+                                        Rectangle self_rec = {
+                                            pos.value.x + collider.bounds.x, pos.value.y + collider.bounds.y,
+                                            collider.bounds.width,
+                                            collider.bounds.height
+                                        };
+                                        Rectangle other_rec = {
+                                            other_pos.value.x + other_collider.bounds.x,
+                                            other_pos.value.y + other_collider.bounds.y,
+                                            other_collider.bounds.width, other_collider.bounds.height
+                                        };
+
+                                        if (CheckCollisionRecs(self_rec, other_rec)) {
+                                            collisions.push_back({self, other});
+                                        }
+                                    });
+                                });
+                        }
+                    }
+                    if (collisions.empty()) return;
+                    systems::list_mutex.lock();
+                    list.records.insert(list.records.end(), collisions.begin(), collisions.end());
+                    systems::list_mutex.unlock();
+                });
+        m_collision_detection_spatial_ecs.disable();
 
         world.system<CollisionRecordList>("Collision Resolution ECS (Naive Record List)")
                 .term_at(0).singleton()

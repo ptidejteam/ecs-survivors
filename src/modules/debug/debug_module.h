@@ -24,6 +24,9 @@ namespace debug {
         flecs::system debug_grid;
         flecs::system debug_closest_enemy;
 
+        flecs::system grid_cell_grow;
+        flecs::system grid_cell_shrink;
+
         void register_components(flecs::world& world);
 
         void register_systems(flecs::world& world);

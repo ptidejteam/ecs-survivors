@@ -81,6 +81,22 @@ namespace debug {
                 .kind<rendering::RenderGizmos>()
                 .run(systems::debug_closest_enemy_to_player_system);
         debug_closest_enemy.disable();
+
+            grid_cell_grow = world.system<physics::SpatialHashingGrid>()
+            .kind(0)
+            .each([] (flecs::entity e, physics::SpatialHashingGrid& grid) {
+                    grid.cell_size = grid.cell_size + 16;
+                    e.set<physics::SpatialHashingGrid>({grid});
+            });
+            grid_cell_grow.disable();
+
+            grid_cell_shrink = world.system<physics::SpatialHashingGrid>()
+            .kind(0)
+            .each([] (flecs::entity e, physics::SpatialHashingGrid& grid) {
+                    grid.cell_size = std::max(16, grid.cell_size - 16);
+                    e.set<physics::SpatialHashingGrid>({grid});
+            });
+            grid_cell_shrink.disable();
     }
 
     void DebugModule::register_entities(flecs::world &world) {
@@ -123,5 +139,17 @@ namespace debug {
                     .set<rendering::gui::MenuBarTabItem>({
                         "Toggle Hashing Collisions", physics::m_collision_detection_spatial_hashing_system, rendering::gui::TOGGLE
                     });
+            world.entity("debug_collisions_item_9").child_of(dropdown)
+                   .set<rendering::gui::MenuBarTabItem>({
+                       "Toggle Hashing Collisions ECS", physics::m_collision_detection_spatial_ecs, rendering::gui::TOGGLE
+                   });
+            world.entity("debug_collisions_item_10").child_of(dropdown)
+                   .set<rendering::gui::MenuBarTabItem>({
+                       "Grow Cell Size", grid_cell_grow, rendering::gui::RUN
+                   });
+            world.entity("debug_collisions_item_11").child_of(dropdown)
+                   .set<rendering::gui::MenuBarTabItem>({
+                       "Shrink Cell Size", grid_cell_shrink, rendering::gui::RUN
+                   });
     }
 }

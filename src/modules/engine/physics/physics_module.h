@@ -26,7 +26,10 @@ namespace physics {
     static CollisionFilter environment_filter = static_cast<CollisionFilter>(player | enemy);
 
     inline flecs::system m_collision_detection_spatial_hashing_system;
+    inline flecs::system m_collision_detection_spatial_ecs;
     inline flecs::system m_collision_detection_naive_system;
+
+    inline std::unordered_map<std::pair<long,long>, flecs::query<const core::Position2D, const Collider>, IdPairHash> m_cell_query;
 
     class PhysicsModule : public BaseModule<PhysicsModule> {
         friend class BaseModule<PhysicsModule>;

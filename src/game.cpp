@@ -75,7 +75,7 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
         m_windowHeight
     });
     m_world.add<physics::CollisionRecordList>();
-    m_world.set<physics::SpatialHashingGrid>({48, {0,0}});
+    m_world.set<physics::SpatialHashingGrid>({640, {0,0}});
 
     flecs::entity player = m_world.entity("player")
             .set<core::Tag>({"player"})
@@ -120,7 +120,7 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
             })
             .set<gameplay::Split>({std::unordered_set<int>()})
             .set<gameplay::Bounce>({2})
-            .set<gameplay::Damage>({2})
+            .set<gameplay::Damage>({0})
             .set<physics::Velocity2D>({0, 0})
             .set<physics::Collider>({
                 false,
@@ -183,11 +183,11 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
     m_world.entity("enemy_spawner")
             .set<gameplay::Spawner>({enemy});
 
-    m_world.entity("tilemap_1")
-            .set<tilemap::Tilemap>({
-                "../resources/tiled/maps/sampleMap.tmx",
-                3.0f
-            });
+    // m_world.entity("tilemap_1")
+    //         .set<tilemap::Tilemap>({
+    //             "../resources/tiled/maps/sampleMap.tmx",
+    //             3.0f
+    //         });
 
     m_world.set<rendering::TrackingCamera>({
         player,
