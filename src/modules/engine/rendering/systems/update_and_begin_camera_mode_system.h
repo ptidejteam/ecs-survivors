@@ -14,7 +14,7 @@ namespace rendering::systems {
     inline void update_and_begin_camera_mode_system(flecs::iter& it, size_t, TrackingCamera &camera, core::GameSettings &settings) {
         Vector2 pos = camera.camera.target;
         if (camera.target.is_alive()) {
-            pos = camera.target.get<core::Position2D>()->value;
+            pos = camera.target.get<core::Position2D>().value;
         };
         camera.camera.target = Vector2Lerp(camera.camera.target ,pos , it.delta_time() * 2.0f);
         camera.camera.offset.x = settings.window_width / 2.0f;

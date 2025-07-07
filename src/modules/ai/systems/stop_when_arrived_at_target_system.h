@@ -20,7 +20,7 @@ namespace ai::systems {
                               physics::DesiredVelocity2D &velocity) {
         const flecs::entity target = it.pair(3).second(); // target component
         if (target.id() == 0) return;
-        const Vector2 ab = target.get<core::Position2D>()->value - pos.value;
+        const Vector2 ab = target.get<core::Position2D>().value - pos.value;
 
         // using the squared length is faster computationally
         const float distSquared = Vector2LengthSqr(ab);

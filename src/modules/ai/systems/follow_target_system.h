@@ -19,7 +19,7 @@ namespace ai::systems {
                               physics::DesiredVelocity2D &velocity) {
         const flecs::entity target = it.pair(3).second(); // target component
         if (target.id() == 0) return;
-        const Vector2 dir = Vector2Normalize(target.get<core::Position2D>()->value - position.value);
+        const Vector2 dir = Vector2Normalize(target.get<core::Position2D>().value - position.value);
         velocity.value = dir * speed.value;
     }
 }

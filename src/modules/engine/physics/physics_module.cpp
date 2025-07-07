@@ -142,7 +142,7 @@ namespace physics {
                     }
 
                     flecs::entity cell = grid.cells[std::make_pair(cell_pos_x, cell_pos_y)];
-                    cell.get_mut<GridCell>()->entities.push_back(e);
+                    cell.get_mut<GridCell>().entities.push_back(e);
                     //e.add<ContainedIn>(cell);
                 });
 
@@ -182,31 +182,31 @@ namespace physics {
                             int y = cell.y + offset_y;
                             if (!grid.cells.contains(std::make_pair(x, y))) continue;
 
-                            const GridCell *neighbour = grid.cells[std::make_pair(x, y)].get<GridCell>();
+                            const GridCell neighbour = grid.cells[std::make_pair(x, y)].get<GridCell>();
 
                             for (int i = 0; i < cell.entities.size(); i++) {
                                 flecs::entity self = cell.entities[i];
                                 if (!self.is_alive()) continue;
-                                const core::Position2D *pos = cell.entities[i].get<core::Position2D>();
-                                const Collider *collider = cell.entities[i].get<Collider>();
-                                for (int j = 0; j < neighbour->entities.size(); j++) {
-                                    flecs::entity other = neighbour->entities[j];
+                                const core::Position2D pos = cell.entities[i].get<core::Position2D>();
+                                const Collider collider = cell.entities[i].get<Collider>();
+                                for (int j = 0; j < neighbour.entities.size(); j++) {
+                                    flecs::entity other = neighbour.entities[j];
                                     if (!other.is_alive()) continue;
-                                    const core::Position2D *other_pos = neighbour->entities[j].get<core::Position2D>();
-                                    const Collider *other_collider = neighbour->entities[j].get<Collider>();
+                                    const core::Position2D other_pos = neighbour.entities[j].get<core::Position2D>();
+                                    const Collider other_collider = neighbour.entities[j].get<Collider>();
                                     if (self.id() <= other.id()) continue;
 
-                                    if ((collider->collision_filter & other_collider->collision_type) == none) continue;
+                                    if ((collider.collision_filter & other_collider.collision_type) == none) continue;
 
                                     Rectangle self_rec = {
-                                        pos->value.x + collider->bounds.x, pos->value.y + collider->bounds.y,
-                                        collider->bounds.width,
-                                        collider->bounds.height
+                                        pos.value.x + collider.bounds.x, pos.value.y + collider.bounds.y,
+                                        collider.bounds.width,
+                                        collider.bounds.height
                                     };
                                     Rectangle other_rec = {
-                                        other_pos->value.x + other_collider->bounds.x,
-                                        other_pos->value.y + other_collider->bounds.y,
-                                        other_collider->bounds.width, other_collider->bounds.height
+                                        other_pos.value.x + other_collider.bounds.x,
+                                        other_pos.value.y + other_collider.bounds.y,
+                                        other_collider.bounds.width, other_collider.bounds.height
                                     };
 
                                     if (CheckCollisionRecs(self_rec, other_rec)) {

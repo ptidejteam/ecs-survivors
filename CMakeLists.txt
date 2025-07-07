@@ -41,7 +41,7 @@ if (NOT raylib_FOUND) # If there's none, fetch and build raylib
     endif ()
 endif ()
 
-set(FLECS_VERSION 4.0.5)
+set(FLECS_VERSION 4.1.0)
 find_package(flecs ${FLECS_VERSION} QUIET) # QUIET or REQUIRED
 if (NOT flecs_FOUND) # If there's none, fetch and build flecs
     include(FetchContent)
