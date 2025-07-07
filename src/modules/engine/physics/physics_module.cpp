@@ -28,7 +28,7 @@ namespace physics {
         world.component<Velocity2D>();
         world.component<AccelerationSpeed>();
         world.component<CollidedWith>();
-        world.component<ContainedIn>().add(flecs::Exclusive);
+        world.component<ContainedIn>().add(flecs::Exclusive).add(flecs::DontFragment);
         //world.component<CircleCollider>().is_a<Collider>();
         //world.component<BoxCollider>().is_a<Collider>();
     }

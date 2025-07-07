@@ -25,8 +25,8 @@ namespace physics::systems {
      */
     inline void correct_positions(flecs::entity &a, const Collider &a_col, CollisionInfo &a_info, flecs::entity &b,
                                   const Collider &b_col, CollisionInfo &b_info, Vector2 overlap) {
-        core::Position2D a_pos = a.get_mut<core::Position2D>();
-        core::Position2D b_pos = b.get_mut<core::Position2D>();
+        const core::Position2D& a_pos = a.get<core::Position2D>();
+        const core::Position2D& b_pos = b.get<core::Position2D>();
 
         float a_move_ratio = 0.5f;
         float b_move_ratio = 0.5f;
@@ -45,8 +45,11 @@ namespace physics::systems {
             b_move_ratio = 0.0f;
         }
 
-        a_pos.value = a_pos.value - overlap * a_move_ratio * 0.75;
-        b_pos.value = b_pos.value + overlap * b_move_ratio * 0.75;
+        a.set<core::Position2D>({a_pos.value - overlap * a_move_ratio * 0.75});
+        b.set<core::Position2D>({b_pos.value + overlap * b_move_ratio * 0.75});
+        //std::cout << overlap.x << "," << overlap.y << std::endl;
+        //std::cout << a_move_ratio << std::endl;
+        //std::cout << b_move_ratio << std::endl;
     }
 
     /**

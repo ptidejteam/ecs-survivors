@@ -75,7 +75,7 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
         m_windowHeight
     });
     m_world.add<physics::CollisionRecordList>();
-    m_world.set<physics::SpatialHashingGrid>({640, {0,0}});
+    m_world.set<physics::SpatialHashingGrid>({48, {0,0}});
 
     flecs::entity player = m_world.entity("player")
             .set<core::Tag>({"player"})
