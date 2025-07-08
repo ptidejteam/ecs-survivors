@@ -11,6 +11,7 @@ While developing this game, I will document most of the work through [blog-posts
 [Part-III: Player and Enemy Movement](https://blog.ptidej.net/ecs-game/)<br>
 [Part-IV: Collisions](https://blog.ptidej.net/ecs-survivors-part-iv/)<br>
 [Part-V: Gameplay](https://blog.ptidej.net/ecs-survivors-part-v-gameplay/)<br>
+[Part-V: Code Refactor]([https://blog.ptidej.net/ecs-survivors-part-v-gameplay](https://blog.ptidej.net/ecs-survivors-part-vi-code-refactor/)/)<br>
 
 You can also play the latest build on [Itch.io](https://laurent-voisard.itch.io/ecs-survivors)
 
