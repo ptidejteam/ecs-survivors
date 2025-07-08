@@ -67,7 +67,7 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
     m_world.import<debug::DebugModule>();
     m_world.import<tilemap::TilemapModule>();
 
-    m_world.set<core::GameSettings>({
+     m_world.set<core::GameSettings>({
         m_windowName,
         m_windowWidth,
         m_windowHeight,
@@ -75,6 +75,7 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
         m_windowHeight
     });
     m_world.add<physics::CollisionRecordList>();
+    m_world.set<physics::SpatialHashingGrid>({48, {0,0}});
 
     flecs::entity player = m_world.entity("player")
             .set<core::Tag>({"player"})

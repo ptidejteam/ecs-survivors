@@ -9,8 +9,8 @@
 #include <raylib.h>
 
 namespace debug::systems {
-    inline void debug_grid_system(flecs::iter &iter) {
-        GuiGrid({0, 0, (float) GetScreenWidth(), (float) GetScreenHeight()}, "grid", 48, 1, nullptr);
+    inline void debug_grid_system(rendering::TrackingCamera &camera, physics::SpatialHashingGrid& grid, physics::GridCell& cell) {
+        DrawRectangleLines(grid.offset.x + cell.x * grid.cell_size, grid.offset.y +cell.y * grid.cell_size, grid.cell_size, grid.cell_size, ORANGE);
     }
 }
 #endif //DEBUG_GRID_SYSTEM_H

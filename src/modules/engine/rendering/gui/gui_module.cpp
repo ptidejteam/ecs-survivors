@@ -49,7 +49,7 @@ namespace rendering::gui {
                 .each(systems::on_parent_rectangle_changed_observer);
 
         world.system<core::GameSettings>("Window Resized")
-                .kind<PreRender>()
+                .kind(flecs::PreFrame)
                 .each(systems::check_window_resized_system);
 
         world.system<const Panel, const Rectangle>("Draw Panel")

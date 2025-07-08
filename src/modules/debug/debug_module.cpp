@@ -14,6 +14,7 @@
 #include "modules/engine/rendering/gui/gui_module.h"
 #include <raymath.h>
 
+#include "modules/engine/physics/physics_module.h"
 #include "systems/debug_closest_enemy_to_player_system.h"
 #include "systems/debug_collidable_entities_system.h"
 #include "systems/debug_colliders_system.h"
@@ -69,15 +70,33 @@ namespace debug {
                 .run(systems::debug_mouse_position_system);
         debug_mouse_pos.disable();
 
-        debug_grid = world.system("Draw Grid")
+        debug_grid = world.system<rendering::TrackingCamera, physics::SpatialHashingGrid, physics::GridCell>("Draw Grid")
+                .term_at(0).singleton()
+                .term_at(1).singleton()
                 .kind<rendering::RenderGizmos>()
-                .run(systems::debug_grid_system);
+                .each(systems::debug_grid_system);
         debug_grid.disable();
 
         debug_closest_enemy = world.system("Draw Ray to closest target")
                 .kind<rendering::RenderGizmos>()
                 .run(systems::debug_closest_enemy_to_player_system);
         debug_closest_enemy.disable();
+
+            grid_cell_grow = world.system<physics::SpatialHashingGrid>()
+            .kind(0)
+            .each([] (flecs::entity e, physics::SpatialHashingGrid& grid) {
+                    grid.cell_size = grid.cell_size + 16;
+                    e.set<physics::SpatialHashingGrid>({grid});
+            });
+            grid_cell_grow.disable();
+
+            grid_cell_shrink = world.system<physics::SpatialHashingGrid>()
+            .kind(0)
+            .each([] (flecs::entity e, physics::SpatialHashingGrid& grid) {
+                    grid.cell_size = std::max(16, grid.cell_size - 16);
+                    e.set<physics::SpatialHashingGrid>({grid});
+            });
+            grid_cell_shrink.disable();
     }
 
     void DebugModule::register_entities(flecs::world &world) {
@@ -113,5 +132,24 @@ namespace debug {
                 .set<rendering::gui::MenuBarTabItem>({
                     "Toggle View Closest Enemy", debug_closest_enemy, rendering::gui::TOGGLE
                 });
+
+            world.entity("debug_collisions_item_7").child_of(dropdown)
+                .set<rendering::gui::MenuBarTabItem>({"Toggle Naive Collisions", physics::m_collision_detection_naive_system, rendering::gui::TOGGLE});
+            world.entity("debug_collisions_item_8").child_of(dropdown)
+                    .set<rendering::gui::MenuBarTabItem>({
+                        "Toggle Hashing Collisions", physics::m_collision_detection_spatial_hashing_system, rendering::gui::TOGGLE
+                    });
+            world.entity("debug_collisions_item_9").child_of(dropdown)
+                   .set<rendering::gui::MenuBarTabItem>({
+                       "Toggle Hashing Collisions ECS", physics::m_collision_detection_spatial_ecs, rendering::gui::TOGGLE
+                   });
+            world.entity("debug_collisions_item_10").child_of(dropdown)
+                   .set<rendering::gui::MenuBarTabItem>({
+                       "Grow Cell Size", grid_cell_grow, rendering::gui::RUN
+                   });
+            world.entity("debug_collisions_item_11").child_of(dropdown)
+                   .set<rendering::gui::MenuBarTabItem>({
+                       "Shrink Cell Size", grid_cell_shrink, rendering::gui::RUN
+                   });
     }
 }

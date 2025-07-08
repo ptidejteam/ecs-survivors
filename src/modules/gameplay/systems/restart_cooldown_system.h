@@ -11,7 +11,7 @@
 namespace gameplay::systems {
     inline void restart_cooldown_system(flecs::entity e) {
         if (e.has<Cooldown>())
-            e.set<Cooldown>({e.get<Cooldown>()->value, 0.0f});
+            e.set<Cooldown>({e.get<Cooldown>().value, 0.0f});
     }
 }
 #endif //RESTART_COOLDOWN_SYSTEM_H

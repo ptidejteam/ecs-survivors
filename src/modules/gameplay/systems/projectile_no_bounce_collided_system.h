@@ -14,7 +14,7 @@
 namespace gameplay::systems {
     inline void projectile_no_bounce_collided_system(flecs::iter &it, size_t i) {
         flecs::entity other = it.pair(0).second();
-        if (other.get<physics::Collider>()->collision_type == physics::environment) {
+        if (other.get<physics::Collider>().collision_type == physics::environment) {
             it.entity(i).remove<physics::CollidedWith>(other);
             it.entity(i).add<core::DestroyAfterFrame>();
         }

@@ -17,27 +17,27 @@ namespace rendering::gui::systems {
 
         auto anchor = e.get<Anchor>();
 
-        Rectangle temp{*e.get<Rectangle>()};
-        switch (anchor->horizontal_anchor) {
+        Rectangle temp{e.get<Rectangle>()};
+        switch (anchor.horizontal_anchor) {
             case CENTER:
-                temp.x = anchor->position.x + parent.x + parent.width / 2;
+                temp.x = anchor.position.x + parent.x + parent.width / 2;
                 break;
             case RIGHT:
-                temp.x = anchor->position.x + parent.x + parent.width;
+                temp.x = anchor.position.x + parent.x + parent.width;
                 break;
             default:
-                temp.x = anchor->position.x + parent.x;
+                temp.x = anchor.position.x + parent.x;
                 break;
         }
-        switch (anchor->vertical_anchor) {
+        switch (anchor.vertical_anchor) {
             case MIDDLE:
-                temp.y = anchor->position.y + parent.y + parent.height / 2;
+                temp.y = anchor.position.y + parent.y + parent.height / 2;
                 break;
             case BOTTOM:
-                temp.y = anchor->position.y + parent.y + parent.height;
+                temp.y = anchor.position.y + parent.y + parent.height;
                 break;
             default:
-                temp.y = anchor->position.y + parent.y;
+                temp.y = anchor.position.y + parent.y;
                 break;
         }
         e.set<Rectangle>({temp});

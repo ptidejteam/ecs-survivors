@@ -8,8 +8,6 @@
 #include <vector>
 
 namespace physics {
-    struct CircleCollider;
-    struct BoxCollider;
 
     enum CollisionFilter {
         none = 0x00,
@@ -80,11 +78,7 @@ namespace physics {
         std::size_t operator () (const std::pair<long,long>& h) const {
             auto h1 = std::hash<long>{}(h.first);
             auto h2 = std::hash<long>{}(h.second);
-
-            // A common way to combine hashes is to use XOR and a bit shift.
-            // The choice of shift value can impact distribution, but 0x9e3779b9 is a common
-            // constant derived from the golden ratio, used in boost::hash_combine.
-            return h1 ^ (h2 << 1); // Or h1 ^ (h2 + 0x9e3779b9 + (h1 << 6) + (h1 >> 2)); for better distribution
+            return h1 ^ (h2 << 1);
         }
     };
 
@@ -93,6 +87,20 @@ namespace physics {
         std::vector<SignificantCollisionRecord> significant_collisions;
         std::unordered_map<std::pair<long,long>, CollisionInfo, IdPairHash> collisions_info;
     };
+
+    struct SpatialHashingGrid {
+        int cell_size;
+        Vector2 offset;
+        std::unordered_map<std::pair<long,long>, flecs::entity, IdPairHash> cells;
+    };
+
+    struct GridCell {
+        int x;
+        int y;
+        std::vector<flecs::entity> entities;
+    };
+
+    struct ContainedIn {};
 
 
 }

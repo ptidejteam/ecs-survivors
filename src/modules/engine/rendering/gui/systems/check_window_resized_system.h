@@ -12,7 +12,7 @@
 #include "modules/engine/core/components.h"
 
 namespace rendering::gui::systems {
-    inline void check_window_resized_system(core::GameSettings &settings) {
+    inline void check_window_resized_system(flecs::entity e, core::GameSettings &settings) {
         if (IsWindowResized()) {
             set_gui_canvas_size_system(settings);
 #ifdef EMSCRIPTEN
