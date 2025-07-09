@@ -30,27 +30,14 @@ namespace physics::systems {
                                 for (int j = 0; j < neighbour.entities.size(); j++) {
                                     flecs::entity other = neighbour.entities[j];
                                     if (!other.is_alive()) continue;
-                                    const core::Position2D other_pos = neighbour.entities[j].get<core::Position2D>();
-                                    const Collider other_collider = neighbour.entities[j].get<Collider>();
                                     if (self.id() <= other.id()) continue;
 
+                                    const core::Position2D other_pos = neighbour.entities[j].get<core::Position2D>();
+                                    const Collider other_collider = neighbour.entities[j].get<Collider>();
                                     if ((collider.collision_filter & other_collider.collision_type) == none) continue;
 
-                                    Rectangle self_rec = {
-                                        pos.value.x + collider.bounds.x, pos.value.y + collider.bounds.y,
-                                        collider.bounds.width,
-                                        collider.bounds.height
-                                    };
-                                    Rectangle other_rec = {
-                                        other_pos.value.x + other_collider.bounds.x,
-                                        other_pos.value.y + other_collider.bounds.y,
-                                        other_collider.bounds.width, other_collider.bounds.height
-                                    };
+                                    collisions.push_back({self, other});
 
-                                    if (CheckCollisionRecs(self_rec, other_rec)) {
-                                        //std::cout << "Collision detected" << std::endl;
-                                        collisions.push_back({self, other});
-                                    }
                                 }
                             }
                         }

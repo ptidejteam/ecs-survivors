@@ -125,7 +125,7 @@ namespace physics {
                 .multi_threaded()
                 .tick_source(m_physicsTick)
                 .each(systems::collision_detection_spatial_hashing_system);
-        m_collision_detection_spatial_hashing_system.disable();
+        //m_collision_detection_spatial_hashing_system.disable();
 
         m_collision_detection_spatial_ecs = world.system<CollisionRecordList, SpatialHashingGrid, GridCell>(
                     "test collision with relationship")
