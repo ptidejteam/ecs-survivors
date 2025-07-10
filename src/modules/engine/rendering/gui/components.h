@@ -84,6 +84,12 @@ namespace rendering::gui {
         };
     };
 
+    struct ProgressBar {
+        float min_val;
+        float max_val;
+        float current_val;
+    };
+
     struct WindowResizedEvent{};
 }
 

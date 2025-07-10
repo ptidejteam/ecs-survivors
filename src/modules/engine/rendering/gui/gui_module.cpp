@@ -68,6 +68,14 @@ namespace rendering::gui {
                 .kind<RenderGUI>()
                 .each(systems::draw_outline_system);
 
+        world.system<const Rectangle, ProgressBar>("Draw Progress bar")
+                .kind<RenderGUI>()
+                .each([](const Rectangle &rec, ProgressBar bar) {
+                    GuiProgressBar(rec, std::to_string((int) bar.current_val).c_str(),
+                                   std::to_string((int) bar.max_val).c_str(),
+                                   &bar.current_val, bar.min_val, bar.max_val);
+                });
+
         world.system<MenuBar>("Draw Menu Bar")
                 .kind<RenderGUI>()
                 .each(systems::draw_menu_bar_system);
@@ -96,5 +104,11 @@ namespace rendering::gui {
                     GetColor(GuiGetStyle(DEFAULT, LINE_COLOR)),
                     GetColor(GuiGetStyle(BUTTON, BACKGROUND_COLOR)),
                 });
+
+
+        exp_bar = world.entity("exp_bar").child_of(gui_canvas)
+                .set<ProgressBar>({0, 100, 0})
+                .set<Rectangle>({-300, -50, 600, 30})
+                .set<Anchor>({CENTER, BOTTOM });
     }
 } // namespace rendering::gui

@@ -11,7 +11,10 @@
 
 namespace gameplay::systems {
     inline void create_health_bar_system(flecs::entity e, const gameplay::Health health) {
-        e.set<rendering::ProgressBar>({0, health.max, health.value, 0, 0, 50, 10});
+        e.add<HealthBar>();
+        e.child()
+                .set<Rectangle>({0, 0, 50, 10})
+                .set<rendering::ProgressBar>({0, health.max, health.value});
     }
 }
 #endif //CREATE_HEALTH_BAR_SYSTEM_H

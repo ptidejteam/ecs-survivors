@@ -8,7 +8,7 @@
 
 namespace rendering::gui::systems {
     inline void draw_panel_system(const Panel &panel, const Rectangle &rect) {
-        GuiPanel(rect, panel.name.c_str());
+        GuiDrawRectangle(rect,0,BLACK, DARKGRAY);
     }
 }
 

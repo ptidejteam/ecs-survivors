@@ -32,7 +32,6 @@ namespace rendering {
         float min_val;
         float max_val;
         float current_val;
-        Rectangle rectangle;
     };
 }
 

@@ -82,7 +82,9 @@ void rendering::RenderingModule::register_systems(flecs::world world) {
             .each(systems::draw_entity_with_texture_system);
 
 
-    world.system<ProgressBar, const core::Position2D, const Renderable>("show healthbar")
+    world.system<ProgressBar, Rectangle, const core::Position2D, const Renderable>("show healthbar")
+            .term_at(2).parent()
+            .term_at(3).parent()
             .kind<Render>()
             .each(systems::draw_health_bar_system);
 

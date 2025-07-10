@@ -34,6 +34,8 @@
 #include <tmxlite/TileLayer.hpp>
 #include <tmxlite/ObjectGroup.hpp>
 
+#include "modules/engine/rendering/gui/components.h"
+#include "modules/engine/rendering/gui/gui_module.h"
 #include "modules/tilemap/components.h"
 #include "modules/tilemap/tilemap_module.h"
 
@@ -101,7 +103,8 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
                 WHITE
             })
             .set<gameplay::Health>({150, 150})
-            .set<gameplay::RegenHealth>({250.0f});
+            .set<gameplay::RegenHealth>({250.0f})
+            .set<gameplay::Experience>({1, 0, 100});
 
     m_world.entity("dagger attack").child_of(player)
             .add<gameplay::Projectile>()
@@ -193,6 +196,8 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
         player,
         Camera2D{0}
     });
+
+
 }
 
 

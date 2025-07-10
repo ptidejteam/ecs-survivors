@@ -89,7 +89,8 @@ namespace gameplay {
                 .immediate()
                 .each(systems::projectile_no_bounce_collided_system);
 
-        world.system<physics::CollisionRecordList, Bounce, physics::Velocity2D, rendering::Rotation>("Bounce if hit wall")
+        world.system<physics::CollisionRecordList, Bounce, physics::Velocity2D, rendering::Rotation>(
+                    "Bounce if hit wall")
                 .with<physics::CollidedWith>(flecs::Wildcard)
                 .with<Projectile>()
                 .kind<OnCollisionDetected>()
@@ -135,17 +136,41 @@ namespace gameplay {
 
         world.system<const Health>("create health bar")
                 .with<TakeDamage>()
+                .without<HealthBar>()
                 .without<rendering::ProgressBar>()
                 .kind<PostCollisionDetected>()
                 .each(systems::create_health_bar_system);
 
         world.system<const Health, rendering::ProgressBar>("update health bar on take damage")
                 .kind<PostCollisionDetected>()
+                .term_at(0).parent()
                 .each(systems::update_health_bar_system);
 
         world.system<Health, RegenHealth>("regen health")
                 .kind(flecs::OnUpdate)
                 .each(systems::regen_health_system);
+
+        world.observer<GiveExperience>()
+                .event(flecs::OnSet)
+                .each([] (GiveExperience& e) {
+                        if (e.other.has<Experience>()) {
+                                e.other.get_mut<Experience>().value += e.value;
+                        }
+                });
+
+            world.system<Experience>().each([world] (Experience& exp) {
+                    if (exp.value >= exp.threshold) {
+                            //level up
+                            exp.level ++;
+                            exp.value -= exp.threshold;
+                            exp.threshold = exp.threshold * 1.2f;
+                            rendering::gui::GUIModule::exp_bar.get_mut<rendering::gui::ProgressBar>().max_val = exp.threshold;
+                    }
+
+                    rendering::gui::GUIModule::exp_bar.get_mut<rendering::gui::ProgressBar>().current_val = exp.value;
+            });
+
+
 
         add_multiproj = world.system("add multi proj")
                 .kind(0)
