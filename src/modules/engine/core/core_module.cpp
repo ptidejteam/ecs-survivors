@@ -41,21 +41,24 @@ namespace core {
                     it.world().set_time_scale(!paused.paused);
                 });
 
-        world.observer()
-                .with<PauseOnDisabled>().filter()
+        world.observer<EnabledMenus>()
+                .term_at(0).singleton()
+                .with<PauseOnEnabled>().filter()
                 .event(flecs::OnAdd)
                 .with(flecs::Disabled)
-                .each([](flecs::iter &it, size_t i) {
-                    std::cout << "a" << std::endl;
-                    it.world().set<Paused>({false});
+                .each([](flecs::iter &it, size_t i, EnabledMenus &enabled) {
+                    enabled.count --;
+                    if (enabled.count == 0)
+                        it.world().set<Paused>({false});
                 });
 
-        world.observer()
-                .with<PauseOnDisabled>().filter()
+        world.observer<EnabledMenus>()
+                .term_at(0).singleton()
+                .with<PauseOnEnabled>().filter()
                 .event(flecs::OnRemove)
                 .with(flecs::Disabled)
-                .each([](flecs::iter &it, size_t i) {
-                    std::cout << "b" << std::endl;
+                .each([](flecs::iter &it, size_t i, EnabledMenus &enabled) {
+                    enabled.count ++;
                     it.world().set<Paused>({true});
                 });
 

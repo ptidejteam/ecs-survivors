@@ -82,6 +82,7 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
     m_world.add<physics::CollisionRecordList>();
     m_world.set<physics::SpatialHashingGrid>({48, {0, 0}});
     m_world.set<core::Paused>({false});
+    m_world.set<core::EnabledMenus>({0});
     flecs::entity player = m_world.entity("player")
             .set<core::Tag>({"player"})
             .set<core::Position2D>({2300.0f, 1300.0f})
@@ -107,7 +108,7 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
             })
             .set<gameplay::Health>({150, 150})
             .set<gameplay::RegenHealth>({250.0f})
-            .set<gameplay::Experience>({1, 0, 100});
+            .set<gameplay::Experience>({1, 0, 20});
 
     m_world.entity("dagger attack").child_of(player)
             .add<gameplay::Projectile>()
@@ -195,16 +196,6 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
                 "../resources/tiled/maps/sampleMap.tmx",
                 3.0f
             });
-
-    auto pause_menu = m_world.entity().child_of(rendering::gui::GUIModule::gui_canvas)
-        .set<rendering::gui::Panel>({"pause"})
-        .set<Rectangle>({-150,-200, 300, 400})
-        .set<rendering::gui::Anchor>({rendering::gui::CENTER, rendering::gui::MIDDLE})
-        .add<core::PauseOnDisabled>()
-        .disable();
-
-    auto input_toggle = pause_menu.child().add<input::InputToggleEnable>();
-    input_toggle.child().set<input::KeyBinding>({KEY_ESCAPE, 0});
 
     m_world.set<rendering::TrackingCamera>({
         player,

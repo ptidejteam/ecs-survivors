@@ -35,9 +35,7 @@ namespace input {
                 .kind(flecs::PreUpdate)
                 .with(flecs::Disabled).optional()
                 .each([] (flecs::entity e, const KeyBinding &binding, InputToggleEnable) {
-                        //std::cout << "hello" << std::endl;
                         if(IsKeyPressed(binding.key)) {
-                                std::cout << e.parent().parent().type().str() << std::endl;
                                 e.parent().type().str();
                                 if(e.parent().parent().enabled()) {
                                         e.parent().parent().disable();

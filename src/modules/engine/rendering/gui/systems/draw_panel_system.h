@@ -12,7 +12,7 @@ namespace rendering::gui::systems {
             rect,
             1,
             GetColor(GuiGetStyle(DEFAULT, BORDER_COLOR_NORMAL)),
-            GetColor(GuiGetStyle(DEFAULT, BACKGROUND_COLOR)));
+            Fade(GetColor(GuiGetStyle(DEFAULT, BACKGROUND_COLOR)), 0.9f));
     }
 }
 

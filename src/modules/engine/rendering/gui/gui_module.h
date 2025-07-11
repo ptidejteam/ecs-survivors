@@ -26,6 +26,8 @@ namespace rendering::gui {
         inline static flecs::entity exp_panel;
         inline static flecs::entity exp_bar;
         inline static flecs::entity exp_level_txt;
+        inline static flecs::entity pause_menu;
+        inline static flecs::entity level_up_menu;
 
         static Color font_color() { return GetColor(GuiGetStyle(TEXTBOX, TEXT_COLOR_NORMAL)); }
 

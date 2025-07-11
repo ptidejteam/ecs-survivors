@@ -176,7 +176,7 @@ namespace gameplay {
                 });
 
         world.system<Experience>()
-                .each([world](flecs::iter& it, size_t i, Experience &exp) {
+                .each([](flecs::iter& it, size_t i, Experience &exp) {
                     if (exp.value >= exp.threshold) {
                         //level up
                         exp.level++;
@@ -186,7 +186,7 @@ namespace gameplay {
                                 threshold;
                         rendering::gui::GUIModule::exp_level_txt.get_mut<rendering::gui::Text>().text =
                                 "Level: " + std::to_string(exp.level);
-
+                        rendering::gui::GUIModule::level_up_menu.enable();
                     }
                     rendering::gui::GUIModule::exp_bar.get_mut<rendering::gui::ProgressBar>().current_val = exp.value;
                 });

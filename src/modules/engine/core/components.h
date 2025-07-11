@@ -38,7 +38,8 @@ namespace core {
         bool paused;
     };
 
-    struct PauseOnDisabled {};
+    struct PauseOnEnabled {};
+    struct EnabledMenus {int count;};
 
 }
 
