@@ -34,6 +34,12 @@ namespace core {
 
     struct DestroyAfterFrame {};
 
+    struct Paused {
+        bool paused;
+    };
+
+    struct PauseOnDisabled {};
+
 }
 
 #endif //CORE_COMPONENTS_H

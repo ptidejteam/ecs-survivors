@@ -30,6 +30,23 @@ namespace input {
                 .kind(flecs::PreUpdate)
                 .each(systems::set_vertical_input_system);
 
+        world.system<const KeyBinding, InputToggleEnable>("toggle object enabled")
+                .term_at(1).cascade()
+                .kind(flecs::PreUpdate)
+                .with(flecs::Disabled).optional()
+                .each([] (flecs::entity e, const KeyBinding &binding, InputToggleEnable) {
+                        //std::cout << "hello" << std::endl;
+                        if(IsKeyPressed(binding.key)) {
+                                std::cout << e.parent().parent().type().str() << std::endl;
+                                e.parent().type().str();
+                                if(e.parent().parent().enabled()) {
+                                        e.parent().parent().disable();
+                                } else {
+                                        e.parent().parent().enable();
+                                }
+                        }
+                });
+
         world.system<InputHorizontal>("Reset Input Horizontal")
                 .kind(flecs::PostUpdate)
                 .each(systems::reset_horizontal_input_system);

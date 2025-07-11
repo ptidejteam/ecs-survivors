@@ -23,16 +23,18 @@ namespace rendering::gui {
 
         inline static flecs::entity gui_canvas;
         inline static flecs::entity menu_bar;
+        inline static flecs::entity exp_panel;
         inline static flecs::entity exp_bar;
+        inline static flecs::entity exp_level_txt;
 
         static Color font_color() { return GetColor(GuiGetStyle(TEXTBOX, TEXT_COLOR_NORMAL)); }
+
     private:
         void register_components(flecs::world &world);
 
         void register_systems(flecs::world &world);
 
         void register_entities(flecs::world &world);
-
 
 
         friend class BaseModule<GUIModule>;

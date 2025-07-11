@@ -47,6 +47,12 @@ namespace physics {
     void PhysicsModule::register_systems(flecs::world &world) {
         m_physicsTick = world.timer().interval(PHYSICS_TICK_LENGTH);
 
+        world.observer<core::Paused>("set physics interval on pause")
+                .event(flecs::OnSet)
+                .each([&](core::Paused &paused) {
+                    //m_physicsTick.enable(paused.paused);
+                });
+
         world.system<SpatialHashingGrid, core::GameSettings>("init grid")
                 .term_at(0).singleton()
                 .term_at(1).singleton()

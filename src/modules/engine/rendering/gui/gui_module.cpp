@@ -37,20 +37,29 @@ namespace rendering::gui {
 
         world.system<core::GameSettings>("On start set move gui elements to match anchors")
                 .kind(flecs::OnStart)
+                .with(flecs::Disabled).optional()
                 .each(systems::set_gui_canvas_size_system);
 
         world.system<const Rectangle, Anchor>("on start, set anchored position")
                 .kind(flecs::OnStart)
+                .with(flecs::Disabled).optional()
                 .each(systems::set_anchored_position_system);
 
-        world.observer<const Rectangle>("parent rectangle changed")
+        world.observer<const Rectangle>("parent rectangle changed enabled")
                 .term_at(0).parent()
+                .event(flecs::OnSet)
+                .each(systems::on_parent_rectangle_changed_observer);
+
+        world.observer<const Rectangle>("parent rectangle changed disabled")
+                .term_at(0).parent()
+                .with(flecs::Disabled).filter()
                 .event(flecs::OnSet)
                 .each(systems::on_parent_rectangle_changed_observer);
 
         world.system<core::GameSettings>("Window Resized")
                 .kind(flecs::PreFrame)
                 .each(systems::check_window_resized_system);
+
 
         world.system<const Panel, const Rectangle>("Draw Panel")
                 .kind<RenderGUI>()
@@ -97,6 +106,7 @@ namespace rendering::gui {
             0, 0, static_cast<float>(GetScreenWidth()), static_cast<float>(GetScreenHeight())
         });
 
+
         menu_bar = world.entity("menu_bar")
                 .set<MenuBar>({
                     200,
@@ -105,10 +115,19 @@ namespace rendering::gui {
                     GetColor(GuiGetStyle(BUTTON, BACKGROUND_COLOR)),
                 });
 
+        exp_panel = world.entity("exp_panel").child_of(gui_canvas)
+                .set<Panel>({"exp_panel"})
+                .set<Rectangle>({-250, -60, 500, 60})
+                .set<Anchor>({CENTER, BOTTOM});
 
-        exp_bar = world.entity("exp_bar").child_of(gui_canvas)
+        exp_bar = world.entity("exp_bar").child_of(exp_panel)
                 .set<ProgressBar>({0, 100, 0})
-                .set<Rectangle>({-300, -50, 600, 30})
-                .set<Anchor>({CENTER, BOTTOM });
+                .set<Rectangle>({-200, -30, 400, 20})
+                .set<Anchor>({CENTER, BOTTOM});
+
+        exp_level_txt = world.entity("exp_level_txt").child_of(exp_panel)
+                .set<Text>({"Level: 1", TEXT_ALIGN_CENTER})
+                .set<Rectangle>({-37.5, 10, 75, 20})
+                .set<Anchor>({CENTER, TOP});
     }
 } // namespace rendering::gui

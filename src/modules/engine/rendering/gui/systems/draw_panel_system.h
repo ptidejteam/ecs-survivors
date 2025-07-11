@@ -8,7 +8,11 @@
 
 namespace rendering::gui::systems {
     inline void draw_panel_system(const Panel &panel, const Rectangle &rect) {
-        GuiDrawRectangle(rect,0,BLACK, DARKGRAY);
+        GuiDrawRectangle(
+            rect,
+            1,
+            GetColor(GuiGetStyle(DEFAULT, BORDER_COLOR_NORMAL)),
+            GetColor(GuiGetStyle(DEFAULT, BACKGROUND_COLOR)));
     }
 }
 

@@ -19,7 +19,6 @@
 #include "systems/remove_empty_tables_system.h"
 
 namespace core {
-
     void CoreModule::register_components(flecs::world &world) {
         world.component<Position2D>();
         world.component<Speed>();
@@ -36,6 +35,31 @@ namespace core {
     void CoreModule::register_systems(flecs::world &world) {
         std::cout << "Registering core systems" << std::endl;
 
+        world.observer<const Paused>()
+                .event(flecs::OnSet)
+                .each([](flecs::iter &it, size_t i, const Paused &paused) {
+                    it.world().set_time_scale(!paused.paused);
+                });
+
+        world.observer()
+                .with<PauseOnDisabled>().filter()
+                .event(flecs::OnAdd)
+                .with(flecs::Disabled)
+                .each([](flecs::iter &it, size_t i) {
+                    std::cout << "a" << std::endl;
+                    it.world().set<Paused>({false});
+                });
+
+        world.observer()
+                .with<PauseOnDisabled>().filter()
+                .event(flecs::OnRemove)
+                .with(flecs::Disabled)
+                .each([](flecs::iter &it, size_t i) {
+                    std::cout << "b" << std::endl;
+                    it.world().set<Paused>({true});
+                });
+
+
         world.system<DestroyAfterTime>("Destroy entities after time")
                 .kind(flecs::PostFrame)
                 .write<DestroyAfterFrame>()
@@ -48,7 +72,8 @@ namespace core {
                 .multi_threaded()
                 .each(systems::destroy_entity_after_frame_system);
 
-        world.system("Remove empty tables to avoid fragmentation in collision (CHANGE TO DONTFRAGMENT WHEN FEATURE IS OUT)")
+        world.system(
+                    "Remove empty tables to avoid fragmentation in collision (CHANGE TO DONTFRAGMENT WHEN FEATURE IS OUT)")
                 //.interval(0.25f)
                 .kind(flecs::PostFrame)
                 .run([world](flecs::iter &it) { systems::remove_empty_tables_system(world); });

@@ -10,12 +10,17 @@
 
 namespace gameplay {
 
+    struct GameState {
+        int player_level;
+    };
+
+    struct LevelUpEvent {};
+
     struct Spawner {
         flecs::entity enemy_prefab;
     };
 
     struct TakeDamage {
-        flecs::entity giver;
         float damage;
     };
 

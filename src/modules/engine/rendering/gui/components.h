@@ -7,6 +7,8 @@
 #include <raylib.h>
 #include <string>
 #include <flecs.h>
+#include <variant>
+
 #include "modules/engine/core/components.h"
 
 namespace rendering::gui {

@@ -52,6 +52,8 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
 
     InitWindow(m_windowWidth, m_windowHeight, m_windowName.c_str());
 
+    SetExitKey(KEY_F4);
+
 #ifndef EMSCRIPTEN
     // use the flecs explorer when not on browser
     m_world.import<flecs::stats>();
@@ -69,7 +71,8 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
     m_world.import<debug::DebugModule>();
     m_world.import<tilemap::TilemapModule>();
 
-     m_world.set<core::GameSettings>({
+
+    m_world.set<core::GameSettings>({
         m_windowName,
         m_windowWidth,
         m_windowHeight,
@@ -77,8 +80,8 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
         m_windowHeight
     });
     m_world.add<physics::CollisionRecordList>();
-    m_world.set<physics::SpatialHashingGrid>({48, {0,0}});
-
+    m_world.set<physics::SpatialHashingGrid>({48, {0, 0}});
+    m_world.set<core::Paused>({false});
     flecs::entity player = m_world.entity("player")
             .set<core::Tag>({"player"})
             .set<core::Position2D>({2300.0f, 1300.0f})
@@ -161,6 +164,7 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
             .set<core::Speed>({25})
             .set<gameplay::Health>({10, 10})
             .set<gameplay::Damage>({1})
+            .set<gameplay::GiveExperience, gameplay::OnDeathEffect>({player, 1})
             .add<ai::Target>(player)
             .add<ai::FollowTarget>()
             .set<ai::StoppingDistance>({16.0})
@@ -192,12 +196,20 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
                 3.0f
             });
 
+    auto pause_menu = m_world.entity().child_of(rendering::gui::GUIModule::gui_canvas)
+        .set<rendering::gui::Panel>({"pause"})
+        .set<Rectangle>({-150,-200, 300, 400})
+        .set<rendering::gui::Anchor>({rendering::gui::CENTER, rendering::gui::MIDDLE})
+        .add<core::PauseOnDisabled>()
+        .disable();
+
+    auto input_toggle = pause_menu.child().add<input::InputToggleEnable>();
+    input_toggle.child().set<input::KeyBinding>({KEY_ESCAPE, 0});
+
     m_world.set<rendering::TrackingCamera>({
         player,
         Camera2D{0}
     });
-
-
 }
 
 

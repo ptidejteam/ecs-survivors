@@ -58,6 +58,11 @@ namespace gameplay {
     void GameplayModule::register_systems(flecs::world world) {
         m_spawner_tick = world.timer().interval(SPAWNER_INTERVAL);
 
+        world.observer<core::Paused>("set physics interval on pause")
+                .event(flecs::OnSet)
+                .each([&](core::Paused &paused) {
+                    //m_spawner_tick.enable(paused.paused);
+                });
 
         world.system<const Spawner, const core::GameSettings, const rendering::TrackingCamera>("Spawn Enemies")
                 .tick_source(m_spawner_tick)
@@ -130,16 +135,26 @@ namespace gameplay {
                 .kind<OnCollisionDetected>()
                 .each(systems::deal_damage_on_collision_system);
 
-        world.system<Health, TakeDamage>("take damage")
-                .kind<PostCollisionDetected>()
-                .each(systems::take_damage_system);
-
         world.system<const Health>("create health bar")
                 .with<TakeDamage>()
                 .without<HealthBar>()
                 .without<rendering::ProgressBar>()
                 .kind<PostCollisionDetected>()
                 .each(systems::create_health_bar_system);
+
+        world.system<Health, TakeDamage>("take damage")
+                .kind<PostCollisionDetected>()
+                .each(systems::take_damage_system);
+
+        world.system<Health>("check if dead")
+                .kind<PostCollisionDetected>()
+                .immediate()
+                .each([](flecs::entity e, Health &h) {
+                    if (h.value <= 0.0f) {
+                        e.add<core::DestroyAfterFrame>();
+                    }
+                });
+
 
         world.system<const Health, rendering::ProgressBar>("update health bar on take damage")
                 .kind<PostCollisionDetected>()
@@ -150,26 +165,31 @@ namespace gameplay {
                 .kind(flecs::OnUpdate)
                 .each(systems::regen_health_system);
 
-        world.observer<GiveExperience>()
-                .event(flecs::OnSet)
-                .each([] (GiveExperience& e) {
-                        if (e.other.has<Experience>()) {
-                                e.other.get_mut<Experience>().value += e.value;
-                        }
+        world.system<GiveExperience>()
+                .with<core::DestroyAfterFrame>()
+                .term_at(0).second<OnDeathEffect>()
+                .kind(flecs::OnStore)
+                .each([](GiveExperience &exp) {
+                    if (Experience *player_exp = exp.other.try_get_mut<Experience>(); player_exp) {
+                        player_exp->value += exp.value;
+                    }
                 });
 
-            world.system<Experience>().each([world] (Experience& exp) {
+        world.system<Experience>()
+                .each([world](flecs::iter& it, size_t i, Experience &exp) {
                     if (exp.value >= exp.threshold) {
-                            //level up
-                            exp.level ++;
-                            exp.value -= exp.threshold;
-                            exp.threshold = exp.threshold * 1.2f;
-                            rendering::gui::GUIModule::exp_bar.get_mut<rendering::gui::ProgressBar>().max_val = exp.threshold;
+                        //level up
+                        exp.level++;
+                        exp.value -= exp.threshold;
+                        exp.threshold = exp.threshold * 1.2f;
+                        rendering::gui::GUIModule::exp_bar.get_mut<rendering::gui::ProgressBar>().max_val = exp.
+                                threshold;
+                        rendering::gui::GUIModule::exp_level_txt.get_mut<rendering::gui::Text>().text =
+                                "Level: " + std::to_string(exp.level);
+
                     }
-
                     rendering::gui::GUIModule::exp_bar.get_mut<rendering::gui::ProgressBar>().current_val = exp.value;
-            });
-
+                });
 
 
         add_multiproj = world.system("add multi proj")

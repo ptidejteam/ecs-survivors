@@ -14,7 +14,7 @@ namespace gameplay::systems {
         flecs::entity other = it.pair(1).second();
 
         if (other.has<TakeDamage>() || !other.has<Health>()) return;
-        other.set<TakeDamage>({self.parent().parent(), dmg.value});
+        other.set<TakeDamage>({dmg.value});
     }
 }
 #endif //DEAL_DAMAGE_ON_COLLISION_SYSTEM_H

@@ -12,11 +12,6 @@
 namespace gameplay::systems {
     inline void take_damage_system(flecs::entity e, Health &health, TakeDamage &dmg) {
         health.value -= dmg.damage;
-        if (health.value <= 0) {
-            e.add<core::DestroyAfterFrame>();
-            // TODO change magic value
-            e.set<GiveExperience>({dmg.giver, 1});
-        }
         e.remove<TakeDamage>();
     }
 }
