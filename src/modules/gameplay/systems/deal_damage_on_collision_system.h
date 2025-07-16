@@ -13,8 +13,12 @@ namespace gameplay::systems {
         flecs::entity self = it.entity(i);
         flecs::entity other = it.pair(1).second();
 
-        if (other.has<TakeDamage>() || !other.has<Health>()) return;
-        other.set<TakeDamage>({dmg.value});
+        if (!other.has<Health>()) return;
+        float value = dmg.value;
+        if (other.has<TakeDamage>()) {
+            value += other.get<TakeDamage>().damage;
+        }
+        other.set<TakeDamage>({value});
     }
 }
 #endif //DEAL_DAMAGE_ON_COLLISION_SYSTEM_H

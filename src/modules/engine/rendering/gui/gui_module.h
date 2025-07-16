@@ -22,6 +22,8 @@ namespace rendering::gui {
 
 
         inline static flecs::entity gui_canvas;
+        inline static flecs::entity button_prefab;
+        inline static flecs::entity panel_prefab;
         inline static flecs::entity menu_bar;
         inline static flecs::entity exp_panel;
         inline static flecs::entity exp_bar;

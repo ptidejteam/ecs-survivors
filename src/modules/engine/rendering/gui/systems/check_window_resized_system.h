@@ -16,8 +16,8 @@ namespace rendering::gui::systems {
         if (IsWindowResized()) {
             set_gui_canvas_size_system(settings);
 #ifdef EMSCRIPTEN
-                        SetMouseScale(settings.windowWidth / (float) settings.initialWidth,
-                                      settings.windowHeight / (float) settings.initialHeight);
+                        SetMouseScale(settings.window_width / (float) settings.initial_width,
+                                      settings.window_height / (float) settings.initial_height);
 #endif
         }
     }

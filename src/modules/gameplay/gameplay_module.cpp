@@ -131,7 +131,7 @@ namespace gameplay {
 
         world.system<Damage>("collision detected, deal damage to target")
                 .with<physics::CollidedWith>(flecs::Wildcard)
-                .write<TakeDamage>()
+                .immediate()
                 .kind<OnCollisionDetected>()
                 .each(systems::deal_damage_on_collision_system);
 
@@ -186,6 +186,8 @@ namespace gameplay {
                                 threshold;
                         rendering::gui::GUIModule::exp_level_txt.get_mut<rendering::gui::Text>().text =
                                 "Level: " + std::to_string(exp.level);
+
+                            it.entity(i).get_mut<Health>().value = it.entity(i).get<Health>().max;
                         rendering::gui::GUIModule::level_up_menu.enable();
                     }
                     rendering::gui::GUIModule::exp_bar.get_mut<rendering::gui::ProgressBar>().current_val = exp.value;

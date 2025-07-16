@@ -15,7 +15,7 @@ namespace rendering::gui::systems {
     inline void draw_menu_bar_tab_item_system(flecs::iter &it, size_t i, MenuBarTabItem &item, MenuBarTab &tab, Rectangle &rec) {
         //std::cout << i << std::endl;
         if (!tab.active) return;
-        if (GuiButton({rec.x, rec.y + (i + 1) * rec.height, rec.width, rec.height}, item.name.c_str())) {
+        if (GuiLabelButton({rec.x, rec.y + (i + 1) * rec.height, rec.width, rec.height}, item.name.c_str())) {
             // tab.active = !tab.active;
             if(item.type == TOGGLE) {
                 if (item.toggle_system_entity.enabled())

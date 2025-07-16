@@ -7,20 +7,45 @@
 #include <raylib.h>
 #include <string>
 #include <flecs.h>
+#include <functional>
 #include <variant>
 
 #include "modules/engine/core/components.h"
 
 namespace rendering::gui {
+
+    const int FONT_SIZE_16 = 16;
+    const int FONT_SIZE_32 = 32;
+    const int FONT_SIZE_48 = 48;
+    const int FONT_SIZE_64 = 64;
+
     struct Button {
-        std::string text;
+        Texture2D texture;
+        Color normal_tint;
+        Color selected_tint;
+        Color hovered_tint;
+        NPatchInfo info;
         // not sure this is the best thing to store
-        flecs::system on_click_system;
+
+    };
+
+    struct ButtonCallback {
+        std::function<void()> callback;
+    };
+
+    struct ButtonLabel {
+        std::string label;
+        int font_size;
     };
 
     struct Text {
         std::string text;
+        int font_size;
         int alignment;
+    };
+
+    struct FontAtlas {
+        std::unordered_map<int, Font> fonts;
     };
 
     struct Outline {
@@ -30,7 +55,8 @@ namespace rendering::gui {
     };
 
     struct Panel {
-        std::string name;
+        Texture2D texture;
+        NPatchInfo info;
     };
 
     struct MenuBar {

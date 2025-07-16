@@ -18,8 +18,8 @@ namespace core {
 
     struct GameSettings {
         std::string windowName;
-        int initialWidth;
-        int initialHeight;
+        int initial_width;
+        int initial_height;
         int window_width;
         int window_height;
     };

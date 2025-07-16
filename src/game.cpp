@@ -107,26 +107,19 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
                 WHITE
             })
             .set<gameplay::Health>({150, 150})
-            .set<gameplay::RegenHealth>({250.0f})
-            .set<gameplay::Experience>({1, 0, 20});
+            .set<gameplay::RegenHealth>({1.0f})
+            .set<gameplay::Experience>({1, 0, 10});
 
     m_world.entity("dagger attack").child_of(player)
             .add<gameplay::Projectile>()
             .set<gameplay::Attack>({"projectile", "enemy"})
             .set<gameplay::Cooldown>({1.0f, 1})
             .add<gameplay::CooldownCompleted>()
-            .set<gameplay::MultiProj>({3, 30.f, 150.f, 30.f})
             .set<core::Speed>({150.f});
 
     m_world.prefab("projectile")
             .add<gameplay::Projectile>()
             .set<gameplay::Attack>({"projectile", "enemy"})
-            .set<gameplay::Chain>({
-                6,
-                std::unordered_set<int>()
-            })
-            .set<gameplay::Split>({std::unordered_set<int>()})
-            .set<gameplay::Bounce>({2})
             .set<gameplay::Damage>({2})
             .set<physics::Velocity2D>({0, 0})
             .set<physics::Collider>({
@@ -165,7 +158,7 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
             .set<core::Speed>({25})
             .set<gameplay::Health>({10, 10})
             .set<gameplay::Damage>({1})
-            .set<gameplay::GiveExperience, gameplay::OnDeathEffect>({player, 1})
+            .set<gameplay::GiveExperience, gameplay::OnDeathEffect>({player, 5})
             .add<ai::Target>(player)
             .add<ai::FollowTarget>()
             .set<ai::StoppingDistance>({16.0})
@@ -201,6 +194,75 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
         player,
         Camera2D{0}
     });
+
+    auto container = m_world.entity().child_of(rendering::gui::GUIModule::level_up_menu).set_name(
+                "level up options container")
+            .set<Rectangle>({-175, -150, 350, 300})
+            .set<rendering::gui::Anchor>({rendering::gui::CENTER, rendering::gui::MIDDLE})
+            .set<rendering::gui::Outline>({1, GRAY, Fade(WHITE, 0)});
+
+    container.child().is_a(rendering::gui::GUIModule::button_prefab).set_name("Option 1")
+            .set<Rectangle>({-162.5, 5, 325, 40})
+            .set<rendering::gui::Anchor>({rendering::gui::CENTER, rendering::gui::TOP})
+            .set<rendering::gui::ButtonLabel>({"+1 Pierce", rendering::gui::FONT_SIZE_32})
+            .set<rendering::gui::ButtonCallback>({
+                [&] {
+                    gameplay::add_pierce.run();
+                    gameplay::add_pierce_amt.run();
+                    rendering::gui::GUIModule::level_up_menu.disable();
+                }
+            });
+
+    container.child().is_a(rendering::gui::GUIModule::button_prefab).set_name("Option 2")
+            .set<Rectangle>({-162.5, 50, 325, 40})
+            .set<rendering::gui::Anchor>({rendering::gui::CENTER, rendering::gui::TOP})
+            .set<rendering::gui::ButtonLabel>({"+1 Chain", rendering::gui::FONT_SIZE_32})
+            .set<rendering::gui::ButtonCallback>({
+                [&] {
+                    gameplay::add_chain.run();
+                    gameplay::add_chain_amt.run();
+                    rendering::gui::GUIModule::level_up_menu.disable();
+                }
+            });
+
+    container.child().is_a(rendering::gui::GUIModule::button_prefab).set_name("Option 3")
+            .set<Rectangle>({-162.5, 95, 325, 40})
+            .set<rendering::gui::Anchor>({rendering::gui::CENTER, rendering::gui::TOP})
+            .set<rendering::gui::ButtonLabel>({"+1 Projectile", rendering::gui::FONT_SIZE_32})
+            .set<rendering::gui::ButtonCallback>({
+                [&] {
+                    gameplay::add_multiproj.run();
+                    gameplay::add_proj.run();
+                    rendering::gui::GUIModule::level_up_menu.disable();
+                }
+            });
+
+    container.child().is_a(rendering::gui::GUIModule::button_prefab).set_name("Option 4")
+            .set<Rectangle>({-162.5, 140, 325, 40})
+            .set<rendering::gui::Anchor>({rendering::gui::CENTER, rendering::gui::TOP})
+            .set<rendering::gui::ButtonLabel>({"+1 Bounce", rendering::gui::FONT_SIZE_32})
+            .set<rendering::gui::ButtonCallback>({
+                [&] {
+                    gameplay::add_bounce.run();
+                    gameplay::add_bounce_amt.run();
+                    rendering::gui::GUIModule::level_up_menu.disable();
+                }
+            });
+
+    flecs::entity split_level_up = container.child().is_a(rendering::gui::GUIModule::button_prefab).set_name("Option 5")
+            .set<Rectangle>({-162.5, 185, 325, 40})
+            .set<rendering::gui::Anchor>({rendering::gui::CENTER, rendering::gui::TOP})
+            .set<rendering::gui::ButtonLabel>({"Projectiles can split", 32});
+
+    split_level_up.set<rendering::gui::ButtonCallback>({
+                [split_level_up] {
+                    gameplay::add_split.run();
+                    rendering::gui::GUIModule::level_up_menu.disable();
+                    split_level_up.disable();
+                }
+            });
+
+    container.disable();
 }
 
 

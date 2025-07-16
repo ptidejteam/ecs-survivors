@@ -9,34 +9,34 @@
 #include <flecs.h>
 
 namespace gameplay {
-    constexpr float SPAWNER_INTERVAL = 0.05f;
+    constexpr float SPAWNER_INTERVAL = 0.33f;
+    inline flecs::system add_multiproj;
+    inline flecs::system remove_multiproj;
+    inline flecs::system add_pierce;
+    inline flecs::system remove_pierce;
+    inline flecs::system add_chain;
+    inline flecs::system remove_chain;
+    inline flecs::system add_split;
+    inline flecs::system remove_split;
+    inline flecs::system add_proj;
+    inline flecs::system remove_proj;
+    inline flecs::system add_pierce_amt;
+    inline flecs::system remove_pierce_amt;
+    inline flecs::system add_chain_amt;
+    inline flecs::system remove_chain_amt;
+
+    inline flecs::system add_bounce;
+    inline flecs::system remove_bounce;
+    inline flecs::system add_bounce_amt;
+    inline flecs::system remove_bounce_amt;
+
     class GameplayModule : public BaseModule<GameplayModule> {
     public:
-        GameplayModule(flecs::world &world): BaseModule(world) {}
+        GameplayModule(flecs::world &world): BaseModule(world) {
+        }
 
     private:
-
         flecs::entity m_spawner_tick;
-
-        flecs::system add_multiproj;
-        flecs::system remove_multiproj;
-        flecs::system add_pierce;
-        flecs::system remove_pierce;
-        flecs::system add_chain;
-        flecs::system remove_chain;
-        flecs::system add_split;
-        flecs::system remove_split;
-        flecs::system add_proj;
-        flecs::system remove_proj;
-        flecs::system add_pierce_amt;
-        flecs::system remove_pierce_amt;
-        flecs::system add_chain_amt;
-        flecs::system remove_chain_amt;
-
-        flecs::system add_bounce;
-        flecs::system remove_bounce;
-        flecs::system add_bounce_amt;
-        flecs::system remove_bounce_amt;
 
         void register_components(flecs::world);
 
