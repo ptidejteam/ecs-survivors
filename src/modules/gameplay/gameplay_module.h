@@ -9,7 +9,8 @@
 #include <flecs.h>
 
 namespace gameplay {
-    constexpr float SPAWNER_INTERVAL = 0.33f;
+    const float BASE_SPAWNER_INTERVAL = 0.33f;
+    inline float spawner_interval = BASE_SPAWNER_INTERVAL;
     inline flecs::system add_multiproj;
     inline flecs::system remove_multiproj;
     inline flecs::system add_pierce;
@@ -29,14 +30,15 @@ namespace gameplay {
     inline flecs::system remove_bounce;
     inline flecs::system add_bounce_amt;
     inline flecs::system remove_bounce_amt;
+    inline flecs::system spawn_system;
 
     class GameplayModule : public BaseModule<GameplayModule> {
     public:
         GameplayModule(flecs::world &world): BaseModule(world) {
         }
+        static inline flecs::entity m_spawner_tick;
 
     private:
-        flecs::entity m_spawner_tick;
 
         void register_components(flecs::world);
 

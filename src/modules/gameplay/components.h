@@ -14,10 +14,18 @@ namespace gameplay {
         int player_level;
     };
 
-    struct LevelUpEvent {};
+    struct LevelUpEvent {
+        int level;
+        int threshold;
+    };
+
+    struct ExpGainedEvent {
+        int cur;
+    };
 
     struct Spawner {
         flecs::entity enemy_prefab;
+        int difficulty;
     };
 
     struct TakeDamage {
@@ -45,8 +53,8 @@ namespace gameplay {
 
     struct Experience {
         int level;
-        float value;
-        float threshold;
+        int value;
+        int threshold;
     };
 
     struct Cooldown {

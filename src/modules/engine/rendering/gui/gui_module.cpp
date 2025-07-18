@@ -14,7 +14,7 @@
 #include "modules/engine/input/components.h"
 #include "modules/gameplay/gameplay_module.h"
 #include "systems/check_window_resized_system.h"
-#include "systems/draw_button_system.h"
+#include "systems/draw_interactable_textured_element_system.h"
 #include "systems/draw_menu_bar_system.h"
 #include "systems/draw_menu_bar_tab_item_system.h"
 #include "systems/draw_menu_bar_tab_system.h"
@@ -30,7 +30,6 @@
 
 namespace rendering::gui {
     void GUIModule::register_components(flecs::world &world) {
-        world.component<Button>();
         world.component<Text>();
         world.component<Outline>();
         world.component<Font>();
@@ -74,6 +73,7 @@ namespace rendering::gui {
                     });
                 });
 
+
         world.observer()
                 .event(flecs::OnAdd)
                 .with(flecs::Disabled)
@@ -93,6 +93,36 @@ namespace rendering::gui {
                     });
                 });
 
+        world.system<const Rectangle>()
+                .with<InteractableElementState>(Normal)
+                .kind(flecs::PreFrame)
+                .each([](flecs::iter &it, size_t i, const Rectangle &rec) {
+                    if (CheckCollisionPointRec(GetMousePosition(), rec)) {
+                        it.entity(i).add<InteractableElementState>(Hovered);
+                    }
+                });
+
+        world.system<const Rectangle>()
+                .with<InteractableElementState>(Hovered)
+                .kind(flecs::PreFrame)
+                .each([](flecs::iter &it, size_t i, const Rectangle &rec) {
+                    if (!CheckCollisionPointRec(GetMousePosition(), rec)) {
+                        it.entity(i).add<InteractableElementState>(Normal);
+                    } else if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+                        it.entity(i).add<InteractableElementState>(Pressed);
+                    }
+                });
+
+        world.system<const Rectangle>()
+                .with<InteractableElementState>(Pressed)
+                .kind(flecs::PreFrame)
+                .each([](flecs::iter &it, size_t i, const Rectangle &rec) {
+                    if (!CheckCollisionPointRec(GetMousePosition(), rec)) {
+                        it.entity(i).add<InteractableElementState>(Normal);
+                    } else if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
+                        it.entity(i).add<InteractableElementState>(Released);
+                    }
+                });
 
         world.system<core::GameSettings>("Window Resized")
                 .kind(flecs::PreFrame)
@@ -102,14 +132,15 @@ namespace rendering::gui {
                 .kind<RenderGUI>()
                 .each(systems::draw_panel_system);
 
-        world.system<const Button, const ButtonLabel, const ButtonCallback, const Rectangle, const FontAtlas>("Draw Button")
-                .term_at(4).singleton()
+        world.system<const TexturedElement, const InteractableElement, const Rectangle>("Draw textured interactable")
+                .with<InteractableElementState>(flecs::Wildcard)
                 .kind<RenderGUI>()
-                .each(systems::draw_button_system);
+                .each(systems::draw_interactable_textured_element_system);
 
-        world.system<const Text, const Rectangle, const FontAtlas>("Draw Text")
+
+        world.system<const Text, const Rectangle, const InteractableElement*, const FontAtlas>("Draw Text")
                 .kind<RenderGUI>()
-                .term_at(2).singleton()
+                .term_at(3).singleton()
                 .each(systems::draw_text_system);
 
         world.system<const Rectangle, const Outline>("Draw Outline")
@@ -138,6 +169,20 @@ namespace rendering::gui {
                 .term_at(2).parent()
                 .kind<RenderGUI>()
                 .each(systems::draw_menu_bar_tab_item_system);
+
+        world.system<const ButtonCallback>("On Button clicked")
+                .with<InteractableElementState>(Released)
+                .kind<RenderGUI>()
+                .each([](flecs::entity e, const ButtonCallback &callback) {
+                    callback.callback();
+                });
+
+        world.system<const Rectangle>()
+                .with<InteractableElementState>(Released)
+                .kind(flecs::PostFrame)
+                .each([](flecs::iter &it, size_t i, const Rectangle &rec) {
+                    it.entity(i).add<InteractableElementState>(Normal);
+                });
     }
 
     void GUIModule::register_entities(flecs::world &world) {
@@ -149,18 +194,24 @@ namespace rendering::gui {
         });
 
         button_prefab = world.prefab()
-                .set<Button>({
+                .set<TexturedElement>({
                     button_texture,
-                    ColorAlpha(WHITE, 0.8),
-                    ColorAlpha(BLACK, 1),
-                    ColorAlpha(WHITE, 1),
                     {
                         {0, 0, (float) panel_texture.width, (float) panel_texture.height}, 16, 16, 16, 16,
                         NPATCH_NINE_PATCH
                     }
-                }).set<ButtonCallback>({
+                })
+                .set<InteractableElement>({
+                    ColorAlpha(WHITE, 0.8),
+                    ColorAlpha(BLACK, 1),
+                    ColorAlpha(WHITE, 1)
+                })
+                .set<ButtonCallback>({
                     [] { std::cout << "You clicked me" << std::endl; }
-                }).set<ButtonLabel>({"Click me", FONT_SIZE_32});
+                })
+                .set<Text>({"Click me", FONT_SIZE_32, TEXT_ALIGN_CENTER, BLACK})
+                .add<InteractableElementState>(Normal);
+
 
         gui_canvas = world.entity("gui_canvas").set<Rectangle>({
             0, 0, static_cast<float>(GetScreenWidth()), static_cast<float>(GetScreenHeight())
@@ -175,47 +226,6 @@ namespace rendering::gui {
                     GetColor(GuiGetStyle(BUTTON, BACKGROUND_COLOR)),
                 });
 
-        exp_panel = world.entity("exp_panel").child_of(gui_canvas).is_a(panel_prefab)
-                .set<Rectangle>({-250, -65, 500, 60})
-                .set<Anchor>({CENTER, BOTTOM});
 
-        exp_bar = world.entity("exp_bar").child_of(exp_panel)
-                .set<ProgressBar>({0, 10, 0})
-                .set<Rectangle>({-200, -30, 400, 20})
-                .set<Anchor>({CENTER, BOTTOM});
-
-        exp_level_txt = world.entity("exp_level_txt").child_of(exp_panel)
-                .set<Text>({"Level: 1", FONT_SIZE_32, TEXT_ALIGN_CENTER})
-                .set<Rectangle>({-37.5, 10, 75, 20})
-                .set<Anchor>({CENTER, TOP});
-
-        pause_menu = m_world.entity("pause_menu").child_of(gui_canvas).is_a(panel_prefab)
-                .set<Rectangle>({-150, -200, 300, 400})
-                .set<Anchor>({CENTER, MIDDLE})
-                .add<core::PauseOnEnabled>()
-                .disable();
-
-        pause_menu.child().set_name("level up menu text")
-                .set<Rectangle>({-150, 5, 300, 50})
-                .set<Anchor>({CENTER, TOP})
-                .set<Text>({"Paused", FONT_SIZE_48, TEXT_ALIGN_CENTER}).disable();
-
-
-        auto input_toggle = pause_menu.child().add<input::InputToggleEnable>();
-        input_toggle.child().set<input::KeyBinding>({KEY_ESCAPE, 0});
-
-        level_up_menu = m_world.entity("level_up_menu").child_of(gui_canvas).is_a(panel_prefab)
-                .set<Rectangle>({-300, -200, 600, 400})
-                .set<Anchor>({CENTER, MIDDLE})
-                .add<core::PauseOnEnabled>();
-
-
-        world.entity().child_of(level_up_menu).set_name("level up menu text")
-                .set<Rectangle>({-150, 5, 300, 50})
-                .set<Anchor>({CENTER, TOP})
-                .set<Text>({"You Leveled Up, Pick an upgrade", 48, TEXT_ALIGN_CENTER});
-
-
-        level_up_menu.disable();
     }
 } // namespace rendering::gui

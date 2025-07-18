@@ -35,6 +35,13 @@ namespace core {
     void CoreModule::register_systems(flecs::world &world) {
         std::cout << "Registering core systems" << std::endl;
 
+        world.system<EnabledMenus>()
+            .kind(flecs::OnStart)
+            .term_at(0).singleton()
+            .each([] (EnabledMenus& menus) {
+                menus.count = 0;
+            });
+
         world.observer<const Paused>()
                 .event(flecs::OnSet)
                 .each([](flecs::iter &it, size_t i, const Paused &paused) {
@@ -48,8 +55,9 @@ namespace core {
                 .with(flecs::Disabled)
                 .each([](flecs::iter &it, size_t i, EnabledMenus &enabled) {
                     enabled.count --;
-                    if (enabled.count == 0)
+                    if (enabled.count == 0) {
                         it.world().set<Paused>({false});
+                    }
                 });
 
         world.observer<EnabledMenus>()
@@ -60,6 +68,22 @@ namespace core {
                 .each([](flecs::iter &it, size_t i, EnabledMenus &enabled) {
                     enabled.count ++;
                     it.world().set<Paused>({true});
+                });
+
+        world.observer()
+                .event(flecs::OnAdd)
+                .with<Close>()
+                .each([](flecs::entity e) {
+                    e.remove<Close>();
+                    e.disable();
+                });
+        world.observer()
+                .event(flecs::OnAdd)
+                .with<Open>()
+                .with(flecs::Disabled).filter()
+                .each([](flecs::entity e) {
+                    e.remove<Open>();
+                    e.enable();
                 });
 
 

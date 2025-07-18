@@ -19,29 +19,33 @@ namespace rendering::gui {
     const int FONT_SIZE_48 = 48;
     const int FONT_SIZE_64 = 64;
 
-    struct Button {
-        Texture2D texture;
+    enum InteractableElementState {
+        Normal,
+        Hovered,
+        Pressed,
+        Released,
+    };
+
+    struct InteractableElement {
         Color normal_tint;
         Color selected_tint;
         Color hovered_tint;
-        NPatchInfo info;
-        // not sure this is the best thing to store
+    };
 
+    struct TexturedElement {
+        Texture2D texture;
+        NPatchInfo info;
     };
 
     struct ButtonCallback {
         std::function<void()> callback;
     };
 
-    struct ButtonLabel {
-        std::string label;
-        int font_size;
-    };
-
     struct Text {
         std::string text;
         int font_size;
         int alignment;
+        Color color;
     };
 
     struct FontAtlas {
@@ -53,6 +57,8 @@ namespace rendering::gui {
         Color border_color;
         Color fill_color;
     };
+
+
 
     struct Panel {
         Texture2D texture;

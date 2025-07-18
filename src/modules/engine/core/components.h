@@ -41,6 +41,12 @@ namespace core {
     struct PauseOnEnabled {};
     struct EnabledMenus {int count;};
 
+    struct Close {};
+    struct Open {};
+
+    struct ExitRequested {};
+    struct ExitConfirmed {};
+
 }
 
 #endif //CORE_COMPONENTS_H
