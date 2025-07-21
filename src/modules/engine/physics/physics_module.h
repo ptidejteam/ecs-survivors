@@ -95,7 +95,6 @@ namespace physics {
             float radius = a.radius;
 
             if (cornerDistSq < radius * radius) {
-                //std::cout << "collided 2" << std::endl;
                 float dist = sqrtf(cornerDistSq);
 
                 if (dist == 0.0f) dist = 0.01f; // Avoid divide by zero

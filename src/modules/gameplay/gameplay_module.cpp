@@ -49,6 +49,8 @@
 #include "systems/take_damage_system.h"
 #include "systems/update_cooldown_system.h"
 #include "systems/update_health_bar_system.h"
+#include "systems/check_if_dead_system.h"
+#include "systems/give_experience_system.h"
 
 namespace gameplay {
     void GameplayModule::register_components(flecs::world world) {
@@ -57,12 +59,6 @@ namespace gameplay {
 
     void GameplayModule::register_systems(flecs::world world) {
         m_spawner_tick = world.timer().interval(spawner_interval);
-
-        world.observer<core::Paused>("set physics interval on pause")
-                .event(flecs::OnSet)
-                .each([&](core::Paused &paused) {
-                    //m_spawner_tick.enable(paused.paused);
-                });
 
         spawn_system = world.system<const Spawner, const core::GameSettings, const rendering::TrackingCamera>("Spawn Enemies")
                 .tick_source(m_spawner_tick)
@@ -146,14 +142,10 @@ namespace gameplay {
                 .kind<PostCollisionDetected>()
                 .each(systems::take_damage_system);
 
-        world.system<Health>("check if dead")
+        world.system<const Health>("check if dead")
                 .kind<PostCollisionDetected>()
                 .immediate()
-                .each([](flecs::entity e, Health &h) {
-                    if (h.value <= 0.0f) {
-                        e.add<core::DestroyAfterFrame>();
-                    }
-                });
+                .each(systems::check_if_dead_system);
 
 
         world.system<const Health, rendering::ProgressBar>("update health bar on take damage")
@@ -169,20 +161,7 @@ namespace gameplay {
                 .with<core::DestroyAfterFrame>()
                 .term_at(0).second<OnDeathEffect>()
                 .kind<PostCollisionDetected>()
-                .each([](GiveExperience &exp) {
-                    if (Experience *player_exp = exp.other.try_get_mut<Experience>(); player_exp) {
-                        player_exp->value += exp.value;
-                        if (player_exp->value >= player_exp->threshold) {
-                            //level up
-                            player_exp->level++;
-                            player_exp->value -= player_exp->threshold;
-                            player_exp->threshold = player_exp->threshold * 1.2f;
-                            exp.other.get_mut<Health>().value = exp.other.get<Health>().max;
-                            exp.other.emit<LevelUpEvent>({player_exp->level, player_exp->threshold});
-                        }
-                        exp.other.emit<ExpGainedEvent>({player_exp->value});
-                    }
-                });
+                .each(systems::give_experience_system);
 
         add_multiproj = world.system("add multi proj")
                 .kind(0)

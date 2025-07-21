@@ -14,7 +14,6 @@ namespace rendering::gui::systems {
     inline void on_parent_rectangle_changed_observer(flecs::entity e, const Rectangle &parent) {
         if (!e.has<Anchor>()) return;
         if (!e.has<Rectangle>()) return;
-        std::cout << e.name() << std::endl;
 
         auto anchor = e.get<Anchor>();
 

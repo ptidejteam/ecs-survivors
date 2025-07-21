@@ -5,11 +5,11 @@
 #include "input_module.h"
 
 #include "components.h"
-#include "raylib.h"
 #include "systems/reset_horizontal_input_system.h"
 #include "systems/reset_vertical_input_system.h"
 #include "systems/set_horizontal_input_system.h"
 #include "systems/set_vertical_input_system.h"
+#include "systems/toggle_element_on_input_system.h"
 
 namespace input {
     void InputModule::register_components(flecs::world &world) {
@@ -34,16 +34,7 @@ namespace input {
                 .term_at(1).cascade()
                 .kind(flecs::PreUpdate)
                 .with(flecs::Disabled).optional()
-                .each([] (flecs::entity e, const KeyBinding &binding, InputToggleEnable) {
-                        if(IsKeyPressed(binding.key)) {
-                                e.parent().type().str();
-                                if(e.parent().parent().enabled()) {
-                                        e.parent().parent().disable();
-                                } else {
-                                        e.parent().parent().enable();
-                                }
-                        }
-                });
+                .each(systems::toggle_element_on_input_system);
 
         world.system<InputHorizontal>("Reset Input Horizontal")
                 .kind(flecs::PostUpdate)

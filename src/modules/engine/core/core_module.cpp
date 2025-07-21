@@ -17,6 +17,12 @@
 #include "systems/destroy_entity_after_frame_system.h"
 #include "systems/destroy_entity_after_time_system.h"
 #include "systems/remove_empty_tables_system.h"
+#include "systems/reset_enabled_menus_system.h"
+#include "systems/set_time_scale_on_pause_system.h"
+#include "systems/set_paused_on_entity_disable_system.h"
+#include "systems/set_paused_on_entity_enabled_system.h"
+#include "systems/disable_entity_on_close_system.h"
+#include "systems/enable_entity_on_open_system.h"
 
 namespace core {
     void CoreModule::register_components(flecs::world &world) {
@@ -38,54 +44,36 @@ namespace core {
         world.system<EnabledMenus>()
             .kind(flecs::OnStart)
             .term_at(0).singleton()
-            .each([] (EnabledMenus& menus) {
-                menus.count = 0;
-            });
+            .each(systems::reset_enabled_menus_system);
 
         world.observer<const Paused>()
                 .event(flecs::OnSet)
-                .each([](flecs::iter &it, size_t i, const Paused &paused) {
-                    it.world().set_time_scale(!paused.paused);
-                });
+                .each(systems::set_time_scale_on_pause_system);
 
         world.observer<EnabledMenus>()
                 .term_at(0).singleton()
                 .with<PauseOnEnabled>().filter()
                 .event(flecs::OnAdd)
                 .with(flecs::Disabled)
-                .each([](flecs::iter &it, size_t i, EnabledMenus &enabled) {
-                    enabled.count --;
-                    if (enabled.count == 0) {
-                        it.world().set<Paused>({false});
-                    }
-                });
+                .each(systems::set_paused_on_entity_disable_system);
 
         world.observer<EnabledMenus>()
                 .term_at(0).singleton()
                 .with<PauseOnEnabled>().filter()
                 .event(flecs::OnRemove)
                 .with(flecs::Disabled)
-                .each([](flecs::iter &it, size_t i, EnabledMenus &enabled) {
-                    enabled.count ++;
-                    it.world().set<Paused>({true});
-                });
+                .each(systems::set_paused_on_entity_enabled_system);
 
         world.observer()
                 .event(flecs::OnAdd)
                 .with<Close>()
-                .each([](flecs::entity e) {
-                    e.remove<Close>();
-                    e.disable();
-                });
+                .each(systems::disable_entity_on_close_system);
+
         world.observer()
                 .event(flecs::OnAdd)
                 .with<Open>()
                 .with(flecs::Disabled).filter()
-                .each([](flecs::entity e) {
-                    e.remove<Open>();
-                    e.enable();
-                });
-
+                .each(systems::enable_entity_on_open_system);
 
         world.system<DestroyAfterTime>("Destroy entities after time")
                 .kind(flecs::PostFrame)

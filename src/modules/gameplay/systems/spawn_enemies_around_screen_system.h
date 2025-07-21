@@ -16,7 +16,6 @@ namespace gameplay::systems {
     inline void spawn_enemies_around_screen_system(flecs::iter &iter, size_t i, const Spawner &spawner,
                                                    const core::GameSettings &settings,
                                                    const rendering::TrackingCamera &camera) {
-        std::cout << iter.delta_system_time() << std::endl;
         if(iter.world().get<core::Paused>().paused) return;
         for (int i = 0; i < 1; i++) {
             float factor = rand() % 2 - 1;

@@ -47,9 +47,6 @@ namespace physics::systems {
 
         a.set<core::Position2D>({a_pos.value - overlap * a_move_ratio * 0.75});
         b.set<core::Position2D>({b_pos.value + overlap * b_move_ratio * 0.75});
-        //std::cout << overlap.x << "," << overlap.y << std::endl;
-        //std::cout << a_move_ratio << std::endl;
-        //std::cout << b_move_ratio << std::endl;
     }
 
     /**
