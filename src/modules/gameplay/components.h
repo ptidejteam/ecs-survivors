@@ -10,8 +10,22 @@
 
 namespace gameplay {
 
+    struct GameState {
+        int player_level;
+    };
+
+    struct LevelUpEvent {
+        int level;
+        int threshold;
+    };
+
+    struct ExpGainedEvent {
+        int cur;
+    };
+
     struct Spawner {
         flecs::entity enemy_prefab;
+        int difficulty;
     };
 
     struct TakeDamage {
@@ -34,6 +48,13 @@ namespace gameplay {
 
     struct RegenHealth {
         float rate; // per second
+    };
+    struct HealthBar {};
+
+    struct Experience {
+        int level;
+        int value;
+        int threshold;
     };
 
     struct Cooldown {
@@ -70,5 +91,11 @@ namespace gameplay {
         float min_spread;
     };
 
+
+    struct OnDeathEffect {};
+    struct GiveExperience {
+        flecs::entity other;
+        float value;
+    };
 }
 #endif //GAMEPLAY_COMPONENTS_H

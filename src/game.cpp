@@ -34,6 +34,8 @@
 #include <tmxlite/TileLayer.hpp>
 #include <tmxlite/ObjectGroup.hpp>
 
+#include "modules/engine/rendering/gui/components.h"
+#include "modules/engine/rendering/gui/gui_module.h"
 #include "modules/tilemap/components.h"
 #include "modules/tilemap/tilemap_module.h"
 
@@ -49,6 +51,12 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
 
 
     InitWindow(m_windowWidth, m_windowHeight, m_windowName.c_str());
+
+    SetExitKey(KEY_F4);
+    init();
+}
+
+void Game::init() {
 
 #ifndef EMSCRIPTEN
     // use the flecs explorer when not on browser
@@ -67,7 +75,8 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
     m_world.import<debug::DebugModule>();
     m_world.import<tilemap::TilemapModule>();
 
-     m_world.set<core::GameSettings>({
+
+    m_world.set<core::GameSettings>({
         m_windowName,
         m_windowWidth,
         m_windowHeight,
@@ -75,8 +84,9 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
         m_windowHeight
     });
     m_world.add<physics::CollisionRecordList>();
-    m_world.set<physics::SpatialHashingGrid>({48, {0,0}});
-
+    m_world.set<physics::SpatialHashingGrid>({48, {0, 0}});
+    m_world.set<core::Paused>({false});
+    m_world.set<core::EnabledMenus>({0});
     flecs::entity player = m_world.entity("player")
             .set<core::Tag>({"player"})
             .set<core::Position2D>({2300.0f, 1300.0f})
@@ -101,25 +111,19 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
                 WHITE
             })
             .set<gameplay::Health>({150, 150})
-            .set<gameplay::RegenHealth>({250.0f});
+            .set<gameplay::RegenHealth>({1.0f})
+            .set<gameplay::Experience>({1, 0, 10});
 
     m_world.entity("dagger attack").child_of(player)
             .add<gameplay::Projectile>()
             .set<gameplay::Attack>({"projectile", "enemy"})
             .set<gameplay::Cooldown>({1.0f, 1})
             .add<gameplay::CooldownCompleted>()
-            .set<gameplay::MultiProj>({3, 30.f, 150.f, 30.f})
             .set<core::Speed>({150.f});
 
     m_world.prefab("projectile")
             .add<gameplay::Projectile>()
             .set<gameplay::Attack>({"projectile", "enemy"})
-            .set<gameplay::Chain>({
-                6,
-                std::unordered_set<int>()
-            })
-            .set<gameplay::Split>({std::unordered_set<int>()})
-            .set<gameplay::Bounce>({2})
             .set<gameplay::Damage>({2})
             .set<physics::Velocity2D>({0, 0})
             .set<physics::Collider>({
@@ -158,6 +162,7 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
             .set<core::Speed>({25})
             .set<gameplay::Health>({10, 10})
             .set<gameplay::Damage>({1})
+            .set<gameplay::GiveExperience, gameplay::OnDeathEffect>({player, 2})
             .add<ai::Target>(player)
             .add<ai::FollowTarget>()
             .set<ai::StoppingDistance>({16.0})
@@ -180,8 +185,8 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
             })
             .set<rendering::Priority>({0});
 
-    m_world.entity("enemy_spawner")
-            .set<gameplay::Spawner>({enemy});
+    auto spawner = m_world.entity("enemy_spawner")
+            .set<gameplay::Spawner>({enemy, 1});
 
     m_world.entity("tilemap_1")
             .set<tilemap::Tilemap>({
@@ -193,8 +198,179 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(
         player,
         Camera2D{0}
     });
-}
 
+    auto exp_panel = m_world.entity("exp_panel")
+            .child_of(rendering::gui::GUIModule::gui_canvas)
+            .is_a(rendering::gui::GUIModule::panel_prefab)
+            .set<Rectangle>({-250, -65, 500, 60})
+            .set<rendering::gui::Anchor>({rendering::gui::CENTER, rendering::gui::BOTTOM});
+
+    auto exp_bar = m_world.entity("exp_bar").child_of(exp_panel)
+            .set<rendering::gui::ProgressBar>({0, 10, 0})
+            .set<Rectangle>({-200, -30, 400, 20})
+            .set<rendering::gui::Anchor>({rendering::gui::CENTER, rendering::gui::BOTTOM});
+
+    auto exp_level_txt = m_world.entity("exp_level_txt").child_of(exp_panel)
+            .set<rendering::gui::Text>({
+                "Level: 1", rendering::gui::FONT_SIZE_32, TEXT_ALIGN_CENTER, rendering::gui::GUIModule::font_color()
+            })
+            .set<Rectangle>({-37.5, 10, 75, 20})
+            .set<rendering::gui::Anchor>({rendering::gui::CENTER, rendering::gui::TOP});
+
+    auto pause_menu = m_world.entity("pause_menu").child_of(rendering::gui::GUIModule::gui_canvas).is_a(
+                rendering::gui::GUIModule::panel_prefab)
+            .set<Rectangle>({-150, -200, 300, 400})
+            .set<rendering::gui::Anchor>({rendering::gui::CENTER, rendering::gui::MIDDLE})
+            .add<core::PauseOnEnabled>()
+            .disable();
+
+    pause_menu.child()
+            .set<Rectangle>({-150, 5, 300, 50})
+            .set<rendering::gui::Anchor>({rendering::gui::CENTER, rendering::gui::TOP})
+            .set<rendering::gui::Text>({
+                "Paused", rendering::gui::FONT_SIZE_48, TEXT_ALIGN_CENTER, rendering::gui::GUIModule::font_color()
+            }).disable();
+
+    flecs::entity resume_btn = pause_menu.child().is_a(rendering::gui::GUIModule::button_prefab)
+            .set<Rectangle>({-125, -135, 250, 50})
+            .set<rendering::gui::Anchor>({
+                rendering::gui::HORIZONTAL_ANCHOR::CENTER, rendering::gui::VERTICAL_ANCHOR::BOTTOM
+            })
+            .set<rendering::gui::ButtonCallback>({
+                [pause_menu] {
+                    pause_menu.add<core::Close>();
+                }
+            }).disable();
+
+    resume_btn.get_mut<rendering::gui::Text>().text = "Resume Game";
+
+#ifndef EMSCRIPTEN
+    flecs::entity close_btn = pause_menu.child().is_a(rendering::gui::GUIModule::button_prefab)
+            .set<Rectangle>({-125, -75, 250, 50})
+            .set<rendering::gui::Anchor>({
+                rendering::gui::HORIZONTAL_ANCHOR::CENTER, rendering::gui::VERTICAL_ANCHOR::BOTTOM
+            })
+            .set<rendering::gui::ButtonCallback>({
+                [&] {
+                    m_world.add<core::ExitConfirmed>();
+                }
+            }).disable();
+
+    close_btn.get_mut<rendering::gui::Text>().text = "Close Game";
+#else
+    resume_btn.set<Rectangle>({-125, -75, 250, 50});
+#endif
+
+
+    auto input_toggle = pause_menu.child().add<input::InputToggleEnable>();
+    input_toggle.child().set<input::KeyBinding>({KEY_ESCAPE, 0});
+
+    auto level_up_menu = m_world.entity("level_up_menu").child_of(rendering::gui::GUIModule::gui_canvas).is_a(
+                rendering::gui::GUIModule::panel_prefab)
+            .set<Rectangle>({-300, -200, 600, 400})
+            .set<rendering::gui::Anchor>({rendering::gui::CENTER, rendering::gui::MIDDLE})
+            .add<core::PauseOnEnabled>();
+
+
+    m_world.entity().child_of(level_up_menu).set_name("level up menu text")
+            .set<Rectangle>({-150, 5, 300, 50})
+            .set<rendering::gui::Anchor>({rendering::gui::CENTER, rendering::gui::TOP})
+            .set<rendering::gui::Text>({
+                "You Leveled Up, Pick an upgrade", rendering::gui::FONT_SIZE_48, TEXT_ALIGN_CENTER,
+                rendering::gui::GUIModule::font_color()
+            });
+
+
+    level_up_menu.disable();
+
+    player.observe<gameplay::LevelUpEvent>([exp_bar, exp_level_txt, level_up_menu](gameplay::LevelUpEvent &event) {
+        exp_bar.get_mut<rendering::gui::ProgressBar>().max_val = event.threshold;
+        exp_level_txt.get_mut<rendering::gui::Text>().text = "Level: " + std::to_string(event.level);
+        level_up_menu.add<core::Open>();
+    });
+
+    player.observe<gameplay::LevelUpEvent>([&, spawner](gameplay::LevelUpEvent &event) {
+        spawner.get_mut<gameplay::Spawner>().difficulty = event.level;
+        gameplay::spawner_interval = std::max(0.0167f, gameplay::BASE_SPAWNER_INTERVAL - 2 * (event.level / 100.f));
+        gameplay::GameplayModule::m_spawner_tick.destruct();
+        gameplay::GameplayModule::m_spawner_tick = m_world.timer().interval(gameplay::spawner_interval);
+        gameplay::spawn_system.set_tick_source(gameplay::GameplayModule::m_spawner_tick);
+
+    });
+    //
+    player.observe<gameplay::ExpGainedEvent>([exp_bar](gameplay::ExpGainedEvent &event) {
+        exp_bar.get_mut<rendering::gui::ProgressBar>().current_val = event.cur;
+    });
+
+    auto container = m_world.entity().child_of(level_up_menu).set_name(
+                "level up options container")
+            .set<Rectangle>({-175, -150, 350, 300})
+            .set<rendering::gui::Anchor>({rendering::gui::CENTER, rendering::gui::MIDDLE})
+            .set<rendering::gui::Outline>({1, GRAY, Fade(WHITE, 0)});
+
+    container.child().is_a(rendering::gui::GUIModule::button_prefab).set_name("Option 1")
+            .set<Rectangle>({-162.5, 5, 325, 40})
+            .set<rendering::gui::Anchor>({rendering::gui::CENTER, rendering::gui::TOP})
+            .set<rendering::gui::Text>({"+1 Pierce", rendering::gui::FONT_SIZE_32, TEXT_ALIGN_CENTER, BLACK})
+            .set<rendering::gui::ButtonCallback>({
+                [level_up_menu] {
+                    gameplay::add_pierce.run();
+                    gameplay::add_pierce_amt.run();
+                    level_up_menu.add<core::Close>();
+                }
+            });
+
+    container.child().is_a(rendering::gui::GUIModule::button_prefab).set_name("Option 2")
+            .set<Rectangle>({-162.5, 50, 325, 40})
+            .set<rendering::gui::Anchor>({rendering::gui::CENTER, rendering::gui::TOP})
+            .set<rendering::gui::Text>({"+1 Chain", rendering::gui::FONT_SIZE_32, TEXT_ALIGN_CENTER, BLACK})
+            .set<rendering::gui::ButtonCallback>({
+                [level_up_menu] {
+                    gameplay::add_chain.run();
+                    gameplay::add_chain_amt.run();
+                    level_up_menu.add<core::Close>();
+                }
+            });
+
+    container.child().is_a(rendering::gui::GUIModule::button_prefab).set_name("Option 3")
+            .set<Rectangle>({-162.5, 95, 325, 40})
+            .set<rendering::gui::Anchor>({rendering::gui::CENTER, rendering::gui::TOP})
+            .set<rendering::gui::Text>({"+1 Projectile", rendering::gui::FONT_SIZE_32, TEXT_ALIGN_CENTER, BLACK})
+            .set<rendering::gui::ButtonCallback>({
+                [level_up_menu] {
+                    gameplay::add_multiproj.run();
+                    gameplay::add_proj.run();
+                    level_up_menu.add<core::Close>();
+                }
+            });
+
+    container.child().is_a(rendering::gui::GUIModule::button_prefab).set_name("Option 4")
+            .set<Rectangle>({-162.5, 140, 325, 40})
+            .set<rendering::gui::Anchor>({rendering::gui::CENTER, rendering::gui::TOP})
+            .set<rendering::gui::Text>({"+1 Bounce", rendering::gui::FONT_SIZE_32, TEXT_ALIGN_CENTER, BLACK})
+            .set<rendering::gui::ButtonCallback>({
+                [level_up_menu] {
+                    gameplay::add_bounce.run();
+                    gameplay::add_bounce_amt.run();
+                    level_up_menu.add<core::Close>();
+                }
+            });
+
+    flecs::entity split_level_up = container.child().is_a(rendering::gui::GUIModule::button_prefab).set_name("Option 5")
+            .set<Rectangle>({-162.5, 185, 325, 40})
+            .set<rendering::gui::Anchor>({rendering::gui::CENTER, rendering::gui::TOP})
+            .set<rendering::gui::Text>({"Projectiles can split", 32, TEXT_ALIGN_CENTER, BLACK});
+
+    split_level_up.set<rendering::gui::ButtonCallback>({
+        [level_up_menu,split_level_up] {
+            gameplay::add_split.run();
+            level_up_menu.add<core::Close>();
+            split_level_up.destruct();
+        }
+    });
+
+    container.add<core::Close>();
+}
 
 void Game::run() {
     // ON START
@@ -205,7 +381,7 @@ void Game::run() {
 #else
 
     // Main game loop
-    while (!WindowShouldClose()) // Detect window close button or ESC key
+    while (!WindowShouldClose() && !m_world.has<core::ExitConfirmed>()) // Detect window close button or ESC key
     {
         UpdateDrawFrameDesktop();
     }

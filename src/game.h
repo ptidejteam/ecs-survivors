@@ -16,6 +16,8 @@ public:
 
 private:
 
+    void init();
+    void reset();
     void UpdateDrawFrameDesktop();
     static void UpdateDrawFrameWeb(void* world);
     flecs::world m_world;

@@ -49,6 +49,8 @@
 #include "systems/take_damage_system.h"
 #include "systems/update_cooldown_system.h"
 #include "systems/update_health_bar_system.h"
+#include "systems/check_if_dead_system.h"
+#include "systems/give_experience_system.h"
 
 namespace gameplay {
     void GameplayModule::register_components(flecs::world world) {
@@ -56,10 +58,9 @@ namespace gameplay {
     }
 
     void GameplayModule::register_systems(flecs::world world) {
-        m_spawner_tick = world.timer().interval(SPAWNER_INTERVAL);
+        m_spawner_tick = world.timer().interval(spawner_interval);
 
-
-        world.system<const Spawner, const core::GameSettings, const rendering::TrackingCamera>("Spawn Enemies")
+        spawn_system = world.system<const Spawner, const core::GameSettings, const rendering::TrackingCamera>("Spawn Enemies")
                 .tick_source(m_spawner_tick)
                 .term_at(1).singleton()
                 .term_at(2).singleton()
@@ -89,7 +90,8 @@ namespace gameplay {
                 .immediate()
                 .each(systems::projectile_no_bounce_collided_system);
 
-        world.system<physics::CollisionRecordList, Bounce, physics::Velocity2D, rendering::Rotation>("Bounce if hit wall")
+        world.system<physics::CollisionRecordList, Bounce, physics::Velocity2D, rendering::Rotation>(
+                    "Bounce if hit wall")
                 .with<physics::CollidedWith>(flecs::Wildcard)
                 .with<Projectile>()
                 .kind<OnCollisionDetected>()
@@ -125,27 +127,41 @@ namespace gameplay {
 
         world.system<Damage>("collision detected, deal damage to target")
                 .with<physics::CollidedWith>(flecs::Wildcard)
-                .write<TakeDamage>()
+                .immediate()
                 .kind<OnCollisionDetected>()
                 .each(systems::deal_damage_on_collision_system);
+
+        world.system<const Health>("create health bar")
+                .with<TakeDamage>()
+                .without<HealthBar>()
+                .without<rendering::ProgressBar>()
+                .kind<PostCollisionDetected>()
+                .each(systems::create_health_bar_system);
 
         world.system<Health, TakeDamage>("take damage")
                 .kind<PostCollisionDetected>()
                 .each(systems::take_damage_system);
 
-        world.system<const Health>("create health bar")
-                .with<TakeDamage>()
-                .without<rendering::ProgressBar>()
+        world.system<const Health>("check if dead")
                 .kind<PostCollisionDetected>()
-                .each(systems::create_health_bar_system);
+                .immediate()
+                .each(systems::check_if_dead_system);
+
 
         world.system<const Health, rendering::ProgressBar>("update health bar on take damage")
                 .kind<PostCollisionDetected>()
+                .term_at(0).parent()
                 .each(systems::update_health_bar_system);
 
         world.system<Health, RegenHealth>("regen health")
                 .kind(flecs::OnUpdate)
                 .each(systems::regen_health_system);
+
+        world.system<GiveExperience>()
+                .with<core::DestroyAfterFrame>()
+                .term_at(0).second<OnDeathEffect>()
+                .kind<PostCollisionDetected>()
+                .each(systems::give_experience_system);
 
         add_multiproj = world.system("add multi proj")
                 .kind(0)
@@ -291,7 +307,7 @@ namespace gameplay {
 
     void GameplayModule::register_entities(flecs::world world) {
         auto dropdown = world.entity("gameplay_dropdown").child_of(rendering::gui::GUIModule::menu_bar)
-                .set<rendering::gui::MenuBarTab>({"Gameplay Tools", 25});
+                .set<rendering::gui::MenuBarTab>({"Gameplay Tools", 25}).disable();
 
         world.entity().child_of(dropdown)
                 .set<rendering::gui::MenuBarTabItem>({

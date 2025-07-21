@@ -19,6 +19,10 @@ namespace input {
         int key;
         float value;
     };
+
+    struct InputToggleEnable {
+
+    };
 }
 
 #endif //INPUT_COMPONENTS_H

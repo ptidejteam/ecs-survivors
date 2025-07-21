@@ -12,8 +12,6 @@
 namespace gameplay::systems {
     inline void take_damage_system(flecs::entity e, Health &health, TakeDamage &dmg) {
         health.value -= dmg.damage;
-        if (health.value <= 0)
-            e.add<core::DestroyAfterFrame>();
         e.remove<TakeDamage>();
     }
 }

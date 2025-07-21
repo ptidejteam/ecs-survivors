@@ -18,8 +18,8 @@ namespace core {
 
     struct GameSettings {
         std::string windowName;
-        int initialWidth;
-        int initialHeight;
+        int initial_width;
+        int initial_height;
         int window_width;
         int window_height;
     };
@@ -33,6 +33,19 @@ namespace core {
     };
 
     struct DestroyAfterFrame {};
+
+    struct Paused {
+        bool paused;
+    };
+
+    struct PauseOnEnabled {};
+    struct EnabledMenus {int count;};
+
+    struct Close {};
+    struct Open {};
+
+    struct ExitRequested {};
+    struct ExitConfirmed {};
 
 }
 

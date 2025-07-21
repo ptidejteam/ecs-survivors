@@ -7,18 +7,49 @@
 #include <raylib.h>
 #include <string>
 #include <flecs.h>
+#include <functional>
+#include <variant>
+
 #include "modules/engine/core/components.h"
 
 namespace rendering::gui {
-    struct Button {
-        std::string text;
-        // not sure this is the best thing to store
-        flecs::system on_click_system;
+
+    const int FONT_SIZE_16 = 16;
+    const int FONT_SIZE_32 = 32;
+    const int FONT_SIZE_48 = 48;
+    const int FONT_SIZE_64 = 64;
+
+    enum InteractableElementState {
+        Normal,
+        Hovered,
+        Pressed,
+        Released,
+    };
+
+    struct InteractableElement {
+        Color normal_tint;
+        Color selected_tint;
+        Color hovered_tint;
+    };
+
+    struct TexturedElement {
+        Texture2D texture;
+        NPatchInfo info;
+    };
+
+    struct ButtonCallback {
+        std::function<void()> callback;
     };
 
     struct Text {
         std::string text;
+        int font_size;
         int alignment;
+        Color color;
+    };
+
+    struct FontAtlas {
+        std::unordered_map<int, Font> fonts;
     };
 
     struct Outline {
@@ -27,8 +58,11 @@ namespace rendering::gui {
         Color fill_color;
     };
 
+
+
     struct Panel {
-        std::string name;
+        Texture2D texture;
+        NPatchInfo info;
     };
 
     struct MenuBar {
@@ -82,6 +116,12 @@ namespace rendering::gui {
             this->horizontal_anchor = horizontal_anchor;
             this->vertical_anchor = vertical_anchor;
         };
+    };
+
+    struct ProgressBar {
+        float min_val;
+        float max_val;
+        float current_val;
     };
 
     struct WindowResizedEvent{};
