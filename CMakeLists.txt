@@ -60,6 +60,7 @@ endif ()
 # Our Project
 
 add_subdirectory("src")
+set(TMXLITE_STATIC_LIB ON)
 add_subdirectory("external/tmxlite/tmxlite")
 add_subdirectory("include")
 add_subdirectory("app")
