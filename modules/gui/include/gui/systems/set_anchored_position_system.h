@@ -6,7 +6,7 @@
 #define SET_ANCHORED_POSITION_H
 
 #include <raylib.h>
-#include "gui_game/components.h"
+#include "gui/components.h"
 
 namespace rendering::gui::systems {
     inline void set_anchored_position_system(const Rectangle &rectangle, Anchor &anchor) {

@@ -4,7 +4,7 @@
 
 #ifndef DRAW_PANEL_SYSTEM_H
 #define DRAW_PANEL_SYSTEM_H
-#include "gui_game/components.h"
+#include "gui/components.h"
 
 namespace rendering::gui::systems {
     inline void draw_panel_system(const Panel &panel, const Rectangle &rect) {

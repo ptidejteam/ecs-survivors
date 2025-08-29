@@ -7,7 +7,7 @@
 
 #include <flecs.h>
 
-#include "modules/engine/physics/components.h"
+#include "physics/components.h"
 
 namespace physics::systems {
     inline void collision_cleanup_system(flecs::iter &it, size_t i) {

@@ -4,7 +4,7 @@
 
 #ifndef CREATE_CAMERA_SYSTEM_H
 #define CREATE_CAMERA_SYSTEM_H
-#include "modules/engine/rendering/components.h"
+#include "rendering/components.h"
 
 namespace rendering::systems {
     inline void create_camera_system(TrackingCamera &camera) {

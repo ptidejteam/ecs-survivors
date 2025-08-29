@@ -4,7 +4,7 @@
 
 #ifndef UPDATE_COOLDOWN_SYSTEM_H
 #define UPDATE_COOLDOWN_SYSTEM_H
-#include "modules/gameplay/components.h"
+#include "../components.h"
 
 namespace gameplay::systems {
     inline void update_cooldown_system(flecs::iter &it, size_t i, Cooldown &cooldown) {

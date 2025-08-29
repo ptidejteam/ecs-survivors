@@ -6,7 +6,7 @@
 #define SET_PAUSED_ON_ENTITY_DISABLE_SYSTEM_H
 
 #include <flecs.h>
-#include "modules/engine/core/components.h"
+#include "core/components.h"
 
 
 namespace core::systems {

@@ -7,7 +7,7 @@
 
 #include <flecs.h>
 
-#include "modules/gameplay/components.h"
+#include "../components.h"
 
 namespace gameplay::systems {
     inline void regen_health_system(flecs::iter &it, size_t i, Health &health, RegenHealth &regen) {

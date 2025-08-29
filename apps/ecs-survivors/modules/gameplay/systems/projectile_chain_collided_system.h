@@ -6,15 +6,12 @@
 #define PROJECTILE_CHAIN_COLLIDED_SYSTEM_H
 #include <flecs.h>
 
-#include "modules/engine/core/components.h"
-#include "modules/engine/physics/components.h"
-#include "modules/engine/rendering/components.h"
-#include "modules/gameplay/components.h"
+#include "core/components.h"
+#include "physics/components.h"
+#include "rendering/components.h"
+#include "../components.h"
 #include <raymath.h>
-
-//#include "modules/engine/core/queries.h"
-#include "modules/engine/core/core_module.h"
-#include "modules/engine/core/queries.h"
+#include "core/queries.h"
 
 namespace gameplay::systems {
     inline void projectile_chain_collided_system(flecs::iter &it, size_t i,

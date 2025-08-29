@@ -7,7 +7,8 @@
 
 #include <flecs.h>
 
-#include "modules/engine/rendering/queries.h"
+#include "physics/components.h"
+#include "rendering/queries.h"
 
 
 namespace debug::systems {

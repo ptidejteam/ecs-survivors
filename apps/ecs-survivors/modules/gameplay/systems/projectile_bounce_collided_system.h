@@ -10,9 +10,9 @@
 #include <raylib.h>
 #include <raymath.h>
 
-#include "modules/engine/physics/components.h"
-#include "modules/engine/rendering/components.h"
-#include "modules/gameplay/components.h"
+#include "physics/components.h"
+#include "rendering/components.h"
+#include "../components.h"
 
 
 namespace gameplay::systems {

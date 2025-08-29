@@ -2,12 +2,12 @@
 // Created by laurent on 03/06/25.
 //
 
-#include "tilemap_module.h"
+#include "tilemap/tilemap_module.h"
 
-#include "components.h"
-#include "modules/engine/rendering/pipeline_steps.h"
-#include "modules/engine/rendering/rendering_module.h"
-#include "systems/create_tilemap_system.h"
+#include "tilemap/components.h"
+#include "rendering/pipeline_steps.h"
+#include "rendering/rendering_module.h"
+#include "tilemap/systems/create_tilemap_system.h"
 
 
 namespace tilemap {

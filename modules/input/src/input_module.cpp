@@ -2,14 +2,15 @@
 // Created by Laurent on 12/29/2024.
 //
 
-#include "input_module.h"
+#include <flecs.h>
+#include "input/input_module.h"
 
-#include "components.h"
-#include "systems/reset_horizontal_input_system.h"
-#include "systems/reset_vertical_input_system.h"
-#include "systems/set_horizontal_input_system.h"
-#include "systems/set_vertical_input_system.h"
-#include "systems/toggle_element_on_input_system.h"
+#include "input/components.h"
+#include "input/systems/reset_horizontal_input_system.h"
+#include "input/systems/reset_vertical_input_system.h"
+#include "input/systems/set_horizontal_input_system.h"
+#include "input/systems/set_vertical_input_system.h"
+#include "input/systems/toggle_element_on_input_system.h"
 
 namespace input {
     void InputModule::register_components(flecs::world &world) {

@@ -7,8 +7,8 @@
 
 #include <flecs.h>
 
-#include "modules/engine/core/components.h"
-#include "modules/engine/physics/components.h"
+#include "core/components.h"
+#include "physics/components.h"
 
 
 namespace gameplay::systems {

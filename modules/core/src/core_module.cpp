@@ -3,23 +3,21 @@
 //
 
 // ReSharper disable CppMemberFunctionMayBeStatic
-#include "core_module.h"
 
-#include "flecs.h"
-#include "components.h"
+#include <flecs.h>
+#include "core/core_module.h"
+#include "core/components.h"
+#include "core/queries.h"
 
-#include <raymath.h>
-
-#include "queries.h"
-#include "systems/destroy_entity_after_frame_system.h"
-#include "systems/destroy_entity_after_time_system.h"
-#include "systems/remove_empty_tables_system.h"
-#include "systems/reset_enabled_menus_system.h"
-#include "systems/set_time_scale_on_pause_system.h"
-#include "systems/set_paused_on_entity_disable_system.h"
-#include "systems/set_paused_on_entity_enabled_system.h"
-#include "systems/disable_entity_on_close_system.h"
-#include "systems/enable_entity_on_open_system.h"
+#include "core/systems/destroy_entity_after_frame_system.h"
+#include "core/systems/destroy_entity_after_time_system.h"
+#include "core/systems/disable_entity_on_close_system.h"
+#include "core/systems/enable_entity_on_open_system.h"
+#include "core/systems/remove_empty_tables_system.h"
+#include "core/systems/reset_enabled_menus_system.h"
+#include "core/systems/set_paused_on_entity_disable_system.h"
+#include "core/systems/set_paused_on_entity_enabled_system.h"
+#include "core/systems/set_time_scale_on_pause_system.h"
 
 namespace core {
     void CoreModule::register_components(flecs::world &world) {
@@ -31,8 +29,8 @@ namespace core {
         world.component<DestroyAfterFrame>();
     }
 
-    void CoreModule::register_queries(flecs::world &world) {
-        queries::position_and_tag_query = world.query<Position2D, Tag>();
+        void CoreModule::register_queries(flecs::world &world) {
+            queries::position_and_tag_query = world.query<Position2D, Tag>();
     }
 
     void CoreModule::register_systems(flecs::world &world) {

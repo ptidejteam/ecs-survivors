@@ -2,32 +2,26 @@
 // Created by Laurent Voisard on 12/22/2024.
 //
 
-#include "physics_module.h"
-#include "pipeline_steps.h"
+#include "physics/physics_module.h"
+#include "physics/pipeline_steps.h"
 
-#include <raygui.h>
-#include <raymath.h>
-#include <modules/engine/rendering/pipeline_steps.h>
 
-#include "components.h"
-#include "queries.h"
-#include "modules/engine/core/components.h"
+#include "physics/queries.h"
+#include "core/components.h"
 
-#include "modules/engine/core/core_module.h"
-#include "modules/engine/rendering/components.h"
-#include "systems/add_collided_with_system.h"
-#include "systems/collision_cleanup_system.h"
-#include "systems/collision_detection_relationship_spatial_hashing_system.h"
-#include "systems/collision_detection_spatial_hashing_system.h"
-#include "systems/collision_detection_system.h"
-#include "systems/collision_resolution_system.h"
-#include "systems/init_spatial_hashing_grid_system.h"
-#include "systems/reset_desired_velocity_system.h"
-#include "systems/update_cell_entities_system.h"
-#include "systems/update_grid_on_window_resized_system.h"
-#include "systems/update_grid_system.h"
-#include "systems/update_position_system.h"
-#include "systems/update_velocity_system.h"
+#include "physics/systems/add_collided_with_system.h"
+#include "physics/systems/collision_cleanup_system.h"
+#include "physics/systems/collision_detection_relationship_spatial_hashing_system.h"
+#include "physics/systems/collision_detection_spatial_hashing_system.h"
+#include "physics/systems/collision_detection_system.h"
+#include "physics/systems/collision_resolution_system.h"
+#include "physics/systems/init_spatial_hashing_grid_system.h"
+#include "physics/systems/reset_desired_velocity_system.h"
+#include "physics/systems/update_cell_entities_system.h"
+#include "physics/systems/update_grid_on_window_resized_system.h"
+#include "physics/systems/update_grid_system.h"
+#include "physics/systems/update_position_system.h"
+#include "physics/systems/update_velocity_system.h"
 
 namespace physics {
     void PhysicsModule::register_components(flecs::world &world) {
@@ -38,8 +32,7 @@ namespace physics {
     }
 
     void PhysicsModule::register_queries(flecs::world &world) {
-        queries::visible_collision_bodies_query = world.query_builder<core::Position2D, Collider>().with<
-            rendering::Visible>().build();
+        queries::visible_collision_bodies_query = world.query_builder<core::Position2D, Collider>().build();
 
         queries::box_collider_query = world.query_builder<core::Position2D, Collider>().with<BoxCollider>().build();
     }
@@ -64,10 +57,9 @@ namespace physics {
                 .event(flecs::OnSet)
                 .each(systems::reset_grid);
 
-        world.system<SpatialHashingGrid, rendering::TrackingCamera, core::GameSettings, GridCell>("update grid")
+        world.system<SpatialHashingGrid,  core::GameSettings, GridCell>("update grid") // TODO change to follow a target, not the camera, physics does not know about cameras.
                 .term_at(0).singleton()
                 .term_at(1).singleton()
-                .term_at(2).singleton()
                 .kind(flecs::PreUpdate)
                 .each(systems::update_grid_system);
 
@@ -100,7 +92,6 @@ namespace physics {
         m_collision_detection_naive_system = world.system<CollisionRecordList, const core::Position2D, const Collider>(
                     "Detect Collisions ECS (Naive Record List) non-static")
                 .term_at(0).singleton()
-                .with<rendering::Visible>()
                 .kind<Detection>()
                 .multi_threaded()
                 .tick_source(m_physicsTick)

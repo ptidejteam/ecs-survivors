@@ -1,20 +1,22 @@
-add_library(core
-        src/core_module.cpp
+add_library(rendering
+        src/rendering_module.cpp
 )
 
 # Public headers (installed/consumed by others)
-target_include_directories(core
+target_include_directories(rendering
         PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>  # during build
         $<INSTALL_INTERFACE:include>                            # when installed
 )
 
 # Link to dependencies
-target_link_libraries(core PUBLIC
+target_link_libraries(rendering PUBLIC
         base
+        core
         raylib #only using the datatypes
+        raygui
         flecs::flecs_static
 )
 
 # Set C++ standard just in case
-target_compile_features(core PUBLIC cxx_std_20)
+target_compile_features(rendering PUBLIC cxx_std_20)

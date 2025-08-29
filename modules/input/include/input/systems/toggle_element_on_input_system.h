@@ -7,8 +7,8 @@
 
 #include <flecs.h>
 #include <raylib.h>
-#include "modules/engine/input/components.h"
-#include "modules/engine/core/components.h"
+#include "input/components.h"
+#include "core/components.h"
 
 namespace input::systems {
     inline void toggle_element_on_input_system(flecs::entity e, const KeyBinding &binding, InputToggleEnable) {

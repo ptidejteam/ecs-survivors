@@ -4,9 +4,10 @@
 
 #ifndef DRAW_HEALTH_BAR_SYSTEM_H
 #define DRAW_HEALTH_BAR_SYSTEM_H
+#include "raygui.h"
+
 
 namespace rendering::systems {
-    // TODO dont like having gameplay since it's outside of core modules
     inline void draw_health_bar_system(ProgressBar bar, Rectangle rec,
                                        const core::Position2D &pos,
                                        const Renderable &renderable) {

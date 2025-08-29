@@ -4,12 +4,9 @@
 
 #include "ai_module.h"
 
-#include <raylib.h>
-#include <raymath.h>
-
 #include "components.h"
-#include "modules/engine/core/components.h"
-#include "modules/engine/physics/components.h"
+#include "core/components.h"
+#include "physics/components.h"
 #include "systems/follow_target_system.h"
 #include "systems/stop_when_arrived_at_target_system.h"
 

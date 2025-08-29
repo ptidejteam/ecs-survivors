@@ -8,8 +8,8 @@
 #include <flecs.h>
 #include <mutex>
 
-#include "modules/engine/core/components.h"
-#include "modules/engine/physics/components.h"
+#include "core/components.h"
+#include "physics/components.h"
 
 namespace physics::systems {
     static std::mutex list_mutex;
@@ -22,8 +22,7 @@ namespace physics::systems {
         flecs::world stage_world = self_it.world();
 
         // Build a staged query, and filter
-        auto visible_query = stage_world.query_builder<const core::Position2D, const Collider>()
-            .with<rendering::Visible>().build();
+        auto visible_query = stage_world.query_builder<const core::Position2D, const Collider>();
         flecs::entity self = self_it.entity(self_id);
 
         visible_query.each(

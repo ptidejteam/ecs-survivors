@@ -6,7 +6,7 @@
 #define ADD_MULTIPROJ_SYSTEM_H
 #include <flecs.h>
 
-#include "modules/gameplay/components.h"
+#include "../components.h"
 
 namespace gameplay::systems {
     inline void add_multiproj_system(flecs::entity e) {

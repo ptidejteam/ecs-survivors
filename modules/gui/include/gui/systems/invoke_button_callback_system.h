@@ -6,7 +6,7 @@
 #define INVOKE_BUTTON_CALLBACK_SYSTEM_H
 
 #include <flecs.h>
-#include "gui_game/components.h"
+#include "gui/components.h"
 
 namespace rendering::gui::systems {
     inline void invoke_button_callback_system(flecs::entity e, const ButtonCallback &callback) {

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.28)
-project(ECS_Survivors VERSION 1.0.0 LANGUAGES C CXX)
+project(ecs-survivors VERSION 1.0.0 LANGUAGES C CXX)
 
 set(EXECUTABLE_NAME Executable)
 set(LIBRARY_NAME Library)
@@ -13,7 +13,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 if (EMSCRIPTEN)
     set(CMAKE_EXE_LINKER_FLAGS "\
         ${CMAKE_EXE_LINKER_FLAGS} \
-        --embed-file resources \
+        --embed-file assets \
         --shell-file _deps/raylib-src/src/minshell.html \
         -s USE_GLFW=3 \
         -s ASSERTIONS=1 \
@@ -58,17 +58,28 @@ if (NOT flecs_FOUND) # If there's none, fetch and build flecs
 endif ()
 
 # Our Project
+add_library(raygui INTERFACE)
 
-add_subdirectory("src")
+target_include_directories(raygui
+        INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/external/raygui/include
+)
+
+#add_subdirectory("src")
+add_subdirectory("modules/base")
+add_subdirectory("modules/core")
+add_subdirectory("modules/input")
+add_subdirectory("modules/physics")
+add_subdirectory("modules/rendering")
+add_subdirectory("modules/gui")
+add_subdirectory("modules/tilemap")
 set(TMXLITE_STATIC_LIB ON)
 add_subdirectory("external/tmxlite/tmxlite")
-add_subdirectory("include")
-add_subdirectory("app")
+
+#add_subdirectory("include")
+add_subdirectory("apps")
 
 
-target_link_libraries(${LIBRARY_NAME} PRIVATE
-        raylib
-        flecs::flecs_static
+target_link_libraries(tilemap PRIVATE
         tmxlite
 )
 

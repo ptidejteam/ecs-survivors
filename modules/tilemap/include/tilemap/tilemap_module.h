@@ -6,7 +6,7 @@
 #define TILEMAPMODULE_H
 
 #include <flecs.h>
-#include "modules/base_module.h"
+#include "base/base_module.h"
 
 namespace tilemap {
     class TilemapModule : public BaseModule<TilemapModule> {

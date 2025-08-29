@@ -6,7 +6,7 @@
 #define DEAL_DAMAGE_ON_COLLISION_SYSTEM_H
 #include <flecs.h>
 
-#include "modules/gameplay/components.h"
+#include "../components.h"
 
 namespace gameplay::systems {
     inline void deal_damage_on_collision_system(flecs::iter &it, size_t i, Damage &dmg) {

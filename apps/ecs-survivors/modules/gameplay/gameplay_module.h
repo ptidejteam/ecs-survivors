@@ -5,7 +5,7 @@
 #ifndef GAMEPLAY_MODULE_H
 #define GAMEPLAY_MODULE_H
 
-#include "modules/base_module.h"
+#include "base/base_module.h"
 #include <flecs.h>
 
 namespace gameplay {

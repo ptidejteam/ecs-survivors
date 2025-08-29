@@ -6,8 +6,8 @@
 #define UPDATE_VELOCITY_SYSTEM_H
 #include <raymath.h>
 
-#include "modules/engine/physics/physics_module.h"
-#include "modules/engine/physics/components.h"
+#include "physics/physics_module.h"
+#include "physics/components.h"
 
 namespace physics::systems {
 

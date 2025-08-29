@@ -6,7 +6,7 @@
 #define INCREMENT_CHAIN_SYSTEM_H
 #include <flecs.h>
 
-#include "modules/gameplay/components.h"
+#include "../components.h"
 
 namespace gameplay::systems {
     inline void increment_chain_system(Chain& c) {

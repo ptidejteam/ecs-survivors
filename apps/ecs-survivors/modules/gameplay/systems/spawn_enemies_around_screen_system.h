@@ -6,9 +6,9 @@
 #define SPAWN_ENEMIES_AROUND_SCREEN_SYSTEM_H
 
 #include <flecs.h>
-#include "modules/engine/core/components.h"
-#include "modules/engine/physics/queries.h"
-#include "modules/gameplay/components.h"
+#include "core/components.h"
+#include "physics/queries.h"
+#include "../components.h"
 
 namespace gameplay::systems {
     inline bool outside_side_switch = false;

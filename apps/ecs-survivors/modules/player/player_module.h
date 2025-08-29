@@ -5,7 +5,7 @@
 #ifndef PLAYER_MODULE_H
 #define PLAYER_MODULE_H
 
-#include "modules/base_module.h"
+#include "base/base_module.h"
 
 namespace player {
     class PlayerModule : public BaseModule<PlayerModule> {

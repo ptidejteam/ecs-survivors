@@ -1,5 +1,4 @@
-#include "game.h"
-
+#include "ecs-survivors/game.h"
 int main() {
 #ifdef EMSCRIPTEN
     const int screenWidth = 1920;
@@ -10,5 +9,5 @@ int main() {
 #endif
     Game("ECS-Survivors", screenWidth, screenHeight).run();
 
-    return 0;
+ return 0;
 }

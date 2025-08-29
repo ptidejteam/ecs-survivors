@@ -6,11 +6,11 @@
 #define CREATE_HEALTH_BAR_SYSTEM_H
 #include <flecs.h>
 
-#include "modules/engine/rendering/components.h"
-#include "modules/gameplay/components.h"
+#include "rendering/components.h"
+#include "../components.h"
 
 namespace gameplay::systems {
-    inline void create_health_bar_system(flecs::entity e, const gameplay::Health health) {
+    inline void create_health_bar_system(flecs::entity e, const Health health) {
         e.add<HealthBar>();
         e.child()
                 .set<Rectangle>({0, 0, 50, 10})

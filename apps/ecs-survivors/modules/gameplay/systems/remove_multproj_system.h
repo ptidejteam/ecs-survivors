@@ -4,7 +4,7 @@
 
 #ifndef REMOVE_MULTPROJ_SYSTEM_H
 #define REMOVE_MULTPROJ_SYSTEM_H
-#include "modules/gameplay/components.h"
+#include "../components.h"
 
 namespace gameplay::systems {
     inline void remove_multiproj_system(flecs::entity e) {

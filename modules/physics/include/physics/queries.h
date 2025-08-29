@@ -7,8 +7,8 @@
 
 #include <flecs.h>
 
-#include "components.h"
-#include "modules/engine/core/components.h"
+#include "physics/components.h"
+#include "core/components.h"
 
 namespace physics::queries {
     inline flecs::query<core::Position2D, Collider> visible_collision_bodies_query;

@@ -5,7 +5,7 @@
 #ifndef RESET_VERTICAL_INPUT_SYSTEM_H
 #define RESET_VERTICAL_INPUT_SYSTEM_H
 
-#include "modules/engine/input/components.h"
+#include "input/components.h"
 
 namespace input::systems {
     inline void reset_vertical_input_system(InputVertical& vertical) {

@@ -11,11 +11,11 @@
 #include <tmxlite/TileLayer.hpp>
 #include <tmxlite/ObjectGroup.hpp>
 
-#include "modules/engine/core/components.h"
-#include "modules/engine/physics/components.h"
-#include "modules/engine/physics/physics_module.h"
-#include "modules/engine/rendering/components.h"
-#include "modules/tilemap/components.h"
+#include "core/components.h"
+#include "physics/components.h"
+#include "physics/physics_module.h"
+#include "rendering/components.h"
+#include "tilemap/components.h"
 
 
 namespace tilemap::systems {

@@ -5,7 +5,7 @@
 #ifndef GIVE_EXPERIENCE_SYSTEM_H
 #define GIVE_EXPERIENCE_SYSTEM_H
 
-#include "modules/gameplay/components.h"
+#include "../components.h"
 
 namespace gameplay::systems {
     inline void give_experience_system(GiveExperience &exp) {

@@ -4,7 +4,7 @@
 
 #ifndef RESET_HORIZONTAL_INPUT_SYSTEM_H
 #define RESET_HORIZONTAL_INPUT_SYSTEM_H
-#include "modules/engine/input/components.h"
+#include "input/components.h"
 
 namespace input::systems {
     inline void reset_horizontal_input_system(InputHorizontal& horizontal) {

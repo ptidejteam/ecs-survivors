@@ -6,7 +6,7 @@
 #define INCREMENT_MULTIPROJ_SYSTEM_H
 #include <flecs.h>
 
-#include "modules/gameplay/components.h"
+#include "../components.h"
 
 namespace gameplay::systems {
     inline void increment_multiproj_system(MultiProj& multi_proj) {

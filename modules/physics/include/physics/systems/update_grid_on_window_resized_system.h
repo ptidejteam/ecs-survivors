@@ -9,8 +9,8 @@
 #include <flecs.h>
 
 #include "init_spatial_hashing_grid_system.h"
-#include "modules/engine/core/components.h"
-#include "modules/engine/physics/components.h"
+#include "core/components.h"
+#include "physics/components.h"
 
 namespace physics::systems {
     inline void reset_grid(flecs::iter &it, size_t i, SpatialHashingGrid &hashing_grid, core::GameSettings &settings) {

@@ -6,7 +6,7 @@
 #define RENDERING_QUERIES_H
 
 #include <flecs.h>
-#include "components.h"
+#include "rendering/components.h"
 
 namespace rendering::queries {
     inline flecs::query<Renderable> entity_count_query;

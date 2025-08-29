@@ -8,7 +8,7 @@
 namespace rendering::systems {
     inline void begin_drawing_system(flecs::iter& it) {
         BeginDrawing();
-        ClearBackground(GetColor(GuiGetStyle(DEFAULT, BACKGROUND_COLOR)));
+        ClearBackground(DARKGRAY);
     }
 }
 

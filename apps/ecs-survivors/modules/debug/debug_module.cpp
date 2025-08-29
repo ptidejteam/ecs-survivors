@@ -4,17 +4,17 @@
 
 #include "debug_module.h"
 
-#include <modules/engine/rendering/pipeline_steps.h>
+#include <rendering/pipeline_steps.h>
 
-#include "modules/engine/core/components.h"
-#include "modules/engine/physics/components.h"
-#include "modules/engine/rendering/components.h"
-#include "modules/engine/rendering/gui/components.h"
+#include "core/components.h"
+#include "physics/components.h"
+#include "rendering/components.h"
+#include "gui/components.h"
 
-#include "modules/engine/rendering/gui/gui_module.h"
+#include "gui/gui_module.h"
 #include <raymath.h>
 
-#include "modules/engine/physics/physics_module.h"
+#include "physics/physics_module.h"
 #include "systems/debug_closest_enemy_to_player_system.h"
 #include "systems/debug_collidable_entities_system.h"
 #include "systems/debug_colliders_system.h"

@@ -9,11 +9,11 @@
 
 #include <raylib.h>
 #include <raymath.h>
-#include "modules/engine/core/components.h"
-#include "modules/engine/core/queries.h"
-#include "modules/engine/physics/components.h"
-#include "modules/engine/rendering/components.h"
-#include "modules/gameplay/components.h"
+#include "core/components.h"
+#include "physics/components.h"
+#include "rendering/components.h"
+#include "../components.h"
+#include "core/queries.h"
 
 namespace gameplay::systems {
     inline void fire_projectile_system(flecs::iter &iter, size_t index, core::Position2D &pos, Attack &attack,

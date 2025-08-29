@@ -6,8 +6,8 @@
 #define TAKE_DAMAGE_SYSTEM_H
 #include <flecs.h>
 
-#include "modules/engine/core/components.h"
-#include "modules/gameplay/components.h"
+#include "core/components.h"
+#include "../components.h"
 
 namespace gameplay::systems {
     inline void take_damage_system(flecs::entity e, Health &health, TakeDamage &dmg) {

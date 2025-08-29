@@ -8,7 +8,7 @@
 #include <flecs.h>
 #include <raylib.h>
 #include <raymath.h>
-#include "modules/engine/rendering/components.h"
+#include "rendering/components.h"
 
 namespace rendering::systems {
     inline void update_and_begin_camera_mode_system(flecs::iter& it, size_t, TrackingCamera &camera, core::GameSettings &settings) {

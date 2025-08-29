@@ -6,7 +6,7 @@
 #define DISABLE_ENTITY_ON_ENABLE_SYSTEM_H
 
 #include <flecs.h>
-#include "modules/engine/core/components.h"
+#include "core/components.h"
 
 namespace core::systems {
     inline void enable_entity_on_open_system(flecs::entity e) {

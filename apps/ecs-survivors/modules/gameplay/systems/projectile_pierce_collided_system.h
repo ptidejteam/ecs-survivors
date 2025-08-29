@@ -7,9 +7,9 @@
 
 #include <flecs.h>
 
-#include "modules/engine/core/components.h"
-#include "modules/engine/physics/components.h"
-#include "modules/gameplay/components.h"
+#include "core/components.h"
+#include "physics/components.h"
+#include "../components.h"
 
 namespace gameplay::systems {
     inline void projectile_pierce_collided_system(flecs::iter &it, size_t i, Pierce &pierce) {

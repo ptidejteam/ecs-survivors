@@ -4,18 +4,16 @@
 
 #include "gameplay_module.h"
 #include "components.h"
-#include "modules/engine/core/components.h"
-#include "modules/engine/physics/components.h"
+#include "core/components.h"
+#include "physics/components.h"
 #include <raymath.h>
-#include <set>
 
-#include "modules/engine/rendering/components.h"
-#include <unordered_set>
+#include "rendering/components.h"
 
 #include "pipeline_steps.h"
-#include "modules/engine/physics/physics_module.h"
-#include "modules/engine/physics/pipeline_steps.h"
-#include "modules/engine/rendering/gui/gui_module.h"
+#include "physics/physics_module.h"
+#include "physics/pipeline_steps.h"
+#include "gui/gui_module.h"
 #include "systems/add_bounce_system.h"
 #include "systems/add_chain_system.h"
 #include "systems/add_multiproj_system.h"

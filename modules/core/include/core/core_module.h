@@ -7,7 +7,7 @@
 #define CORE_MODULE_H
 
 #include "components.h"
-#include "modules/base_module.h"
+#include "base/base_module.h"
 
 namespace core {
 

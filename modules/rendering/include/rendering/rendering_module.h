@@ -5,9 +5,8 @@
 #ifndef RENDERING_MODULE_H
 #define RENDERING_MODULE_H
 
-#include <raylib.h>
-
-#include "modules/base_module.h"
+#include <flecs.h>
+#include "base/base_module.h"
 
 namespace rendering {
     class RenderingModule: public BaseModule<RenderingModule> {

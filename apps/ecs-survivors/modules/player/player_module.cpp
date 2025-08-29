@@ -5,14 +5,14 @@
 #include "player_module.h"
 
 #include "components.h"
-#include "modules/engine/input/components.h"
+#include "input/components.h"
 
 #include <raylib.h>
 #include <raymath.h>
 
-#include "modules/engine/core/components.h"
-#include "modules/engine/physics/physics_module.h"
-#include "modules/engine/physics/components.h"
+#include "core/components.h"
+#include "physics/physics_module.h"
+#include "physics/components.h"
 #include "systems/scale_desired_velocity_system.h"
 #include "systems/translate_horizontal_input_to_desired_vel_system.h"
 #include "systems/translate_vertical_input_to_desired_vel_system.h"

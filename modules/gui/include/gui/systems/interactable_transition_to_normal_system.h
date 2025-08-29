@@ -8,7 +8,7 @@
 #include <flecs.h>
 #include <raylib.h>
 
-#include "gui_game/components.h"
+#include "gui/components.h"
 
 namespace rendering::gui::systems {
     inline void interactable_transition_to_normal_system(flecs::iter &it, size_t i, const Rectangle &rec) {

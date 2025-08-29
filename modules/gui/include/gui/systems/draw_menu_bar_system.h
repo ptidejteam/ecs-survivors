@@ -6,7 +6,7 @@
 #define DRAW_MENU_BAR_SYSTEM_H
 
 #include <raylib.h>
-#include "gui_game/components.h"
+#include "gui/components.h"
 
 namespace rendering::gui::systems {
     inline void draw_menu_bar_system(MenuBar &bar) {

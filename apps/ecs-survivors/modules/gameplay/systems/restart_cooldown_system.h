@@ -6,7 +6,7 @@
 #define RESTART_COOLDOWN_SYSTEM_H
 #include <flecs.h>
 
-#include "modules/gameplay/components.h"
+#include "../components.h"
 
 namespace gameplay::systems {
     inline void restart_cooldown_system(flecs::entity e) {

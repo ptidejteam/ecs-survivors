@@ -9,8 +9,8 @@
 #include <raylib.h>
 #include <raymath.h>
 
-#include "modules/engine/core/components.h"
-#include "modules/engine/physics/components.h"
+#include "core/components.h"
+#include "physics/components.h"
 
 namespace ai::systems {
     inline void follow_target_system(flecs::iter &it, size_t i,

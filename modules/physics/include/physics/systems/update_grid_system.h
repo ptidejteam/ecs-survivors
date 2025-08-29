@@ -8,14 +8,15 @@
 #include <flecs.h>
 #include <raylib.h>
 #include <raymath.h>
-#include "modules/engine/physics/components.h"
-#include "modules/engine/rendering/components.h"
+#include "physics/components.h"
 
 
 namespace physics::systems {
-    inline void update_grid_system(flecs::iter &it, size_t i, SpatialHashingGrid &grid, rendering::TrackingCamera &cam,
+    inline void update_grid_system(flecs::iter &it, size_t i, SpatialHashingGrid &grid,
                          core::GameSettings &settings, GridCell &cell) {
-        grid.offset = cam.camera.target - Vector2{
+        auto player = it.world().lookup("player");
+        Vector2 pos = player ? player.get<core::Position2D>().value : Vector2(0.0f, 0.0f);
+        grid.offset = pos - Vector2{
             settings.window_width / 2.0f, settings.window_height / 2.0f
         };
 

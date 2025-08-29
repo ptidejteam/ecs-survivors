@@ -8,7 +8,7 @@
 #include <flecs.h>
 #include <raylib.h>
 
-#include "gui_game/components.h"
+#include "gui/components.h"
 
 
 namespace rendering::gui::systems {

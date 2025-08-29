@@ -9,8 +9,8 @@
 #include <raylib.h>
 #include <raymath.h>
 
-#include "modules/engine/core/components.h"
-#include "modules/engine/core/queries.h"
+#include "core/components.h"
+#include "core/queries.h"
 
 namespace debug::systems {
     inline void debug_closest_enemy_to_player_system(flecs::iter &iter) {

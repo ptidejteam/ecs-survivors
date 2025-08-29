@@ -6,7 +6,7 @@
 #define RENDERING_COMPONENTS_H
 
 #include <raylib.h>
-#include <modules/engine/core/components.h>
+#include <core/components.h>
 
 namespace rendering {
     struct Priority {int priority;};

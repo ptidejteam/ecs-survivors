@@ -2,24 +2,22 @@
 // Created by laure on 1/27/2025.
 //
 
-#include "rendering_module.h"
+#
+#include "rendering/rendering_module.h"
 
-#include "components.h"
-#include "pipeline_steps.h"
-#include "modules/engine/core/components.h"
-#include "gui/components.h"
+#include "rendering/components.h"
+#include "rendering/pipeline_steps.h"
+#include "core/components.h"
 #include <raymath.h>
 
-#include "queries.h"
-#include "gui/gui_module.h"
-#include "modules/gameplay/components.h"
-#include "systems/begin_drawing_system.h"
-#include "systems/create_camera_system.h"
-#include "systems/determine_visible_entities_system.h"
-#include "systems/draw_entity_with_texture_system.h"
-#include "systems/draw_health_bar_system.h"
-#include "systems/end_drawing_system.h"
-#include "systems/update_and_begin_camera_mode_system.h"
+#include "rendering/queries.h"
+#include "rendering/systems/begin_drawing_system.h"
+#include "rendering/systems/create_camera_system.h"
+#include "rendering/systems/determine_visible_entities_system.h"
+#include "rendering/systems/draw_entity_with_texture_system.h"
+#include "rendering/systems/draw_health_bar_system.h"
+#include "rendering/systems/end_drawing_system.h"
+#include "rendering/systems/update_and_begin_camera_mode_system.h"
 
 
 void rendering::RenderingModule::register_components(flecs::world world) {
@@ -107,5 +105,4 @@ void rendering::RenderingModule::register_pipeline(flecs::world world) {
 }
 
 void rendering::RenderingModule::register_submodules(flecs::world world) {
-    world.import<gui::GUIModule>();
 }

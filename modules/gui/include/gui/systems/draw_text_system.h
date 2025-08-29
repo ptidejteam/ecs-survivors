@@ -6,8 +6,8 @@
 #define DRAW_TEXT_SYSTEM_H
 
 #include <raylib.h>
-#include "gui_game/components.h"
-#include "gui_game/gui_module.h"
+#include "gui/components.h"
+#include "gui/gui_module.h"
 
 namespace rendering::gui::systems {
     inline void draw_text_system(flecs::entity e, const Text &text, const Rectangle &rect, const InteractableElement *inter, const FontAtlas &fonts) {

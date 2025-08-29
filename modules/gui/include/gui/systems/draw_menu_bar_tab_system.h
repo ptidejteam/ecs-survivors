@@ -8,7 +8,7 @@
 #include <flecs.h>
 #include <raylib.h>
 
-#include "gui_game/components.h"
+#include "gui/components.h"
 
 namespace rendering::gui::systems {
     inline void draw_menu_bar_tab_system(flecs::iter &it, size_t i, MenuBarTab &tab, MenuBar &bar) {

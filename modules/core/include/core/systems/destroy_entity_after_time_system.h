@@ -6,7 +6,7 @@
 #define DESTROY_ENTITY_AFTER_TIME_SYSTEM_H
 
 #include <flecs.h>
-#include "modules/engine/core/components.h"
+#include "core/components.h"
 namespace core::systems {
     void destroy_entity_after_time_system(flecs::iter& it, size_t i, DestroyAfterTime& time) {
         time.time -= it.delta_time();

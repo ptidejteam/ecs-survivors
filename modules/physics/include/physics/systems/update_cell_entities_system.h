@@ -8,8 +8,8 @@
 #include <cmath>
 #include <flecs.h>
 
-#include "modules/engine/core/components.h"
-#include "modules/engine/physics/components.h"
+#include "core/components.h"
+#include "physics/components.h"
 
 namespace physics::systems {
     inline void update_cell_entities_system(flecs::entity e, SpatialHashingGrid &grid, Collider &col, core::Position2D &pos) {

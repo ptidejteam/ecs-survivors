@@ -5,7 +5,7 @@
 #ifndef ADD_COLLIDED_WITH_SYSTEM_H
 #define ADD_COLLIDED_WITH_SYSTEM_H
 #include <flecs.h>
-#include "modules/engine/physics/components.h"
+#include "physics/components.h"
 
 namespace physics::systems {
     inline void add_collided_with_system(CollisionRecordList& list) {

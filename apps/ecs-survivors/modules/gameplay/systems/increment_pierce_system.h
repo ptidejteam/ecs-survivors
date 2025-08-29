@@ -4,9 +4,8 @@
 
 #ifndef INCREMENT_PIERCE_SYSTEM_H
 #define INCREMENT_PIERCE_SYSTEM_H
-#include <flecs.h>
 
-#include "modules/gameplay/components.h"
+#include "../components.h"
 
 namespace gameplay::systems {
     inline void increment_pierce_system(Pierce& p) {

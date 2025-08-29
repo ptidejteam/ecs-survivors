@@ -4,7 +4,7 @@
 
 #ifndef DEBUG_MODULE_H
 #define DEBUG_MODULE_H
-#include "modules/base_module.h"
+#include "base/base_module.h"
 
 
 namespace debug {

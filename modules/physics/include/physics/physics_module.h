@@ -5,18 +5,15 @@
 #ifndef PHYSICS_MODULE_H
 #define PHYSICS_MODULE_H
 
-
-#include <cmath>
-#include <vector>
-
-#include "modules/base_module.h"
-#include "flecs.h"
-#include "modules/engine/core/components.h"
-#include "modules/engine/rendering/components.h"
-
+#include <flecs.h>
+#include <raylib.h>
 #include <raymath.h>
 
 #include "components.h"
+#include "base/base_module.h"
+#include "core/components.h"
+
+
 
 
 namespace physics {

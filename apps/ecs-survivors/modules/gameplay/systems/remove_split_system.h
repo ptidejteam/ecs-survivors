@@ -4,7 +4,7 @@
 
 #ifndef REMOVE_SPLIT_SYSTEM_H
 #define REMOVE_SPLIT_SYSTEM_H
-#include "modules/gameplay/components.h"
+#include "../components.h"
 
 namespace gameplay::systems {
     inline void remove_split_system(const flecs::world& world, flecs::entity e) {

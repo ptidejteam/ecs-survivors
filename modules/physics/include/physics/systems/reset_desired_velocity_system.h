@@ -5,7 +5,7 @@
 #ifndef RESET_DESIRED_VELOCITY_SYSTEM_H
 #define RESET_DESIRED_VELOCITY_SYSTEM_H
 
-#include "modules/engine/physics/components.h"
+#include "physics/components.h"
 
 namespace physics::systems {
     inline void reset_desired_velocity_system(const Velocity2D &vel, DesiredVelocity2D &desiredVel) {

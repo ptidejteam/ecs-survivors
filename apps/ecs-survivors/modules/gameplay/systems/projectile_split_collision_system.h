@@ -8,10 +8,10 @@
 #include <raylib.h>
 #include <raymath.h>
 
-#include "modules/engine/core/components.h"
-#include "modules/engine/physics/components.h"
-#include "modules/engine/rendering/components.h"
-#include "modules/gameplay/components.h"
+#include "core/components.h"
+#include "physics/components.h"
+#include "rendering/components.h"
+#include "../components.h"
 
 namespace gameplay::systems {
     inline void projectile_split_collision_system(flecs::iter &it, size_t i, Split &split, physics::Velocity2D &vel, core::Position2D &pos,

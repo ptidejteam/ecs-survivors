@@ -8,8 +8,8 @@
 #include <flecs.h>
 
 #include "collision_detection_system.h"
-#include "modules/engine/core/components.h"
-#include "modules/engine/physics/components.h"
+#include "core/components.h"
+#include "physics/components.h"
 
 namespace physics::systems {
     inline void collision_detection_spatial_hashing_system(flecs::entity e, CollisionRecordList &list, SpatialHashingGrid &grid, GridCell &cell) {
@@ -24,12 +24,10 @@ namespace physics::systems {
 
                             for (int i = 0; i < cell.entities.size(); i++) {
                                 flecs::entity self = cell.entities[i];
-                                if (!self.is_alive()) continue;
                                 const core::Position2D pos = cell.entities[i].get<core::Position2D>();
                                 const Collider collider = cell.entities[i].get<Collider>();
                                 for (int j = 0; j < neighbour.entities.size(); j++) {
                                     flecs::entity other = neighbour.entities[j];
-                                    if (!other.is_alive()) continue;
                                     if (self.id() <= other.id()) continue;
 
                                     const core::Position2D other_pos = neighbour.entities[j].get<core::Position2D>();

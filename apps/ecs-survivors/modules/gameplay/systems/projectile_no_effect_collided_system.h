@@ -7,7 +7,7 @@
 
 #include <flecs.h>
 
-#include "modules/engine/core/components.h"
+#include "core/components.h"
 
 namespace gameplay::systems {
     inline void project_no_effect_collided_system(flecs::iter &it, size_t i) {

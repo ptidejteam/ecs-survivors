@@ -5,7 +5,7 @@
 #ifndef AI_MODULE_H
 #define AI_MODULE_H
 
-#include "modules/base_module.h"
+#include "base/base_module.h"
 
 namespace ai {
     class AIModule : public BaseModule<AIModule> {

@@ -6,7 +6,7 @@
 #define DECREMENT_PIERCE_SYSTEM_H
 #include <flecs.h>
 
-#include "modules/gameplay/components.h"
+#include "../components.h"
 
 namespace gameplay::systems {
     inline void decrement_pierce_system(Pierce& p) {

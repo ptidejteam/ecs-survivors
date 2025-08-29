@@ -7,7 +7,7 @@
 #include <flecs.h>
 #include <raylib.h>
 
-#include "modules/engine/input/components.h"
+#include "input/components.h"
 
 namespace input::systems {
     inline void set_horizontal_input_system(const KeyBinding &binding, InputHorizontal &horizontal) {

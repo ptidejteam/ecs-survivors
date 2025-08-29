@@ -9,9 +9,9 @@
 #include <raylib.h>
 #include <raymath.h>
 
-#include "modules/ai/components.h"
-#include "modules/engine/core/components.h"
-#include "modules/engine/physics/components.h"
+#include "../components.h"
+#include "core/components.h"
+#include "physics/components.h"
 
 namespace ai::systems {
     inline void stop_when_arrived_at_target_system(flecs::iter &it, size_t i,

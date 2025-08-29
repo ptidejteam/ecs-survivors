@@ -7,7 +7,7 @@
 
 #include <string>
 #include <raylib.h>
-#include "gui_game/gui_module.h"
+#include "gui/gui_module.h"
 
 namespace rendering::gui::systems {
     inline void draw_progress_bar_system(const Rectangle &rec, ProgressBar bar) {

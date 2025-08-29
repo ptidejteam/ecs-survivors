@@ -2,7 +2,7 @@
 // Created by Laurent Voisard on 12/22/2024.
 //
 
-#include "gui_game/gui_module.h"
+#include "gui/gui_module.h"
 
 #include <flecs.h>
 #include <iostream>
@@ -10,31 +10,31 @@
 #define RAYGUI_IMPLEMENTATION
 #include <raygui.h>
 #include "core/components.h"
-#include "gui_game/components.h"
+#include "gui/components.h"
 #include "rendering/pipeline_steps.h"
-#include "gui_game/systems/check_window_resized_system.h"
-#include "gui_game/systems/draw_interactable_textured_element_system.h"
-#include "gui_game/systems/draw_menu_bar_system.h"
-#include "gui_game/systems/draw_menu_bar_tab_item_system.h"
-#include "gui_game/systems/draw_menu_bar_tab_system.h"
-#include "gui_game/systems/draw_outline_system.h"
-#include "gui_game/systems/draw_panel_system.h"
-#include "gui_game/systems/draw_text_system.h"
-#include "gui_game/systems/load_style_system.h"
-#include "gui_game/systems/parent_rectangle_changed_observer.h"
-#include "gui_game/systems/set_anchored_position_system.h"
-#include "gui_game/systems/set_gui_canvas_size_system.h"
-#include "gui_game/systems/parent_rectangle_changed_disabled_observer.h"
+#include "gui/systems/check_window_resized_system.h"
+#include "gui/systems/draw_interactable_textured_element_system.h"
+#include "gui/systems/draw_menu_bar_system.h"
+#include "gui/systems/draw_menu_bar_tab_item_system.h"
+#include "gui/systems/draw_menu_bar_tab_system.h"
+#include "gui/systems/draw_outline_system.h"
+#include "gui/systems/draw_panel_system.h"
+#include "gui/systems/draw_text_system.h"
+#include "gui/systems/load_style_system.h"
+#include "gui/systems/parent_rectangle_changed_observer.h"
+#include "gui/systems/set_anchored_position_system.h"
+#include "gui/systems/set_gui_canvas_size_system.h"
+#include "gui/systems/parent_rectangle_changed_disabled_observer.h"
 
-#include "gui_game/systems/disable_children_on_disable_system.h"
-#include "gui_game/systems/enable_children_on_enable_system.h"
-#include "gui_game/systems/invoke_button_callback_system.h"
-#include "gui_game/systems/draw_progress_bar_system.h"
+#include "gui/systems/disable_children_on_disable_system.h"
+#include "gui/systems/enable_children_on_enable_system.h"
+#include "gui/systems/invoke_button_callback_system.h"
+#include "gui/systems/draw_progress_bar_system.h"
 
-#include "gui_game/systems/interactable_transition_to_normal_system.h"
-#include "gui_game/systems/interactable_transition_to_hovered_system.h"
-#include "gui_game/systems/interactable_transition_to_pressed_system.h"
-#include "gui_game/systems/interactable_transition_to_released_system.h"
+#include "gui/systems/interactable_transition_to_normal_system.h"
+#include "gui/systems/interactable_transition_to_hovered_system.h"
+#include "gui/systems/interactable_transition_to_pressed_system.h"
+#include "gui/systems/interactable_transition_to_released_system.h"
 
 namespace rendering::gui {
     void GUIModule::register_components(flecs::world &world) {

@@ -11,33 +11,32 @@
 #endif
 
 #include <thread>
+#include <raylib.h>
+#include <flecs.h>
+#include <raygui.h>
 
 #include "modules/ai/ai_module.h"
 #include "modules/ai/components.h"
-#include "modules/engine/core/components.h"
-#include "modules/engine/core/core_module.h"
-#include "modules/engine/input/components.h"
-#include "modules/engine/input/input_module.h"
-#include "modules/engine/physics/components.h"
-#include "modules/engine/physics/physics_module.h"
+#include "core/components.h"
+#include "core/core_module.h"
+#include "input/components.h"
+#include "input/input_module.h"
+#include "physics/components.h"
+#include "physics/physics_module.h"
 #include "modules/player/player_module.h"
 #include "raylib.h"
-#include "modules/debug/debug_module.h"
 
-#include "modules/engine/rendering/components.h"
-#include "modules/engine/rendering/rendering_module.h"
+#include "rendering/components.h"
+#include "rendering/rendering_module.h"
 #include "modules/gameplay/components.h"
 #include "modules/gameplay/gameplay_module.h"
+#include "tilemap/tilemap_module.h"
+#include "tilemap/components.h"
 
-#include <tmxlite/Map.hpp>
-#include <tmxlite/Layer.hpp>
-#include <tmxlite/TileLayer.hpp>
-#include <tmxlite/ObjectGroup.hpp>
+#include "gui/gui_module.h"
+#include "gui/components.h"
 
-#include "modules/engine/rendering/gui/components.h"
-#include "modules/engine/rendering/gui/gui_module.h"
-#include "modules/tilemap/components.h"
-#include "modules/tilemap/tilemap_module.h"
+#include "modules/debug/debug_module.h"
 
 Game::Game(const char *windowName, int windowWidth, int windowHeight) : m_world(flecs::world()),
                                                                         m_windowName(windowName),
@@ -68,6 +67,7 @@ void Game::init() {
     m_world.import<core::CoreModule>();
     m_world.import<input::InputModule>();
     m_world.import<rendering::RenderingModule>();
+    m_world.import<rendering::gui::GUIModule>();
     m_world.import<physics::PhysicsModule>();
     m_world.import<player::PlayerModule>();
     m_world.import<ai::AIModule>();
@@ -105,7 +105,7 @@ void Game::init() {
             .set<physics::CircleCollider>({24})
             .set<rendering::Priority>({2})
             .set<rendering::Renderable>({
-                LoadTexture("../resources/player.png"), // 8x8
+                LoadTexture("../assets/player.png"), // 8x8
                 {0, 0},
                 3.f,
                 WHITE
@@ -137,7 +137,7 @@ void Game::init() {
             .set<physics::CircleCollider>({18})
             .set<rendering::Priority>({1})
             .set<rendering::Renderable>({
-                LoadTexture("../resources/dagger.png"), // 8x8
+                LoadTexture("../assets/dagger.png"), // 8x8
                 {0, 0},
                 3.f,
                 WHITE
@@ -178,7 +178,7 @@ void Game::init() {
             })
             .set<physics::CircleCollider>({24})
             .set<rendering::Renderable>({
-                LoadTexture("../resources/ghost.png"), // 8x8
+                LoadTexture("../assets/ghost.png"), // 8x8
                 {0, 0},
                 3.f,
                 WHITE
@@ -190,7 +190,7 @@ void Game::init() {
 
     m_world.entity("tilemap_1")
             .set<tilemap::Tilemap>({
-                "../resources/tiled/maps/sampleMap.tmx",
+                "../assets/tiled/maps/sampleMap.tmx",
                 3.0f
             });
 

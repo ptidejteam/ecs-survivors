@@ -4,8 +4,8 @@
 
 #ifndef TRANSLATE_HORIZONTAL_INPUT_TO_DESIRED_VEL_SYSTEM_H
 #define TRANSLATE_HORIZONTAL_INPUT_TO_DESIRED_VEL_SYSTEM_H
-#include "modules/engine/input/components.h"
-#include "modules/engine/physics/components.h"
+#include "input/components.h"
+#include "physics/components.h"
 
 namespace player::systems {
     inline void translate_horizontal_input_to_desired_vel_system(const input::InputHorizontal &horizontal,

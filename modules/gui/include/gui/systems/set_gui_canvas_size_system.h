@@ -9,7 +9,7 @@
 #include <flecs.h>
 #include <raylib.h>
 
-#include "gui_game/gui_module.h"
+#include "gui/gui_module.h"
 
 namespace rendering::gui::systems {
     inline void set_gui_canvas_size_system(core::GameSettings& settings) {

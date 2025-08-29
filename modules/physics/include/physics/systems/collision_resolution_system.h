@@ -10,9 +10,8 @@
 #include <raylib.h>
 #include <raymath.h>
 
-#include "modules/engine/core/components.h"
-#include "modules/engine/physics/components.h"
-#include "modules/gameplay/components.h"
+#include "core/components.h"
+#include "physics/components.h"
 
 namespace physics::systems {
     /**

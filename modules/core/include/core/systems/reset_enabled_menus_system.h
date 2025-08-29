@@ -5,7 +5,7 @@
 #ifndef RESET_ENABLED_MENUS_SYSTEM_H
 #define RESET_ENABLED_MENUS_SYSTEM_H
 
-#include "modules/engine/core/components.h"
+#include "core/components.h"
 
 namespace core::systems {
     inline void reset_enabled_menus_system(EnabledMenus& menus) {

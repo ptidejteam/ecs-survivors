@@ -6,7 +6,7 @@
 #define DRAW_OUTLINE_SYSTEM_H
 #include <raylib.h>
 
-#include "gui_game/components.h"
+#include "gui/components.h"
 
 namespace rendering::gui::systems {
     inline void draw_outline_system(const Rectangle &rect, const Outline &outline) {

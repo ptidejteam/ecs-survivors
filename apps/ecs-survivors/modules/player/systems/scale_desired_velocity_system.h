@@ -4,8 +4,8 @@
 
 #ifndef SCALE_DESIRED_VELOCITY_SYSTEM_H
 #define SCALE_DESIRED_VELOCITY_SYSTEM_H
-#include "modules/engine/core/components.h"
-#include "modules/engine/physics/components.h"
+#include "core/components.h"
+#include "physics/components.h"
 #include <raymath.h>
 
 namespace player::systems {
