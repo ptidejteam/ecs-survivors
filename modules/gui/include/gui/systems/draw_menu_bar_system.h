@@ -8,7 +8,7 @@
 #include <raylib.h>
 #include "gui/components.h"
 
-namespace rendering::gui::systems {
+namespace gui::systems {
     inline void draw_menu_bar_system(MenuBar &bar) {
         GuiDrawRectangle(
             {0, 0, (float) GetScreenWidth(), (float) 25},

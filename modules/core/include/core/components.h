@@ -16,14 +16,6 @@ namespace core {
         float value;
     };
 
-    struct GameSettings {
-        std::string windowName;
-        int initial_width;
-        int initial_height;
-        int window_width;
-        int window_height;
-    };
-
     struct Tag {
         std::string name;
     };

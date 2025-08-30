@@ -23,7 +23,6 @@ namespace core {
     void CoreModule::register_components(flecs::world &world) {
         world.component<Position2D>();
         world.component<Speed>();
-        world.component<GameSettings>();
         world.component<Tag>();
         world.component<DestroyAfterTime>();
         world.component<DestroyAfterFrame>();

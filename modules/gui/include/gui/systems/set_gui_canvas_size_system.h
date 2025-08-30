@@ -5,14 +5,14 @@
 #ifndef SET_GUI_CANVAS_SIZE_SYSTEM_H
 #define SET_GUI_CANVAS_SIZE_SYSTEM_H
 
-#include "core/components.h"
 #include <flecs.h>
 #include <raylib.h>
 
+#include "rendering/components.h"
 #include "gui/gui_module.h"
 
-namespace rendering::gui::systems {
-    inline void set_gui_canvas_size_system(core::GameSettings& settings) {
+namespace gui::systems {
+    inline void set_gui_canvas_size_system(rendering::Settings& settings) {
         GUIModule::gui_canvas.set<Rectangle>({
             0, 0, static_cast<float>(GetScreenWidth()), static_cast<float>(GetScreenHeight())
         });

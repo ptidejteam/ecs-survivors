@@ -13,11 +13,11 @@
 
 namespace physics::systems {
     inline void update_grid_system(flecs::iter &it, size_t i, SpatialHashingGrid &grid,
-                         core::GameSettings &settings, GridCell &cell) {
+                         Settings &settings, GridCell &cell) {
         auto player = it.world().lookup("player");
-        Vector2 pos = player ? player.get<core::Position2D>().value : Vector2(0.0f, 0.0f);
+        Vector2 pos = player != 0 ? player.get<core::Position2D>().value : Vector2(0.0f, 0.0f);
         grid.offset = pos - Vector2{
-            settings.window_width / 2.0f, settings.window_height / 2.0f
+            settings.world_bounds.x / 2.0f, settings.world_bounds.y / 2.0f
         };
 
         cell.entities.clear();

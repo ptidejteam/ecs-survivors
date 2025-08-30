@@ -8,7 +8,7 @@
 
 #include "gui/components.h"
 
-namespace rendering::gui::systems {
+namespace gui::systems {
     inline void draw_outline_system(const Rectangle &rect, const Outline &outline) {
         GuiDrawRectangle(rect, outline.border_size, outline.border_color, outline.fill_color);
     }

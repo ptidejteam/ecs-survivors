@@ -13,10 +13,10 @@
 
 namespace physics::systems {
     inline void init_spatial_hashing_grid_system(flecs::iter &it, size_t i, SpatialHashingGrid &hashing_grid,
-                                                 core::GameSettings &settings) {
-        for (int y = -1; y < std::ceil((float) settings.window_height / (float) hashing_grid.cell_size) + 1;
+                                                 Settings &settings) {
+        for (int y = -1; y < std::ceil(settings.world_bounds.y / (float) hashing_grid.cell_size) + 1;
              y++) {
-            for (int x = -1; x < std::ceil(settings.window_width / hashing_grid.cell_size) + 1; x++) {
+            for (int x = -1; x < std::ceil(settings.world_bounds.x /  (float) hashing_grid.cell_size) + 1; x++) {
                 flecs::entity e = it.world().entity().set<GridCell>({x, y});
                 hashing_grid.cells[std::make_pair(x, y)] = e;
             }

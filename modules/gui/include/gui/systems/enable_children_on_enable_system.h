@@ -7,7 +7,7 @@
 #include <flecs.h>
 #include <raylib.h>
 
-namespace rendering::gui::systems {
+namespace gui::systems {
     inline void enable_children_on_enable_system(flecs::entity e) {
         e.children([](flecs::entity child) {
             if (child.has<Rectangle>())

@@ -11,7 +11,7 @@
 #include "rendering/components.h"
 
 namespace rendering::systems {
-    inline void update_and_begin_camera_mode_system(flecs::iter& it, size_t, TrackingCamera &camera, core::GameSettings &settings) {
+    inline void update_and_begin_camera_mode_system(flecs::iter& it, size_t, TrackingCamera &camera, Settings &settings) {
         Vector2 pos = camera.camera.target;
         if (camera.target.is_alive()) {
             pos = camera.target.get<core::Position2D>().value;

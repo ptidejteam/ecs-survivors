@@ -100,56 +100,56 @@ namespace debug {
     }
 
     void DebugModule::register_entities(flecs::world &world) {
-        auto dropdown = world.entity("debug_dropdown").child_of(rendering::gui::GUIModule::menu_bar)
-                .set<rendering::gui::MenuBarTab>({"Debug Tools", 25});
+        auto dropdown = world.entity("debug_dropdown").child_of(gui::GUIModule::menu_bar)
+                .set<gui::MenuBarTab>({"Debug Tools", 25});
 
         world.entity("debug_collisions_item_0").child_of(dropdown)
-                .set<rendering::gui::MenuBarTabItem>({
-                    "Toggle Collidable Entity Ids", debug_entity_ids, rendering::gui::TOGGLE
+                .set<gui::MenuBarTabItem>({
+                    "Toggle Collidable Entity Ids", debug_entity_ids, gui::TOGGLE
                 });
         world.entity("debug_collisions_item_1_0").child_of(dropdown)
-                .set<rendering::gui::MenuBarTabItem>({
-                    "Toggle Collider Bounds", debug_collider_bounds, rendering::gui::TOGGLE
+                .set<gui::MenuBarTabItem>({
+                    "Toggle Collider Bounds", debug_collider_bounds, gui::TOGGLE
                 });
         world.entity("debug_collisions_item_1_1").child_of(dropdown)
-                .set<rendering::gui::MenuBarTabItem>({
-                    "Toggle Circle Colliders", debug_circle_colliders, rendering::gui::TOGGLE
+                .set<gui::MenuBarTabItem>({
+                    "Toggle Circle Colliders", debug_circle_colliders, gui::TOGGLE
                 });
         world.entity("debug_collisions_item_1_2").child_of(dropdown)
-                .set<rendering::gui::MenuBarTabItem>({
-                    "Toggle Square Colliders", debug_square_colliders, rendering::gui::TOGGLE
+                .set<gui::MenuBarTabItem>({
+                    "Toggle Square Colliders", debug_square_colliders, gui::TOGGLE
                 });
         world.entity("debug_collisions_item_2").child_of(dropdown)
-                .set<rendering::gui::MenuBarTabItem>({"Toggle FPS", debug_FPS, rendering::gui::TOGGLE});
+                .set<gui::MenuBarTabItem>({"Toggle FPS", debug_FPS, gui::TOGGLE});
         world.entity("debug_collisions_item_3").child_of(dropdown)
-                .set<rendering::gui::MenuBarTabItem>(
-                    {"Toggle Entity Count", debug_entity_count, rendering::gui::TOGGLE});
+                .set<gui::MenuBarTabItem>(
+                    {"Toggle Entity Count", debug_entity_count, gui::TOGGLE});
         world.entity("debug_collisions_item_4").child_of(dropdown)
-                .set<rendering::gui::MenuBarTabItem>({"Toggle Mouse Pos", debug_mouse_pos, rendering::gui::TOGGLE});
+                .set<gui::MenuBarTabItem>({"Toggle Mouse Pos", debug_mouse_pos, gui::TOGGLE});
         world.entity("debug_collisions_item_5").child_of(dropdown)
-                .set<rendering::gui::MenuBarTabItem>({"Toggle Grid", debug_grid, rendering::gui::TOGGLE});
+                .set<gui::MenuBarTabItem>({"Toggle Grid", debug_grid, gui::TOGGLE});
         world.entity("debug_collisions_item_6").child_of(dropdown)
-                .set<rendering::gui::MenuBarTabItem>({
-                    "Toggle View Closest Enemy", debug_closest_enemy, rendering::gui::TOGGLE
+                .set<gui::MenuBarTabItem>({
+                    "Toggle View Closest Enemy", debug_closest_enemy, gui::TOGGLE
                 });
 
             world.entity("debug_collisions_item_7").child_of(dropdown)
-                .set<rendering::gui::MenuBarTabItem>({"Toggle Naive Collisions", physics::m_collision_detection_naive_system, rendering::gui::TOGGLE});
+                .set<gui::MenuBarTabItem>({"Toggle Naive Collisions", physics::m_collision_detection_naive_system, gui::TOGGLE});
             world.entity("debug_collisions_item_8").child_of(dropdown)
-                    .set<rendering::gui::MenuBarTabItem>({
-                        "Toggle Hashing Collisions", physics::m_collision_detection_spatial_hashing_system, rendering::gui::TOGGLE
+                    .set<gui::MenuBarTabItem>({
+                        "Toggle Hashing Collisions", physics::m_collision_detection_spatial_hashing_system, gui::TOGGLE
                     });
             world.entity("debug_collisions_item_9").child_of(dropdown)
-                   .set<rendering::gui::MenuBarTabItem>({
-                       "Toggle Hashing Collisions ECS", physics::m_collision_detection_spatial_ecs, rendering::gui::TOGGLE
+                   .set<gui::MenuBarTabItem>({
+                       "Toggle Hashing Collisions ECS", physics::m_collision_detection_spatial_ecs, gui::TOGGLE
                    });
             world.entity("debug_collisions_item_10").child_of(dropdown)
-                   .set<rendering::gui::MenuBarTabItem>({
-                       "Grow Cell Size", grid_cell_grow, rendering::gui::RUN
+                   .set<gui::MenuBarTabItem>({
+                       "Grow Cell Size", grid_cell_grow, gui::RUN
                    });
             world.entity("debug_collisions_item_11").child_of(dropdown)
-                   .set<rendering::gui::MenuBarTabItem>({
-                       "Shrink Cell Size", grid_cell_shrink, rendering::gui::RUN
+                   .set<gui::MenuBarTabItem>({
+                       "Shrink Cell Size", grid_cell_shrink, gui::RUN
                    });
     }
 }

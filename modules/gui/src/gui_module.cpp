@@ -31,30 +31,32 @@
 #include "gui/systems/invoke_button_callback_system.h"
 #include "gui/systems/draw_progress_bar_system.h"
 
-#include "gui/systems/interactable_transition_to_normal_system.h"
 #include "gui/systems/interactable_transition_to_hovered_system.h"
+#include "gui/systems/interactable_transition_to_normal_system.h"
 #include "gui/systems/interactable_transition_to_pressed_system.h"
 #include "gui/systems/interactable_transition_to_released_system.h"
+#include "gui/systems/register_entities_system.h"
 
-namespace rendering::gui {
+namespace gui {
     void GUIModule::register_components(flecs::world &world) {
         world.component<Text>();
         world.component<Outline>();
         world.component<Font>();
         world.set<FontAtlas>({
             std::unordered_map<int, Font>{
-                {FONT_SIZE_16, LoadFontEx("../assets/Spectral-SemiBold.ttf", FONT_SIZE_16, nullptr, 0)},
-                {FONT_SIZE_32, LoadFontEx("../assets/Spectral-SemiBold.ttf", FONT_SIZE_32, nullptr, 0)},
-                {FONT_SIZE_48, LoadFontEx("../assets/Spectral-SemiBold.ttf", FONT_SIZE_48, nullptr, 0)},
-                {FONT_SIZE_64, LoadFontEx("../assets/Spectral-SemiBold.ttf", FONT_SIZE_64, nullptr, 0)},
+                {FONT_SIZE_16, LoadFontEx("assets/Spectral-SemiBold.ttf", FONT_SIZE_16, nullptr, 0)},
+                {FONT_SIZE_32, LoadFontEx("assets/Spectral-SemiBold.ttf", FONT_SIZE_32, nullptr, 0)},
+                {FONT_SIZE_48, LoadFontEx("assets/Spectral-SemiBold.ttf", FONT_SIZE_48, nullptr, 0)},
+                {FONT_SIZE_64, LoadFontEx("assets/Spectral-SemiBold.ttf", FONT_SIZE_64, nullptr, 0)},
             }
         });
     }
 
     void GUIModule::register_systems(flecs::world &world) {
         world.system().kind(flecs::OnStart).run(systems::load_style_system);
+        //world.system().kind(flecs::OnStart).run(systems::register_entities_system);
 
-        world.system<core::GameSettings>("On start set move gui elements to match anchors")
+        world.system<rendering::Settings>("On start set move gui elements to match anchors")
                 .kind(flecs::OnStart)
                 .with(flecs::Disabled).optional()
                 .each(systems::set_gui_canvas_size_system);
@@ -101,51 +103,51 @@ namespace rendering::gui {
                 .kind(flecs::PreFrame)
                 .each(systems::interactable_transition_to_released_system);
 
-        world.system<core::GameSettings>("Window Resized")
+        world.system<rendering::Settings>("Window Resized")
                 .kind(flecs::PreFrame)
                 .each(systems::check_window_resized_system);
 
         world.system<const Panel, const Rectangle>("Draw Panel")
-                .kind<RenderGUI>()
+                .kind<rendering::RenderGUI>()
                 .each(systems::draw_panel_system);
 
         world.system<const TexturedElement, const InteractableElement, const Rectangle>("Draw textured interactable")
                 .with<InteractableElementState>(flecs::Wildcard)
-                .kind<RenderGUI>()
+                .kind<rendering::RenderGUI>()
                 .each(systems::draw_interactable_textured_element_system);
 
 
         world.system<const Text, const Rectangle, const InteractableElement*, const FontAtlas>("Draw Text")
-                .kind<RenderGUI>()
+                .kind<rendering::RenderGUI>()
                 .term_at(3).singleton()
                 .each(systems::draw_text_system);
 
         world.system<const Rectangle, const Outline>("Draw Outline")
-                .kind<RenderGUI>()
+                .kind<rendering::RenderGUI>()
                 .each(systems::draw_outline_system);
 
         world.system<const Rectangle, ProgressBar>("Draw Progress bar")
-                .kind<RenderGUI>()
+                .kind<rendering::RenderGUI>()
                 .each(systems::draw_progress_bar_system);
 
         world.system<MenuBar>("Draw Menu Bar")
-                .kind<RenderGUI>()
+                .kind<rendering::RenderGUI>()
                 .each(systems::draw_menu_bar_system);
 
         world.system<MenuBarTab, MenuBar>("Draw Tabs")
                 .term_at(1).parent()
-                .kind<RenderGUI>()
+                .kind<rendering::RenderGUI>()
                 .each(systems::draw_menu_bar_tab_system);
 
         world.system<MenuBarTabItem, MenuBarTab, Rectangle>("Draw Tab Items")
                 .term_at(1).parent()
                 .term_at(2).parent()
-                .kind<RenderGUI>()
+                .kind<rendering::RenderGUI>()
                 .each(systems::draw_menu_bar_tab_item_system);
 
         world.system<const ButtonCallback>("On Button clicked")
                 .with<InteractableElementState>(Released)
-                .kind<RenderGUI>()
+                .kind<rendering::RenderGUI>()
                 .each(systems::invoke_button_callback_system);
 
         world.system<const Rectangle>()
@@ -155,8 +157,8 @@ namespace rendering::gui {
     }
 
     void GUIModule::register_entities(flecs::world &world) {
-        auto panel_texture = LoadTexture("../assets/panel-010.png");
-        auto button_texture = LoadTexture("../assets/panel-009.png");
+        auto panel_texture = LoadTexture("assets/panel-010.png");
+        auto button_texture = LoadTexture("assets/panel-009.png");
         panel_prefab = world.prefab().set<Panel>({
             panel_texture,
             {{0, 0, (float) panel_texture.width, (float) panel_texture.height}, 16, 16, 16, 16, NPATCH_NINE_PATCH}
@@ -197,4 +199,4 @@ namespace rendering::gui {
 
 
     }
-} // namespace rendering::gui
+} // namespace gui

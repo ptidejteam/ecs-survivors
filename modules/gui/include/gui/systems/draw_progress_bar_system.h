@@ -9,7 +9,7 @@
 #include <raylib.h>
 #include "gui/gui_module.h"
 
-namespace rendering::gui::systems {
+namespace gui::systems {
     inline void draw_progress_bar_system(const Rectangle &rec, ProgressBar bar) {
         GuiProgressBar(rec, std::to_string((int) bar.current_val).c_str(),
                        std::to_string((int) bar.max_val).c_str(),

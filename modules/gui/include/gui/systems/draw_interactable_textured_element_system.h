@@ -10,7 +10,7 @@
 #include "gui/components.h"
 
 
-namespace rendering::gui::systems {
+namespace gui::systems {
     inline void draw_interactable_textured_element_system(flecs::entity e, const TexturedElement& tex, const InteractableElement& inter,
                                    const Rectangle &rect) {
         Color tint;

@@ -24,6 +24,10 @@ namespace physics {
         // ... more
     };
 
+    struct Settings {
+        Vector2 world_bounds;
+    };
+
     struct Velocity2D {
         Vector2 value;
     };

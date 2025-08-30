@@ -20,9 +20,10 @@ namespace physics::systems {
         std::vector<CollisionRecord> collisions;
         std::vector<CollisionRecord> events;
         flecs::world stage_world = self_it.world();
+        std::cout << "coll" << std::endl;
 
         // Build a staged query, and filter
-        auto visible_query = stage_world.query_builder<const core::Position2D, const Collider>();
+        auto visible_query = stage_world.query_builder<const core::Position2D, const Collider>().without<StaticCollider>().build();
         flecs::entity self = self_it.entity(self_id);
 
         visible_query.each(
@@ -43,6 +44,7 @@ namespace physics::systems {
                 };
 
                 if (CheckCollisionRecs(self_rec, other_rec)) {
+                    std::cout << "coll" << std::endl;
                     collisions.push_back({self, other});
                 }
             });

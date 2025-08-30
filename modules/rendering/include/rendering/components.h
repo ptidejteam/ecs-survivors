@@ -19,6 +19,14 @@ namespace rendering {
         Color tint;
     };
 
+    struct Settings {
+        std::string window_name;
+        int initial_width;
+        int initial_height;
+        int window_width;
+        int window_height;
+    };
+
     struct TrackingCamera {
         flecs::entity target;
         Camera2D camera {0};

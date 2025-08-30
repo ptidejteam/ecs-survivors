@@ -1,16 +1,16 @@
-add_library(gui_game
+add_library(gui
         src/gui_module.cpp
 )
 
 # Public headers (installed/consumed by others)
-target_include_directories(gui_game
+target_include_directories(gui
         PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>  # during build
         $<INSTALL_INTERFACE:include>                            # when installed
 )
 
 # Link to dependencies
-target_link_libraries(gui_game PUBLIC
+target_link_libraries(gui PUBLIC
         base
         core
         rendering
@@ -20,4 +20,4 @@ target_link_libraries(gui_game PUBLIC
 )
 
 # Set C++ standard just in case
-target_compile_features(gui_game PUBLIC cxx_std_20)
+target_compile_features(gui PUBLIC cxx_std_20)

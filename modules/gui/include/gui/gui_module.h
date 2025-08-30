@@ -6,14 +6,11 @@
 #define GUI_MODULE_H
 
 #include <raylib.h>
-#include <raygui.h>
 
-#include "components.h"
 #include "base/base_module.h"
 #include "flecs.h"
-#include "core/core_module.h"
 
-namespace rendering::gui {
+namespace gui {
     class GUIModule : public BaseModule<GUIModule> {
     public:
         // do not add implementation to the constructor

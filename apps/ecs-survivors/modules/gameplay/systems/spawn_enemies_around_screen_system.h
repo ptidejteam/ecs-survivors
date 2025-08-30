@@ -14,7 +14,7 @@ namespace gameplay::systems {
     inline bool outside_side_switch = false;
 
     inline void spawn_enemies_around_screen_system(flecs::iter &iter, size_t i, const Spawner &spawner,
-                                                   const core::GameSettings &settings,
+                                                   const rendering::Settings &settings,
                                                    const rendering::TrackingCamera &camera) {
         if(iter.world().get<core::Paused>().paused) return;
         for (int i = 0; i < 1; i++) {

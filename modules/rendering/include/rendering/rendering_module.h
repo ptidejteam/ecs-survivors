@@ -7,11 +7,11 @@
 
 #include <flecs.h>
 #include "base/base_module.h"
-
 namespace rendering {
     class RenderingModule: public BaseModule<RenderingModule> {
     public:
-        RenderingModule(flecs::world world): BaseModule(world) {}
+        RenderingModule(flecs::world world): BaseModule(world) {
+        }
 
     private:
         void register_components(flecs::world world);

@@ -57,6 +57,25 @@ if (NOT flecs_FOUND) # If there's none, fetch and build flecs
     endif ()
 endif ()
 
+set(IMGUI_VERSION 1.92.2)
+FetchContent_Declare(
+        imgui
+        URL https://github.com/ocornut/imgui/archive/refs/tags/v${IMGUI_VERSION}-docking.tar.gz
+)
+FetchContent_MakeAvailable(imgui)
+add_library(imgui STATIC
+        ${imgui_SOURCE_DIR}/imgui.cpp
+        ${imgui_SOURCE_DIR}/imgui_demo.cpp
+        ${imgui_SOURCE_DIR}/imgui_draw.cpp
+        ${imgui_SOURCE_DIR}/imgui_tables.cpp
+        ${imgui_SOURCE_DIR}/imgui_widgets.cpp
+)
+target_include_directories(imgui PUBLIC
+        ${imgui_SOURCE_DIR}
+        ${imgui_SOURCE_DIR}/backends)
+
+target_link_libraries(imgui PUBLIC raylib)
+
 # Our Project
 add_library(raygui INTERFACE)
 
@@ -71,16 +90,21 @@ add_subdirectory("modules/input")
 add_subdirectory("modules/physics")
 add_subdirectory("modules/rendering")
 add_subdirectory("modules/gui")
+add_subdirectory("modules/editor")
 add_subdirectory("modules/tilemap")
+
 set(TMXLITE_STATIC_LIB ON)
 add_subdirectory("external/tmxlite/tmxlite")
+target_link_libraries(tilemap PRIVATE
+        tmxlite
+)
+
+add_subdirectory("external/rlImGui")
+
 
 #add_subdirectory("include")
 add_subdirectory("apps")
 
 
-target_link_libraries(tilemap PRIVATE
-        tmxlite
-)
 
 

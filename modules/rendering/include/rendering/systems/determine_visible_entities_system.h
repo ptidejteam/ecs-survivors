@@ -8,7 +8,7 @@
 namespace rendering::systems {
     inline void determine_visible_entities_system(flecs::entity e, const core::Position2D &pos,
                                                   const Renderable &renderable,
-                                                  const core::GameSettings &settings,
+                                                  const Settings &settings,
                                                   const TrackingCamera& camera) {
         //if (!camera.target.is_alive()) return;
         if (pos.value.x - camera.camera.target.x > settings.window_width * 1.05f + renderable.texture.width - camera.camera.offset.x|| pos.value.x - camera.camera.target.x + settings.window_width * 0.05f < -renderable.texture.

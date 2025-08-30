@@ -10,15 +10,17 @@
 
 #include "rendering/components.h"
 
-#include "pipeline_steps.h"
+#include "gui/components.h"
+#include "gui/gui_module.h"
 #include "physics/physics_module.h"
 #include "physics/pipeline_steps.h"
-#include "gui/gui_module.h"
+#include "pipeline_steps.h"
 #include "systems/add_bounce_system.h"
 #include "systems/add_chain_system.h"
 #include "systems/add_multiproj_system.h"
 #include "systems/add_pierce_system.h"
 #include "systems/add_split_system.h"
+#include "systems/check_if_dead_system.h"
 #include "systems/create_health_bar_system.h"
 #include "systems/deal_damage_on_collision_system.h"
 #include "systems/decrement_bounce_system.h"
@@ -26,6 +28,7 @@
 #include "systems/decrement_multiproj_system.h"
 #include "systems/decrement_pierce_system.h"
 #include "systems/fire_projectile_system.h"
+#include "systems/give_experience_system.h"
 #include "systems/increment_bounce_system.h"
 #include "systems/increment_chain_system.h"
 #include "systems/increment_multiproj_system.h"
@@ -47,8 +50,6 @@
 #include "systems/take_damage_system.h"
 #include "systems/update_cooldown_system.h"
 #include "systems/update_health_bar_system.h"
-#include "systems/check_if_dead_system.h"
-#include "systems/give_experience_system.h"
 
 namespace gameplay {
     void GameplayModule::register_components(flecs::world world) {
@@ -58,7 +59,7 @@ namespace gameplay {
     void GameplayModule::register_systems(flecs::world world) {
         m_spawner_tick = world.timer().interval(spawner_interval);
 
-        spawn_system = world.system<const Spawner, const core::GameSettings, const rendering::TrackingCamera>("Spawn Enemies")
+        spawn_system = world.system<const Spawner, const rendering::Settings, const rendering::TrackingCamera>("Spawn Enemies")
                 .tick_source(m_spawner_tick)
                 .term_at(1).singleton()
                 .term_at(2).singleton()
@@ -304,71 +305,71 @@ namespace gameplay {
     }
 
     void GameplayModule::register_entities(flecs::world world) {
-        auto dropdown = world.entity("gameplay_dropdown").child_of(rendering::gui::GUIModule::menu_bar)
-                .set<rendering::gui::MenuBarTab>({"Gameplay Tools", 25}).disable();
+        auto dropdown = world.entity("gameplay_dropdown").child_of(gui::GUIModule::menu_bar)
+                .set<gui::MenuBarTab>({"Gameplay Tools", 25}).disable();
 
         world.entity().child_of(dropdown)
-                .set<rendering::gui::MenuBarTabItem>({
-                    "Add Multi Proj", add_multiproj, rendering::gui::MenuBarTabItemType::RUN
+                .set<gui::MenuBarTabItem>({
+                    "Add Multi Proj", add_multiproj, gui::MenuBarTabItemType::RUN
                 });
         world.entity().child_of(dropdown)
-                .set<rendering::gui::MenuBarTabItem>({
-                    "Remove Multi Proj", remove_multiproj, rendering::gui::MenuBarTabItemType::RUN
+                .set<gui::MenuBarTabItem>({
+                    "Remove Multi Proj", remove_multiproj, gui::MenuBarTabItemType::RUN
                 });
         world.entity().child_of(dropdown)
-                .set<rendering::gui::MenuBarTabItem>({"+1 Proj", add_proj, rendering::gui::MenuBarTabItemType::RUN});
+                .set<gui::MenuBarTabItem>({"+1 Proj", add_proj, gui::MenuBarTabItemType::RUN});
         world.entity().child_of(dropdown)
-                .set<rendering::gui::MenuBarTabItem>({"-1 Proj", remove_proj, rendering::gui::MenuBarTabItemType::RUN});
+                .set<gui::MenuBarTabItem>({"-1 Proj", remove_proj, gui::MenuBarTabItemType::RUN});
         world.entity().child_of(dropdown)
-                .set<rendering::gui::MenuBarTabItem>(
-                    {"Add Pierce", add_pierce, rendering::gui::MenuBarTabItemType::RUN});
+                .set<gui::MenuBarTabItem>(
+                    {"Add Pierce", add_pierce, gui::MenuBarTabItemType::RUN});
         world.entity().child_of(dropdown)
-                .set<rendering::gui::MenuBarTabItem>({
-                    "Remove Pierce", remove_pierce, rendering::gui::MenuBarTabItemType::RUN
+                .set<gui::MenuBarTabItem>({
+                    "Remove Pierce", remove_pierce, gui::MenuBarTabItemType::RUN
                 });
         world.entity().child_of(dropdown)
-                .set<rendering::gui::MenuBarTabItem>({
-                    "+1 Pierce", add_pierce_amt, rendering::gui::MenuBarTabItemType::RUN
+                .set<gui::MenuBarTabItem>({
+                    "+1 Pierce", add_pierce_amt, gui::MenuBarTabItemType::RUN
                 });
         world.entity().child_of(dropdown)
-                .set<rendering::gui::MenuBarTabItem>({
-                    "-1 Pierce", remove_pierce_amt, rendering::gui::MenuBarTabItemType::RUN
+                .set<gui::MenuBarTabItem>({
+                    "-1 Pierce", remove_pierce_amt, gui::MenuBarTabItemType::RUN
                 });
         world.entity().child_of(dropdown)
-                .set<rendering::gui::MenuBarTabItem>({"Add Chain", add_chain, rendering::gui::MenuBarTabItemType::RUN});
+                .set<gui::MenuBarTabItem>({"Add Chain", add_chain, gui::MenuBarTabItemType::RUN});
         world.entity().child_of(dropdown)
-                .set<rendering::gui::MenuBarTabItem>({
-                    "Remove Chain", remove_chain, rendering::gui::MenuBarTabItemType::RUN
+                .set<gui::MenuBarTabItem>({
+                    "Remove Chain", remove_chain, gui::MenuBarTabItemType::RUN
                 });
         world.entity().child_of(dropdown)
-                .set<rendering::gui::MenuBarTabItem>({
-                    "+1 Chain", add_chain_amt, rendering::gui::MenuBarTabItemType::RUN
+                .set<gui::MenuBarTabItem>({
+                    "+1 Chain", add_chain_amt, gui::MenuBarTabItemType::RUN
                 });
         world.entity().child_of(dropdown)
-                .set<rendering::gui::MenuBarTabItem>({
-                    "-1 Chain", remove_chain_amt, rendering::gui::MenuBarTabItemType::RUN
+                .set<gui::MenuBarTabItem>({
+                    "-1 Chain", remove_chain_amt, gui::MenuBarTabItemType::RUN
                 });
         world.entity().child_of(dropdown)
-                .set<rendering::gui::MenuBarTabItem>({"Add Split", add_split, rendering::gui::MenuBarTabItemType::RUN});
+                .set<gui::MenuBarTabItem>({"Add Split", add_split, gui::MenuBarTabItemType::RUN});
         world.entity().child_of(dropdown)
-                .set<rendering::gui::MenuBarTabItem>({
-                    "Remove Split", remove_split, rendering::gui::MenuBarTabItemType::RUN
+                .set<gui::MenuBarTabItem>({
+                    "Remove Split", remove_split, gui::MenuBarTabItemType::RUN
                 });
         world.entity().child_of(dropdown)
-                .set<rendering::gui::MenuBarTabItem>({
-                    "Add Bounce", add_bounce, rendering::gui::MenuBarTabItemType::RUN
+                .set<gui::MenuBarTabItem>({
+                    "Add Bounce", add_bounce, gui::MenuBarTabItemType::RUN
                 });
         world.entity().child_of(dropdown)
-                .set<rendering::gui::MenuBarTabItem>({
-                    "Remove Bounce", remove_bounce, rendering::gui::MenuBarTabItemType::RUN
+                .set<gui::MenuBarTabItem>({
+                    "Remove Bounce", remove_bounce, gui::MenuBarTabItemType::RUN
                 });
         world.entity().child_of(dropdown)
-                .set<rendering::gui::MenuBarTabItem>({
-                    "+1 Bounce", add_bounce_amt, rendering::gui::MenuBarTabItemType::RUN
+                .set<gui::MenuBarTabItem>({
+                    "+1 Bounce", add_bounce_amt, gui::MenuBarTabItemType::RUN
                 });
         world.entity().child_of(dropdown)
-                .set<rendering::gui::MenuBarTabItem>({
-                    "-1 Bounce", remove_bounce_amt, rendering::gui::MenuBarTabItemType::RUN
+                .set<gui::MenuBarTabItem>({
+                    "-1 Bounce", remove_bounce_amt, gui::MenuBarTabItemType::RUN
                 });
     }
 

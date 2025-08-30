@@ -9,7 +9,7 @@
 
 #include "gui/components.h"
 
-namespace rendering::gui::systems {
+namespace gui::systems {
     inline void interactable_transition_to_pressed_system(flecs::iter &it, size_t i, const Rectangle &rec) {
         if (!CheckCollisionPointRec(GetMousePosition(), rec)) {
             it.entity(i).add<InteractableElementState>(Normal);

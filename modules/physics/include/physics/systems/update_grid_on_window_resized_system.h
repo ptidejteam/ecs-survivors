@@ -13,7 +13,7 @@
 #include "physics/components.h"
 
 namespace physics::systems {
-    inline void reset_grid(flecs::iter &it, size_t i, SpatialHashingGrid &hashing_grid, core::GameSettings &settings) {
+    inline void reset_grid(flecs::iter &it, size_t i, SpatialHashingGrid &hashing_grid, Settings &settings) {
         for (auto cell: hashing_grid.cells) {
             cell.second.destruct();
         }
@@ -22,7 +22,7 @@ namespace physics::systems {
     }
 
     inline void update_grid_on_window_resized_system(flecs::iter &it, size_t i, SpatialHashingGrid &hashing_grid,
-                                                     core::GameSettings &settings) {
+                                                     Settings &settings) {
         if (IsWindowResized()) {
             reset_grid(it, i, hashing_grid, settings);
         }

@@ -40,24 +40,31 @@ namespace physics {
     void PhysicsModule::register_systems(flecs::world &world) {
         m_physicsTick = world.timer().interval(PHYSICS_TICK_LENGTH);
 
-        world.system<SpatialHashingGrid, core::GameSettings>("init grid")
+        world.system<Settings>().term_at(0).singleton().kind(flecs::OnStart).each([world] (flecs::iter &iter, size_t, Settings& settings) {
+            Vector2 min_bounds;
+            Vector2 max_bounds;
+
+        });
+
+
+        world.system<SpatialHashingGrid, Settings>("init grid")
                 .term_at(0).singleton()
                 .term_at(1).singleton()
                 .kind(flecs::OnStart)
                 .each(systems::init_spatial_hashing_grid_system);
 
-        world.system<SpatialHashingGrid, core::GameSettings>("update grid on window resized")
+        world.system<SpatialHashingGrid, Settings>("update grid on window resized")
                 .term_at(0).singleton()
                 .term_at(1).singleton()
                 .kind(flecs::OnUpdate)
                 .each(systems::update_grid_on_window_resized_system);
 
-        world.observer<SpatialHashingGrid, core::GameSettings>("update grid on grid set")
+        world.observer<SpatialHashingGrid, Settings>("update grid on grid set")
                 .term_at(1).singleton()
                 .event(flecs::OnSet)
                 .each(systems::reset_grid);
 
-        world.system<SpatialHashingGrid,  core::GameSettings, GridCell>("update grid") // TODO change to follow a target, not the camera, physics does not know about cameras.
+        world.system<SpatialHashingGrid, Settings, GridCell>("update grid") // TODO change to follow a target, not the camera, physics does not know about cameras.
                 .term_at(0).singleton()
                 .term_at(1).singleton()
                 .kind(flecs::PreUpdate)

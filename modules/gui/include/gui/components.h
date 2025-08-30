@@ -12,7 +12,7 @@
 
 #include "core/components.h"
 
-namespace rendering::gui {
+namespace gui {
 
     const int FONT_SIZE_16 = 16;
     const int FONT_SIZE_32 = 32;

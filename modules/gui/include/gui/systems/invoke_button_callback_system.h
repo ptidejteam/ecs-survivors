@@ -8,7 +8,7 @@
 #include <flecs.h>
 #include "gui/components.h"
 
-namespace rendering::gui::systems {
+namespace gui::systems {
     inline void invoke_button_callback_system(flecs::entity e, const ButtonCallback &callback) {
         callback.callback();
     }

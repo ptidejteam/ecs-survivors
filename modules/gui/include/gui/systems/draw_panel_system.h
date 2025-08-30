@@ -6,7 +6,7 @@
 #define DRAW_PANEL_SYSTEM_H
 #include "gui/components.h"
 
-namespace rendering::gui::systems {
+namespace gui::systems {
     inline void draw_panel_system(const Panel &panel, const Rectangle &rect) {
         // GuiDrawRectangle(
         //     rect,

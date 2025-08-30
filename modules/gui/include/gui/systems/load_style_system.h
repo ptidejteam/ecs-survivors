@@ -7,9 +7,9 @@
 
 #include <flecs.h>
 
-namespace rendering::gui::systems {
+namespace gui::systems {
     inline void load_style_system(flecs::iter &iter) {
-        GuiLoadStyle("../assets/styles/style_amber.rgs");
+        GuiLoadStyle("assets/styles/style_amber.rgs");
         //GuiSetFont(iter.world().get<FontAtlas>().fonts.at(FONT_SIZE_64));
     }
 }

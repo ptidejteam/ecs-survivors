@@ -9,7 +9,7 @@
 #include "gui/components.h"
 #include "gui/gui_module.h"
 
-namespace rendering::gui::systems {
+namespace gui::systems {
     inline void draw_text_system(flecs::entity e, const Text &text, const Rectangle &rect, const InteractableElement *inter, const FontAtlas &fonts) {
         Vector2 pos;
         Vector2 text_size = MeasureTextEx(fonts.fonts.at(text.font_size), text.text.c_str(), text.font_size, 0);

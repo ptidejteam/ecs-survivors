@@ -9,10 +9,10 @@
 #include <raylib.h>
 
 #include "set_gui_canvas_size_system.h"
-#include "core/components.h"
+#include "rendering/components.h"
 
-namespace rendering::gui::systems {
-    inline void check_window_resized_system(flecs::entity e, core::GameSettings &settings) {
+namespace gui::systems {
+    inline void check_window_resized_system(flecs::entity e, rendering::Settings &settings) {
         if (IsWindowResized()) {
             set_gui_canvas_size_system(settings);
 #ifdef EMSCRIPTEN
