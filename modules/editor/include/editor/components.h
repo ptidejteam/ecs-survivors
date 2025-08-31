@@ -4,7 +4,12 @@
 
 #ifndef EDITOR_COMPONENTS_H
 #define EDITOR_COMPONENTS_H
+#include <string>
 namespace editor {
+    struct Window {
+        std::string name;
+    };
 
+    struct Inspector {};
 }
 #endif // EDITOR_COMPONENTS_H

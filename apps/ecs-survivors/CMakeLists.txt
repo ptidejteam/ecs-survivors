@@ -1,9 +1,5 @@
 add_executable(ecs-survivors "main.cpp"
-        "game.cpp"
-        "modules/gameplay/gameplay_module.cpp"
-        "modules/debug/debug_module.cpp"
-        "modules/player/player_module.cpp"
-        "modules/ai/ai_module.cpp")
+        "game.cpp")
 
 add_custom_target(copy_to_survivors ALL
         COMMAND ${CMAKE_COMMAND} -E copy_directory
@@ -20,6 +16,10 @@ target_link_libraries(ecs-survivors PUBLIC
         rendering
         gui
         tilemap
+        ai
+        debugging
+        gameplay
+        player
         raylib
         raygui
         flecs::flecs_static)

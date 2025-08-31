@@ -17,6 +17,8 @@ namespace editor {
 
         void register_entities(flecs::world &world);
 
+        void register_pipeline(flecs::world &world);
+
 
         friend class BaseModule<EditorModule>;
     };

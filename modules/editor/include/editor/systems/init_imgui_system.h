@@ -76,8 +76,12 @@ namespace editor::systems {
         style.ScrollbarSize = 16.0f;
         ImGuiIO& io = ImGui::GetIO();
         io.Fonts->Clear();
-        io.Fonts->AddFontFromFileTTF("assets/CormorantGaramond-Bold.ttf", 18.0f);
+        io.Fonts->AddFontFromFileTTF("assets/Roboto-Regular.ttf", 18.0f);
         rlImGuiEndInitImGui();
+
+#ifdef IMGUI_HAS_DOCK
+        ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+#endif
     }
 }
 #endif // ECS_SURVIVORS_SET_IMGUI_STYLE_H

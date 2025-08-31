@@ -7,10 +7,11 @@
 
 namespace rendering {
     struct PreRender{};
-    struct RenderBackground{};
+    struct RenderStart{};
+    struct RenderObjects{};
     struct RenderGizmos{};
-    struct Render{};
     struct RenderGUI{};
+    struct RenderEnd{};
     struct PostRender{};
 }
 

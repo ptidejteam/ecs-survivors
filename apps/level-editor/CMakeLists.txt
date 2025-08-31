@@ -8,13 +8,16 @@ add_custom_target(copy_resources ALL
 
 add_dependencies(level-editor copy_resources)
 
-
 target_link_libraries(level-editor PUBLIC
         core
         input
         rendering
         gui
-        editor
         tilemap
+        ai
+        gameplay
+        debugging
+        player
         raylib
+        editor
         flecs::flecs_static)

@@ -1,0 +1,10 @@
+add_subdirectory("base")
+add_subdirectory("core")
+add_subdirectory("input")
+add_subdirectory("physics")
+add_subdirectory("rendering")
+add_subdirectory("gui")
+add_subdirectory("editor")
+add_subdirectory("tilemap")
+
+add_subdirectory("ecs-survivors")

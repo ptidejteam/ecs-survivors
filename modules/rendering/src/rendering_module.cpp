@@ -31,20 +31,14 @@ void rendering::RenderingModule::register_queries(flecs::world world) {
 
 void rendering::RenderingModule::register_systems(flecs::world world) {
 
-    world.system<TrackingCamera>("on start begin camera mode")
+    world.system<TrackingCamera>("on start init camera")
             .term_at(0)
             .singleton()
             .kind(flecs::OnStart)
             .each(systems::create_camera_system);
 
     world.system("Before Draw").kind<PreRender>().run(systems::begin_drawing_system);
-    world.system<TrackingCamera, Settings>("begin camera mode")
-            .term_at(0)
-            .singleton()
-            .term_at(1)
-            .singleton()
-            .kind<PreRender>()
-            .each(systems::update_and_begin_camera_mode_system);
+
 
     world.system<const core::Position2D, const Renderable, const Settings, const TrackingCamera>(
                  "Determine Visible Entities")
@@ -57,8 +51,20 @@ void rendering::RenderingModule::register_systems(flecs::world world) {
             .multi_threaded()
             .each(systems::determine_visible_entities_system);
 
+    world.system<const Viewport>("draw on viewport")
+        .kind<RenderStart>().each([] (const Viewport& vp) {
+            BeginTextureMode(vp.render_target);
+        });
+
+    world.system<TrackingCamera, Settings>("begin camera mode")
+                .term_at(0)
+                .singleton()
+                .term_at(1)
+                .singleton()
+                .kind<RenderStart>()
+                .each(systems::update_and_begin_camera_mode_system);
     world.system<const Renderable>("Draw Background Textures")
-            .kind<RenderBackground>()
+            .kind<RenderStart>()
             .without<core::Position2D>()
             .with<Priority>()
             .order_by<Priority>([](flecs::entity_t e1, const Priority *p1, flecs::entity_t e2, const Priority *p2) {
@@ -70,7 +76,7 @@ void rendering::RenderingModule::register_systems(flecs::world world) {
             .each(systems::draw_background_textures_system);
 
     world.system<const Renderable, const core::Position2D, const Rotation *>("Draw Entities with Textures")
-            .kind<Render>()
+            .kind<RenderObjects>()
             .with<Visible>()
             .with<Priority>()
             .order_by<Priority>([](flecs::entity_t e1, const Priority *p1, flecs::entity_t e2, const Priority *p2) {
@@ -87,21 +93,26 @@ void rendering::RenderingModule::register_systems(flecs::world world) {
             .parent()
             .term_at(3)
             .parent()
-            .kind<Render>()
+            .kind<RenderObjects>()
             .each(systems::draw_health_bar_system);
 
-    world.system("end camera mode").kind<RenderGUI>().run(systems::end_camera_mode_system);
+
+    world.system("end camera mode").kind<RenderGizmos>().run(systems::end_camera_mode_system);
+    world.system<const Viewport>().kind<RenderEnd>().each([] (const Viewport&) {
+       EndTextureMode();
+    });
 
     world.system("After Draw").kind<PostRender>().run(systems::end_drawing_system);
 }
 
 void rendering::RenderingModule::register_pipeline(flecs::world world) {
     world.component<PreRender>().add(flecs::Phase).depends_on(flecs::OnStore);
-    world.component<RenderBackground>().add(flecs::Phase).depends_on<PreRender>();
-    world.component<Render>().add(flecs::Phase).depends_on<RenderBackground>();
-    world.component<RenderGizmos>().add(flecs::Phase).depends_on<Render>();
+    world.component<RenderStart>().add(flecs::Phase).depends_on<PreRender>();
+    world.component<RenderObjects>().add(flecs::Phase).depends_on<RenderStart>();
+    world.component<RenderGizmos>().add(flecs::Phase).depends_on<RenderObjects>();
     world.component<RenderGUI>().add(flecs::Phase).depends_on<RenderGizmos>();
-    world.component<PostRender>().add(flecs::Phase).depends_on<RenderGUI>();
+    world.component<RenderEnd>().add(flecs::Phase).depends_on<RenderGUI>();
+    world.component<PostRender>().add(flecs::Phase).depends_on<RenderEnd>();
 }
 
 void rendering::RenderingModule::register_submodules(flecs::world world) {}

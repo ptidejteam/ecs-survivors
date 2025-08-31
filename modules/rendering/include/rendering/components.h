@@ -5,6 +5,7 @@
 #ifndef RENDERING_COMPONENTS_H
 #define RENDERING_COMPONENTS_H
 
+#include <flecs.h>
 #include <raylib.h>
 #include <core/components.h>
 
@@ -30,6 +31,14 @@ namespace rendering {
     struct TrackingCamera {
         flecs::entity target;
         Camera2D camera {0};
+    };
+
+    struct Viewport {
+        RenderTexture render_target;
+        int initial_width;
+        int initial_height;
+        int width;
+        int height;
     };
 
     struct Rotation {

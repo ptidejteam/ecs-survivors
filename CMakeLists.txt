@@ -84,14 +84,7 @@ target_include_directories(raygui
 )
 
 #add_subdirectory("src")
-add_subdirectory("modules/base")
-add_subdirectory("modules/core")
-add_subdirectory("modules/input")
-add_subdirectory("modules/physics")
-add_subdirectory("modules/rendering")
-add_subdirectory("modules/gui")
-add_subdirectory("modules/editor")
-add_subdirectory("modules/tilemap")
+add_subdirectory("modules")
 
 set(TMXLITE_STATIC_LIB ON)
 add_subdirectory("external/tmxlite/tmxlite")

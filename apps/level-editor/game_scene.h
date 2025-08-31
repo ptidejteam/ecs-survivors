@@ -2,8 +2,8 @@
 // Created by laurent on 8/30/25.
 //
 
-#ifndef GAME_SCENE_H
-#define GAME_SCENE_H
+#ifndef TEST_GAME_SCENE_H
+#define TEST_GAME_SCENE_H
 
 #include <raygui.h>
 #include <raylib.h>
@@ -291,4 +291,4 @@ public:
         container.add<core::Close>();
     }
 };
-#endif // GAME_SCENE_H
+#endif // TEST_GAME_SCENE_H

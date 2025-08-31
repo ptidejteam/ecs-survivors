@@ -11,19 +11,18 @@
 #endif
 
 #include <flecs.h>
-#include <raygui.h>
 #include <raylib.h>
 #include <thread>
 
 #include "core/components.h"
 #include "core/core_module.h"
 #include "input/input_module.h"
-#include "modules/ai/ai_module.h"
-#include "modules/player/player_module.h"
+#include "ai/ai_module.h"
+#include "player/player_module.h"
 #include "physics/components.h"
 #include "physics/physics_module.h"
 
-#include "modules/gameplay/gameplay_module.h"
+#include "gameplay/gameplay_module.h"
 #include "rendering/components.h"
 #include "rendering/rendering_module.h"
 #include "tilemap/tilemap_module.h"
@@ -31,7 +30,7 @@
 #include "gui/components.h"
 #include "gui/gui_module.h"
 
-#include "modules/debug/debug_module.h"
+#include "debugging/debug_module.h"
 
 #include "game_scene.h"
 
@@ -41,11 +40,7 @@ Game::Game(const char *windowName, int windowWidth, int windowHeight) :
 void Game::init() {
 
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
-    //#endif
-
-
     InitWindow(m_window_width, m_window_height, m_window_name.c_str());
-
     SetExitKey(KEY_F4);
 
 #ifndef EMSCRIPTEN
@@ -55,6 +50,7 @@ void Game::init() {
     m_world.set_threads(static_cast<int>(std::thread::hardware_concurrency()));
 #endif
 
+    // import modules
     m_world.import <core::CoreModule>();
     m_world.import <input::InputModule>();
     m_world.import <rendering::RenderingModule>();
@@ -64,18 +60,18 @@ void Game::init() {
     m_world.import <player::PlayerModule>();
     m_world.import <ai::AIModule>();
     m_world.import <gameplay::GameplayModule>();
-    m_world.import <debug::DebugModule>();
+    m_world.import <debugging::DebugModule>();
 
 
+    //configure settings
     m_world.set<rendering::Settings>({m_window_name, m_window_width, m_window_height, m_window_width, m_window_height});
-
-
     m_world.set<physics::Settings>({(float) m_window_width, (float) m_window_height});
     m_world.add<physics::CollisionRecordList>();
     m_world.set<physics::SpatialHashingGrid>({48, {0, 0}});
     m_world.set<core::Paused>({false});
     m_world.set<core::EnabledMenus>({0});
 
+    // load whatever you need
     game_scene = new GameScene();
     game_scene->load(m_world);
 
