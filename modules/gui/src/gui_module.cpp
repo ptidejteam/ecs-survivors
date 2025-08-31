@@ -44,10 +44,10 @@ namespace gui {
         world.component<Font>();
         world.set<FontAtlas>({
             std::unordered_map<int, Font>{
-                {FONT_SIZE_16, LoadFontEx("assets/Spectral-SemiBold.ttf", FONT_SIZE_16, nullptr, 0)},
-                {FONT_SIZE_32, LoadFontEx("assets/Spectral-SemiBold.ttf", FONT_SIZE_32, nullptr, 0)},
-                {FONT_SIZE_48, LoadFontEx("assets/Spectral-SemiBold.ttf", FONT_SIZE_48, nullptr, 0)},
-                {FONT_SIZE_64, LoadFontEx("assets/Spectral-SemiBold.ttf", FONT_SIZE_64, nullptr, 0)},
+                {FONT_SIZE_16, LoadFontEx("../../assets/Spectral-SemiBold.ttf", FONT_SIZE_16, nullptr, 0)},
+                {FONT_SIZE_32, LoadFontEx("../../assets/Spectral-SemiBold.ttf", FONT_SIZE_32, nullptr, 0)},
+                {FONT_SIZE_48, LoadFontEx("../../assets/Spectral-SemiBold.ttf", FONT_SIZE_48, nullptr, 0)},
+                {FONT_SIZE_64, LoadFontEx("../../assets/Spectral-SemiBold.ttf", FONT_SIZE_64, nullptr, 0)},
             }
         });
     }
@@ -157,8 +157,8 @@ namespace gui {
     }
 
     void GUIModule::register_entities(flecs::world &world) {
-        auto panel_texture = LoadTexture("assets/panel-010.png");
-        auto button_texture = LoadTexture("assets/panel-009.png");
+        auto panel_texture = LoadTexture("../../assets/panel-010.png");
+        auto button_texture = LoadTexture("../../assets/panel-009.png");
         panel_prefab = world.prefab().set<Panel>({
             panel_texture,
             {{0, 0, (float) panel_texture.width, (float) panel_texture.height}, 16, 16, 16, 16, NPATCH_NINE_PATCH}

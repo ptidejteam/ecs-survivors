@@ -40,7 +40,7 @@ public:
                                        })
                                        .set<physics::CircleCollider>({24})
                                        .set<rendering::Priority>({2})
-                                       .set<rendering::Renderable>({LoadTexture("assets/player.png"), // 8x8
+                                       .set<rendering::Renderable>({LoadTexture("../../assets/player.png"), // 8x8
                                                                     {0, 0},
                                                                     3.f,
                                                                     WHITE})
@@ -71,7 +71,7 @@ public:
                 })
                 .set<physics::CircleCollider>({18})
                 .set<rendering::Priority>({1})
-                .set<rendering::Renderable>({LoadTexture("assets/dagger.png"), // 8x8
+                .set<rendering::Renderable>({LoadTexture("../../assets/dagger.png"), // 8x8
                                              {0, 0},
                                              3.f,
                                              WHITE})
@@ -109,7 +109,7 @@ public:
                                                                physics::enemy_filter,
                                                                physics::ColliderType::Circle})
                                       .set<physics::CircleCollider>({24})
-                                      .set<rendering::Renderable>({LoadTexture("assets/ghost.png"), // 8x8
+                                      .set<rendering::Renderable>({LoadTexture("../../assets/ghost.png"), // 8x8
                                                                    {0, 0},
                                                                    3.f,
                                                                    WHITE})
@@ -117,7 +117,7 @@ public:
 
         auto spawner = world.entity("enemy_spawner").set<gameplay::Spawner>({enemy, 1});
 
-        world.entity("tilemap_1").set<tilemap::Tilemap>({"assets/tiled/maps/sampleMap.tmx", 3.0f});
+        world.entity("tilemap_1").set<tilemap::Tilemap>({"../../assets/tiled/maps/sampleMap.tmx", 3.0f});
 
         world.set<rendering::TrackingCamera>({player, Camera2D{0}});
 
