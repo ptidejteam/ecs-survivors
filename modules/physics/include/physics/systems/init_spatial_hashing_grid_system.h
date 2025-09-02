@@ -14,6 +14,8 @@
 namespace physics::systems {
     inline void init_spatial_hashing_grid_system(flecs::iter &it, size_t i, SpatialHashingGrid &hashing_grid,
                                                  Settings &settings) {
+                std::cout << "physics" << std::endl;
+
         for (int y = -1; y < std::ceil(settings.world_bounds.y / (float) hashing_grid.cell_size) + 1;
              y++) {
             for (int x = -1; x < std::ceil(settings.world_bounds.x /  (float) hashing_grid.cell_size) + 1; x++) {

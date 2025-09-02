@@ -18,7 +18,7 @@
 
 #include <flecs.h>
 
-#include "../../modules/ecs-survivors/player/include/player/player_module.h"
+#include "player/player_module.h"
 #include "ai/ai_module.h"
 #include "core/core_module.h"
 #include "debugging/components.h"
@@ -54,26 +54,26 @@ int main(int argc, char* argv[])
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     InitWindow(screenWidth, screenHeight, "LaeVo - Editor");
 
-    SetExitKey(KEY_F4);
+    SetExitKey(KEY_NULL);
     flecs::world world;
 
 #ifndef EMSCRIPTEN
     // use the flecs explorer when not on browser
     world.import <flecs::stats>();
-    world.set<flecs::Rest>({});
+	world.set<flecs::Rest>({});
 #endif
 
-    world.import<core::CoreModule>();
-    world.import<input::InputModule>();
-    world.import<rendering::RenderingModule>();
-    world.import<physics::PhysicsModule>();
-    world.import<tilemap::TilemapModule>();
-    world.import<gui::GUIModule>();
-    world.import<editor::EditorModule>();
-    world.import<player::PlayerModule>();
-    world.import<gameplay::GameplayModule>();
-    world.import<ai::AIModule>();
-    world.import<debugging::DebugModule>();
+	world.import<core::CoreModule>();
+	world.import<rendering::RenderingModule>();
+	world.import<gui::GUIModule>();
+	world.import<physics::PhysicsModule>();
+	world.import<tilemap::TilemapModule>();
+	world.import<input::InputModule>();
+	world.import<player::PlayerModule>();
+	world.import<ai::AIModule>();
+	world.import<gameplay::GameplayModule>();
+	world.import<debugging::DebugModule>();
+	world.import<editor::EditorModule>();
 
 
 	// do not set the FLAG_WINDOW_HIGHDPI flag, that scales a low res framebuffer up to the native resolution.
@@ -86,17 +86,17 @@ int main(int argc, char* argv[])
     world.set<core::Paused>({false});
     world.set<core::EnabledMenus>({0});
 
+	rendering::RenderingModule::main_viewport.remove<rendering::Viewport>();
+	rendering::RenderingModule::main_viewport
+		.set<rendering::VirtualViewport>({0,0, 1920, 1080})
+		.set<editor::Window>({"Game View"});
+
     // load whatever you need
-    auto game_scene = GameScene();
-    game_scene.load(world);
+    auto game_scene = new GameScene();
+    game_scene->load(world);
 
-    world.entity().set<rendering::Viewport>({
-            LoadRenderTexture(1920, 1080),
-            0,0,
-            1920, 1080
-        }).set<editor::Window>({"Game View"});
 
-    world.entity().set<editor::Window>({"Inspector"}).add<editor::Inspector>();
+	world.entity().set<editor::Window>({"Inspector"}).add<editor::Inspector>();
 
     world.progress();
 
@@ -106,6 +106,8 @@ int main(int argc, char* argv[])
 	    world.progress(GetFrameTime());
 	}
 	rlImGuiShutdown();
+
+	//delete game_scene;
 
 	// De-Initialization
 	//--------------------------------------------------------------------------------------   

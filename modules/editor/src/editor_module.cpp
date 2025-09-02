@@ -22,27 +22,30 @@ void editor::EditorModule::register_systems(flecs::world &world) {
 #endif
     });
 
-    world.system<rendering::Viewport, Window>("draw viewport window")
+    world.system<rendering::VirtualViewport, Window>("draw viewport window")
             .kind<RenderEditor>()
-            .each([world](flecs::entity e, rendering::Viewport &viewport, Window &window) {
+            .each([world](flecs::entity e, rendering::VirtualViewport &viewport, Window &window) {
                 if (ImGui::Begin(window.name.c_str())) {
-
                     auto pos = ImGui::GetCursorScreenPos();
                     viewport.rect.x = pos.x;
                     viewport.rect.y = pos.y;
 
-                    auto a = ImGui::GetContentRegionAvail();
-                    if (viewport.render_target.texture.width != a.x || viewport.render_target.texture.height != a.y) {
+                    auto content_size = ImGui::GetContentRegionAvail();
+                    rlImGuiImageRenderTexture(&viewport.render_target);
+
+                    if (IsWindowResized() || viewport.render_target.texture.width != content_size.x || viewport.render_target.texture.height != content_size.y) {
+                        std::cout << viewport.render_target.texture.width << "," << content_size.x << std::endl;
+                        std::cout << viewport.render_target.texture.height << "," << content_size.y << std::endl;
                         UnloadRenderTexture(viewport.render_target);
-                        viewport.render_target = LoadRenderTexture(a.x, a.y);
-                        world.event(flecs::OnSet).id<rendering::Viewport>().entity(e).emit();
-                        world.get_mut<rendering::Settings>().window_width = a.x;
-                        world.get_mut<rendering::Settings>().window_height = a.y;
+                        viewport.render_target = LoadRenderTexture(content_size.x, content_size.y);
+                        viewport.rect.width = content_size.x;
+                        viewport.rect.height = content_size.y;
+                        world.event(flecs::OnSet).id<rendering::VirtualViewport>().entity(e).emit();
                     }
 
-                    rlImGuiImageRenderTexture(&viewport.render_target);
                 }
                 ImGui::End();
+
             });
 
     world.system<Window>("draw inspector window")

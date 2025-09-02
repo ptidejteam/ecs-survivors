@@ -9,9 +9,9 @@
 #include "gui/components.h"
 
 namespace gui::systems {
-    inline void draw_menu_bar_system(MenuBar &bar, rendering::Settings& settings) {
+    inline void draw_menu_bar_system(flecs::entity e, MenuBar &bar, Rectangle& rec) {
         GuiDrawRectangle(
-            {0, 0, (float) settings.window_width, (float) 25},
+            {0, 0, rec.width, (float) 25},
             bar.border_size,
             GetColor(GuiGetStyle(DEFAULT, BORDER_COLOR_NORMAL)),
             GetColor(GuiGetStyle(DEFAULT, BACKGROUND_COLOR)));

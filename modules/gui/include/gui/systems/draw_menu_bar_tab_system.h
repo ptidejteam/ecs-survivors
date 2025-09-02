@@ -11,9 +11,9 @@
 #include "gui/components.h"
 
 namespace gui::systems {
-    inline void draw_menu_bar_tab_system(flecs::iter &it, size_t i, MenuBarTab &tab, MenuBar &bar, rendering::Settings &settings) {
+    inline void draw_menu_bar_tab_system(flecs::iter &it, size_t i, MenuBarTab &tab, MenuBar &bar, Rectangle &rect) {
         Rectangle rec = {
-            settings.window_width - (float) (i + 1) * bar.item_width, 0, (float) bar.item_width, (float) 25
+            rect.width - (float) (i + 1) * bar.item_width, 0, (float) bar.item_width, (float) 25
         };
 
         if(!it.entity(i).has<Rectangle>()) {

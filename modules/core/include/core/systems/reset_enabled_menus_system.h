@@ -10,6 +10,8 @@
 namespace core::systems {
     inline void reset_enabled_menus_system(EnabledMenus& menus) {
         menus.count = 0;
+        std::cout << "core" << std::endl;
+
     }
 }
 

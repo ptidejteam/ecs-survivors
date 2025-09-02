@@ -18,12 +18,13 @@
 #include "physics/components.h"
 #include "physics/physics_module.h"
 #include "rendering/components.h"
+#include "rendering/rendering_module.h"
 #include "tilemap/components.h"
 class GameScene : public core::Scene {
 public:
     ~GameScene() override = default;
     void load(flecs::world &world) override {
-        flecs::entity player = world.entity("player")
+        flecs::entity player = world.entity("player").child_of(rendering::RenderingModule::main_viewport)
                                        .set<core::Tag>({"player"})
                                        .set<core::Position2D>({2300.0f, 1300.0f})
                                        .set<core::Speed>({300})
@@ -40,7 +41,7 @@ public:
                                        })
                                        .set<physics::CircleCollider>({24})
                                        .set<rendering::Priority>({2})
-                                       .set<rendering::Renderable>({LoadTexture("assets/player.png"), // 8x8
+                                       .set<rendering::Renderable>({LoadTexture("../../assets/player.png"), // 8x8
                                                                     {0, 0},
                                                                     3.f,
                                                                     WHITE})
@@ -71,7 +72,7 @@ public:
                 })
                 .set<physics::CircleCollider>({18})
                 .set<rendering::Priority>({1})
-                .set<rendering::Renderable>({LoadTexture("assets/dagger.png"), // 8x8
+                .set<rendering::Renderable>({LoadTexture("../../assets/dagger.png"), // 8x8
                                              {0, 0},
                                              3.f,
                                              WHITE})
@@ -109,15 +110,15 @@ public:
                                                                physics::enemy_filter,
                                                                physics::ColliderType::Circle})
                                       .set<physics::CircleCollider>({24})
-                                      .set<rendering::Renderable>({LoadTexture("assets/ghost.png"), // 8x8
+                                      .set<rendering::Renderable>({LoadTexture("../../assets/ghost.png"), // 8x8
                                                                    {0, 0},
                                                                    3.f,
                                                                    WHITE})
                                       .set<rendering::Priority>({0});
 
-        auto spawner = world.entity("enemy_spawner").set<gameplay::Spawner>({enemy, 1});
+        auto spawner = world.entity("enemy_spawner").child_of(rendering::RenderingModule::main_viewport).set<gameplay::Spawner>({enemy, 1});
 
-        world.entity("tilemap_1").set<tilemap::Tilemap>({"assets/tiled/maps/sampleMap.tmx", 3.0f});
+        world.entity("tilemap_1").set<tilemap::Tilemap>({"../../assets/tiled/maps/sampleMap.tmx", 3.0f});
 
         world.set<rendering::TrackingCamera>({player, Camera2D{0}});
 
@@ -145,22 +146,19 @@ public:
                                   .is_a(gui::GUIModule::panel_prefab)
                                   .set<Rectangle>({-150, -200, 300, 400})
                                   .set<gui::Anchor>({gui::CENTER, gui::MIDDLE})
-                                  .add<core::PauseOnEnabled>()
-                                  .disable();
+                                  .add<core::PauseOnEnabled>().disable();
 
         pause_menu.child()
                 .set<Rectangle>({-150, 5, 300, 50})
                 .set<gui::Anchor>({gui::CENTER, gui::TOP})
-                .set<gui::Text>({"Paused", gui::FONT_SIZE_48, TEXT_ALIGN_CENTER, gui::GUIModule::font_color()})
-                .disable();
+                .set<gui::Text>({"Paused", gui::FONT_SIZE_48, TEXT_ALIGN_CENTER, gui::GUIModule::font_color()}).disable();
 
         flecs::entity resume_btn =
                 pause_menu.child()
                         .is_a(gui::GUIModule::button_prefab)
                         .set<Rectangle>({-125, -135, 250, 50})
                         .set<gui::Anchor>({gui::HORIZONTAL_ANCHOR::CENTER, gui::VERTICAL_ANCHOR::BOTTOM})
-                        .set<gui::ButtonCallback>({[pause_menu] { pause_menu.add<core::Close>(); }})
-                        .disable();
+                        .set<gui::ButtonCallback>({[pause_menu] { pause_menu.add<core::Close>(); }}).disable();
 
         resume_btn.get_mut<gui::Text>().text = "Resume Game";
 

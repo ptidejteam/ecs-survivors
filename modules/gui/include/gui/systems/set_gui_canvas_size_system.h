@@ -12,9 +12,10 @@
 #include "gui/gui_module.h"
 
 namespace gui::systems {
-    inline void set_gui_canvas_size_system(rendering::Settings& settings) {
+    inline void set_gui_canvas_size_system(flecs::iter& it, size_t, rendering::Viewport& vp) {
+        std::cout << "world updated" << std::endl;
         GUIModule::gui_canvas.set<Rectangle>({
-            0, 0, static_cast<float>(settings.window_width), static_cast<float>(settings.window_width)
+            0, 0, vp.rect.width, vp.rect.height
         });
     }
 }

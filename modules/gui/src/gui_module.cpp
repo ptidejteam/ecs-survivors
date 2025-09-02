@@ -12,7 +12,6 @@
 #include "core/components.h"
 #include "gui/components.h"
 #include "rendering/pipeline_steps.h"
-#include "gui/systems/check_window_resized_system.h"
 #include "gui/systems/draw_interactable_textured_element_system.h"
 #include "gui/systems/draw_menu_bar_system.h"
 #include "gui/systems/draw_menu_bar_tab_item_system.h"
@@ -36,6 +35,7 @@
 #include "gui/systems/interactable_transition_to_pressed_system.h"
 #include "gui/systems/interactable_transition_to_released_system.h"
 #include "gui/systems/register_entities_system.h"
+#include "rendering/rendering_module.h"
 
 namespace gui {
     void GUIModule::register_components(flecs::world &world) {
@@ -55,9 +55,8 @@ namespace gui {
     void GUIModule::register_systems(flecs::world &world) {
         world.system().kind(flecs::OnStart).run(systems::load_style_system);
 
-        world.system<rendering::Settings>("On start set move gui elements to match anchors")
+        world.system<rendering::Viewport>("On start set move gui elements to match anchors")
                 .kind(flecs::OnStart)
-                .with(flecs::Disabled).optional()
                 .each(systems::set_gui_canvas_size_system);
 
         world.system<const Rectangle, Anchor>("on start, set anchored position")
@@ -65,17 +64,32 @@ namespace gui {
                 .with(flecs::Disabled).optional()
                 .each(systems::set_anchored_position_system);
 
-        world.observer<const Rectangle>("parent rectangle changed enabled")
-                .term_at(0).up()
+        world.observer<rendering::Viewport>()
                 .event(flecs::OnSet)
+                .each(systems::set_gui_canvas_size_system);
+
+        world.observer<rendering::ScreenViewport>()
+            .event(flecs::OnSet)
+            .each(systems::set_gui_canvas_size_system);
+
+        world.observer<rendering::VirtualViewport>()
+            .event(flecs::OnSet)
+            .each(systems::set_gui_canvas_size_system);
+
+        // TODO: CRITICAL, need to only update when the screen reso changes, not every frame
+        // Observer is acting weird so I canged to system
+        world.system<const Rectangle>("parent rectangle changed enabled")
+                .term_at(0).up()
+                //.event(flecs::OnSet)
                 .each(systems::on_parent_rectangle_changed_observer);
 
-        world.observer<const Rectangle>("parent rectangle changed disabled")
+        // TODO: CRITICAL, need to only update when the screen reso changes, not every frame
+        // Observer is acting weird so I canged to system
+        world.system<const Rectangle>("parent rectangle changed disabled")
                 .term_at(0).parent()
-                .event(flecs::OnSet)
+                //.event(flecs::OnSet)
                 .with(flecs::Disabled).filter()
                 .each(systems::on_parent_rectangle_changed_disabled_observer);
-
 
         world.observer()
                 .event(flecs::OnAdd)
@@ -89,23 +103,18 @@ namespace gui {
 
         world.system<const Rectangle>()
                 .with<InteractableElementState>(Normal)
-                .kind(flecs::PreFrame)
+                .kind<rendering::RenderGUI>()
                 .each(systems::interactable_transition_to_hovered_system);
 
         world.system<const Rectangle>()
                 .with<InteractableElementState>(Hovered)
-                .kind(flecs::PreFrame)
+            .kind<rendering::RenderGUI>()
                 .each(systems::interactable_transition_to_pressed_system);
 
         world.system<const Rectangle>()
                 .with<InteractableElementState>(Pressed)
-                .kind(flecs::PreFrame)
+        .kind<rendering::RenderGUI>()
                 .each(systems::interactable_transition_to_released_system);
-
-        world.system<rendering::Settings>("Window Resized")
-                .term_at(1).singleton()
-                .kind(flecs::PreFrame)
-                .each(systems::check_window_resized_system);
 
         world.system<const Panel, const Rectangle>("Draw Panel")
                 .kind<rendering::RenderGUI>()
@@ -115,7 +124,6 @@ namespace gui {
                 .with<InteractableElementState>(flecs::Wildcard)
                 .kind<rendering::RenderGUI>()
                 .each(systems::draw_interactable_textured_element_system);
-
 
         world.system<const Text, const Rectangle, const InteractableElement*, const FontAtlas>("Draw Text")
                 .kind<rendering::RenderGUI>()
@@ -130,13 +138,14 @@ namespace gui {
                 .kind<rendering::RenderGUI>()
                 .each(systems::draw_progress_bar_system);
 
-        world.system<MenuBar, rendering::Settings>("Draw Menu Bar")
+        world.system<MenuBar, Rectangle>("Draw Menu Bar")
+                .term_at(1).parent()
                 .kind<rendering::RenderGUI>()
                 .each(systems::draw_menu_bar_system);
 
-        world.system<MenuBarTab, MenuBar, rendering::Settings>("Draw Tabs")
+        world.system<MenuBarTab, MenuBar, Rectangle>("Draw Tabs")
                 .term_at(1).parent()
-                .term_at(2).singleton()
+                .term_at(2).parent()
                 .kind<rendering::RenderGUI>()
                 .each(systems::draw_menu_bar_tab_system);
 
@@ -187,18 +196,19 @@ namespace gui {
 
         //auto w = world.get<rendering::Settings>().window_width;
         //auto h = world.get<rendering::Settings>().window_height;
-        gui_canvas = world.entity("gui_canvas").set<Rectangle>({
+        gui_canvas = world.entity("gui_canvas").child_of(rendering::RenderingModule::main_viewport).set<Rectangle>({
             0, 0, static_cast<float>(1920), static_cast<float>(1080)
         });
 
 
         menu_bar = world.entity("menu_bar")
+                .child_of(gui_canvas)
                 .set<MenuBar>({
                     200,
                     1,
                     GetColor(GuiGetStyle(DEFAULT, LINE_COLOR)),
                     GetColor(GuiGetStyle(BUTTON, BACKGROUND_COLOR)),
-                });
+                }).disable();
 
 
     }

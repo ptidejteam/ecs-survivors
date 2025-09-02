@@ -71,6 +71,8 @@ void Game::init() {
     m_world.set<core::Paused>({false});
     m_world.set<core::EnabledMenus>({0});
 
+    rendering::RenderingModule::main_viewport.remove<rendering::Viewport>();
+    rendering::RenderingModule::main_viewport.set<rendering::ScreenViewport>({0,0, 1920, 1080});
     // load whatever you need
     game_scene = new GameScene();
     game_scene->load(m_world);

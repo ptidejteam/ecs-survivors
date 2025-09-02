@@ -14,19 +14,18 @@ namespace gameplay::systems {
     inline bool outside_side_switch = false;
 
     inline void spawn_enemies_around_screen_system(flecs::iter &iter, size_t i, const Spawner &spawner,
-                                                   const rendering::Settings &settings,
                                                    const rendering::TrackingCamera &camera) {
         if(iter.world().get<core::Paused>().paused) return;
         for (int i = 0; i < 1; i++) {
             float factor = rand() % 2 - 1;
             float neg = rand() % 1 - 1;
             float randX = outside_side_switch
-                              ? neg * factor * (settings.window_width + 200)
-                              : rand() % (settings.window_width + 200);
+                              ? neg * factor * (camera.camera.offset.x * 2 + 200)
+                              : rand() % ((int)camera.camera.offset.x * 2 + 200);
             randX += camera.camera.target.x - camera.camera.offset.x - 100;
             float randY = outside_side_switch
-                              ? rand() % (settings.window_height + 200)
-                              : neg * factor * (settings.window_height + 200);
+                              ? rand() % ((int)camera.camera.offset.y * 2 + 200)
+                              : neg * factor * (camera.camera.offset.y * 2  + 200);
             randY += camera.camera.target.y - camera.camera.offset.y - 100;
             bool is_valid = true;
 

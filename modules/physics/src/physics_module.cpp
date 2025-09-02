@@ -44,6 +44,8 @@ namespace physics {
             Vector2 min_bounds;
             Vector2 max_bounds;
 
+                std::cout << "physics" << std::endl;
+
         });
 
 
@@ -103,7 +105,7 @@ namespace physics {
                 .multi_threaded()
                 .tick_source(m_physicsTick)
                 .each(systems::collision_detection_non_static_system);
-        m_collision_detection_naive_system.disable();
+        //m_collision_detection_naive_system.disable();
 
         // need a second pass to collide static colliders. Even when static objects are out of the screen we compute the collision
         world.system<CollisionRecordList, const core::Position2D, const Collider>(
@@ -123,7 +125,7 @@ namespace physics {
                 .multi_threaded()
                 .tick_source(m_physicsTick)
                 .each(systems::collision_detection_spatial_hashing_system);
-        //m_collision_detection_spatial_hashing_system.disable();
+        m_collision_detection_spatial_hashing_system.disable();
 
         m_collision_detection_spatial_ecs = world.system<CollisionRecordList, SpatialHashingGrid, GridCell>(
                     "test collision with relationship")

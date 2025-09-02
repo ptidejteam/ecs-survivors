@@ -21,7 +21,16 @@
 #include "rendering/systems/update_and_begin_camera_mode_system.h"
 
 
-void rendering::RenderingModule::register_components(flecs::world world) { world.component<Priority>(); }
+void rendering::RenderingModule::register_components(flecs::world world) {
+    world.component<Priority>();
+    auto vp = world.component<Viewport>();
+    world.component<VirtualViewport>().is_a(vp);
+    world.component<ScreenViewport>().is_a(vp);
+}
+
+void rendering::RenderingModule::register_entities(flecs::world world) {
+    main_viewport = world.entity("main_viewport").set<Viewport>({0,0, 1920, 1080});
+}
 
 void rendering::RenderingModule::register_queries(flecs::world world) {
     auto base_query = world.query_builder<Renderable>();
@@ -31,41 +40,46 @@ void rendering::RenderingModule::register_queries(flecs::world world) {
 
 void rendering::RenderingModule::register_systems(flecs::world world) {
 
-    world.system<TrackingCamera, Settings>("on start init camera")
+    world.system<TrackingCamera, Viewport>("on start init camera")
             .term_at(0)
-            .singleton()
-            .term_at(1)
             .singleton()
             .kind(flecs::OnStart)
             .each(systems::create_camera_system);
 
     world.system("Before Draw").kind<PreRender>().run(systems::begin_drawing_system);
 
+    world.system<ScreenViewport>()
+        .kind<PreRender>()
+        .each([world](flecs::entity e, ScreenViewport& svp) {
+        if (IsWindowResized()) {
+            svp.rect.width = GetScreenWidth();
+            svp.rect.height = GetScreenHeight();
+            world.event(flecs::OnSet).id<ScreenViewport>().entity(e).emit();
+        }
+    });
 
-    world.system<const core::Position2D, const Renderable, const Settings, const TrackingCamera>(
+
+    world.system<const core::Position2D, const Renderable, const TrackingCamera>(
                  "Determine Visible Entities")
             .term_at(2)
-            .singleton()
-            .term_at(3)
             .singleton()
             .write<Visible>()
             .kind<PreRender>()
             .multi_threaded()
             .each(systems::determine_visible_entities_system);
 
-    world.system<const Viewport>("draw on viewport")
-        .kind<RenderStart>().each([] (const Viewport& vp) {
+    world.system<const VirtualViewport>("draw on viewport")
+        .kind<RenderStart>().each([] (const VirtualViewport& vp) {
             BeginTextureMode(vp.render_target);
             SetMouseOffset(-vp.rect.x, -vp.rect.y);
         });
 
-    world.system<TrackingCamera, Settings>("begin camera mode")
+    world.system<TrackingCamera, Viewport>("begin camera mode")
                 .term_at(0)
-                .singleton()
-                .term_at(1)
                 .singleton()
                 .kind<RenderStart>()
                 .each(systems::update_and_begin_camera_mode_system);
+
     world.system<const Renderable>("Draw Background Textures")
             .kind<RenderStart>()
             .without<core::Position2D>()
@@ -101,8 +115,9 @@ void rendering::RenderingModule::register_systems(flecs::world world) {
 
 
     world.system("end camera mode").kind<RenderGizmos>().run(systems::end_camera_mode_system);
-    world.system<const Viewport>().kind<RenderEnd>().each([] (const Viewport&) {
-       EndTextureMode();
+    world.system<const VirtualViewport>().kind<RenderEnd>().each([] (const VirtualViewport& vp) {
+        SetMouseOffset(0, 0);
+        EndTextureMode();
     });
 
     world.system("After Draw").kind<PostRender>().run(systems::end_drawing_system);

@@ -59,10 +59,11 @@ namespace gameplay {
     void GameplayModule::register_systems(flecs::world world) {
         m_spawner_tick = world.timer().interval(spawner_interval);
 
-        spawn_system = world.system<const Spawner, const rendering::Settings, const rendering::TrackingCamera>("Spawn Enemies")
+
+        // TODO: need to redo this logic since removing the global rendering settings
+        spawn_system = world.system<const Spawner, const rendering::TrackingCamera>("Spawn Enemies")
                 .tick_source(m_spawner_tick)
                 .term_at(1).singleton()
-                .term_at(2).singleton()
                 .each(systems::spawn_enemies_around_screen_system);
 
         world.system<Cooldown>("Update Cooldown")

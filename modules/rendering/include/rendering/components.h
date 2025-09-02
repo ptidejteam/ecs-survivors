@@ -34,8 +34,13 @@ namespace rendering {
     };
 
     struct Viewport {
-        RenderTexture render_target;
         Rectangle rect;
+    };
+
+    struct ScreenViewport : Viewport {};
+
+    struct VirtualViewport : Viewport {
+        RenderTexture render_target;
     };
 
     struct Rotation {

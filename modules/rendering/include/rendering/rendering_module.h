@@ -12,9 +12,10 @@ namespace rendering {
     public:
         RenderingModule(flecs::world world): BaseModule(world) {
         }
-
+        inline static flecs::entity main_viewport;
     private:
         void register_components(flecs::world world);
+        void register_entities(flecs::world world);
         void register_queries(flecs::world world);
         void register_systems(flecs::world world);
         void register_pipeline(flecs::world world);
