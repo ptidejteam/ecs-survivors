@@ -24,9 +24,23 @@ void editor::EditorModule::register_systems(flecs::world &world) {
 
     world.system<rendering::Viewport, Window>("draw viewport window")
             .kind<RenderEditor>()
-            .each([](rendering::Viewport &viewport, Window &window) {
+            .each([world](flecs::entity e, rendering::Viewport &viewport, Window &window) {
                 if (ImGui::Begin(window.name.c_str())) {
-                    rlImGuiImageRenderTextureFit(&viewport.render_target, true);
+
+                    auto pos = ImGui::GetCursorScreenPos();
+                    viewport.rect.x = pos.x;
+                    viewport.rect.y = pos.y;
+
+                    auto a = ImGui::GetContentRegionAvail();
+                    if (viewport.render_target.texture.width != a.x || viewport.render_target.texture.height != a.y) {
+                        UnloadRenderTexture(viewport.render_target);
+                        viewport.render_target = LoadRenderTexture(a.x, a.y);
+                        world.event(flecs::OnSet).id<rendering::Viewport>().entity(e).emit();
+                        world.get_mut<rendering::Settings>().window_width = a.x;
+                        world.get_mut<rendering::Settings>().window_height = a.y;
+                    }
+
+                    rlImGuiImageRenderTexture(&viewport.render_target);
                 }
                 ImGui::End();
             });

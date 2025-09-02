@@ -51,9 +51,10 @@ int main(int argc, char* argv[])
 	//--------------------------------------------------------------------------------------
 	int screenWidth = 1920;
 	int screenHeight = 1080;
-    SetConfigFlags(FLAG_MSAA_4X_HINT | FLAG_VSYNC_HINT | FLAG_WINDOW_RESIZABLE);
+    SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     InitWindow(screenWidth, screenHeight, "LaeVo - Editor");
-    SetTargetFPS(144);
+
+    SetExitKey(KEY_F4);
     flecs::world world;
 
 #ifndef EMSCRIPTEN
@@ -91,7 +92,7 @@ int main(int argc, char* argv[])
 
     world.entity().set<rendering::Viewport>({
             LoadRenderTexture(1920, 1080),
-            1920, 1080,
+            0,0,
             1920, 1080
         }).set<editor::Window>({"Game View"});
 

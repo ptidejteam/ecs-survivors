@@ -31,8 +31,10 @@ void rendering::RenderingModule::register_queries(flecs::world world) {
 
 void rendering::RenderingModule::register_systems(flecs::world world) {
 
-    world.system<TrackingCamera>("on start init camera")
+    world.system<TrackingCamera, Settings>("on start init camera")
             .term_at(0)
+            .singleton()
+            .term_at(1)
             .singleton()
             .kind(flecs::OnStart)
             .each(systems::create_camera_system);
@@ -54,6 +56,7 @@ void rendering::RenderingModule::register_systems(flecs::world world) {
     world.system<const Viewport>("draw on viewport")
         .kind<RenderStart>().each([] (const Viewport& vp) {
             BeginTextureMode(vp.render_target);
+            SetMouseOffset(-vp.rect.x, -vp.rect.y);
         });
 
     world.system<TrackingCamera, Settings>("begin camera mode")

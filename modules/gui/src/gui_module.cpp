@@ -54,7 +54,6 @@ namespace gui {
 
     void GUIModule::register_systems(flecs::world &world) {
         world.system().kind(flecs::OnStart).run(systems::load_style_system);
-        //world.system().kind(flecs::OnStart).run(systems::register_entities_system);
 
         world.system<rendering::Settings>("On start set move gui elements to match anchors")
                 .kind(flecs::OnStart)
@@ -104,6 +103,7 @@ namespace gui {
                 .each(systems::interactable_transition_to_released_system);
 
         world.system<rendering::Settings>("Window Resized")
+                .term_at(1).singleton()
                 .kind(flecs::PreFrame)
                 .each(systems::check_window_resized_system);
 
@@ -130,12 +130,13 @@ namespace gui {
                 .kind<rendering::RenderGUI>()
                 .each(systems::draw_progress_bar_system);
 
-        world.system<MenuBar>("Draw Menu Bar")
+        world.system<MenuBar, rendering::Settings>("Draw Menu Bar")
                 .kind<rendering::RenderGUI>()
                 .each(systems::draw_menu_bar_system);
 
-        world.system<MenuBarTab, MenuBar>("Draw Tabs")
+        world.system<MenuBarTab, MenuBar, rendering::Settings>("Draw Tabs")
                 .term_at(1).parent()
+                .term_at(2).singleton()
                 .kind<rendering::RenderGUI>()
                 .each(systems::draw_menu_bar_tab_system);
 
@@ -184,8 +185,10 @@ namespace gui {
                 .add<InteractableElementState>(Normal);
 
 
+        //auto w = world.get<rendering::Settings>().window_width;
+        //auto h = world.get<rendering::Settings>().window_height;
         gui_canvas = world.entity("gui_canvas").set<Rectangle>({
-            0, 0, static_cast<float>(GetScreenWidth()), static_cast<float>(GetScreenHeight())
+            0, 0, static_cast<float>(1920), static_cast<float>(1080)
         });
 
 

@@ -35,10 +35,7 @@ namespace rendering {
 
     struct Viewport {
         RenderTexture render_target;
-        int initial_width;
-        int initial_height;
-        int width;
-        int height;
+        Rectangle rect;
     };
 
     struct Rotation {

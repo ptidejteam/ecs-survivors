@@ -68,7 +68,7 @@ namespace debugging {
         debug_mouse_pos = world.system("Draw Mouse Position")
                 .kind<rendering::RenderGUI>()
                 .run(systems::debug_mouse_position_system);
-        debug_mouse_pos.disable();
+        //debug_mouse_pos.disable();
 
         debug_grid = world.system<rendering::TrackingCamera, physics::SpatialHashingGrid, physics::GridCell>("Draw Grid")
                 .term_at(0).singleton()

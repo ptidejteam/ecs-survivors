@@ -40,7 +40,7 @@ namespace gui::systems {
 
 
         GUIModule::gui_canvas = world.entity("gui_canvas").set<Rectangle>({
-            0, 0, static_cast<float>(GetScreenWidth()), static_cast<float>(GetScreenHeight())
+            0, 0, static_cast<float>(world.get<rendering::Settings>().window_height)
         });
 
 

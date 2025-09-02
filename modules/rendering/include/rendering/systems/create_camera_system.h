@@ -7,10 +7,10 @@
 #include "rendering/components.h"
 
 namespace rendering::systems {
-    inline void create_camera_system(TrackingCamera &camera) {
+    inline void create_camera_system(TrackingCamera &camera, Settings &settings) {
         if (!camera.target.is_alive()) return;
         camera.camera.target = camera.target.get<core::Position2D>().value;
-        camera.camera.offset = {GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f};
+        camera.camera.offset = {settings.window_width / 2.0f, settings.window_height / 2.0f};
         camera.camera.zoom = 1.0f;
         camera.camera.rotation = 0;
     }
