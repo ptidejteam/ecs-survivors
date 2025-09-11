@@ -25,6 +25,7 @@ namespace physics {
     inline flecs::system m_collision_detection_spatial_hashing_system;
     inline flecs::system m_collision_detection_spatial_ecs;
     inline flecs::system m_collision_detection_naive_system;
+    inline static flecs::entity cell_container;
 
     class PhysicsModule : public BaseModule<PhysicsModule> {
         friend class BaseModule<PhysicsModule>;

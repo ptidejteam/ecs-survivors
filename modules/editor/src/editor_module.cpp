@@ -6,9 +6,14 @@
 
 #include "editor/components.h"
 #include "editor/pipeline_steps.h"
+#include "editor/systems/draw_entities_inspector_system.h"
 #include "editor/systems/init_imgui_system.h"
 #include "rendering/components.h"
 #include "rendering/pipeline_steps.h"
+
+inline void draw_tree(flecs::entity e) {
+
+}
 
 void editor::EditorModule::register_components(flecs::world &world) {}
 
@@ -30,6 +35,8 @@ void editor::EditorModule::register_systems(flecs::world &world) {
                                                                       // we can see the raylib contents behind the dockspace
 #endif
     });
+
+
 
     world.system<rendering::VirtualViewport, Window>("draw viewport window")
             .kind<RenderEditor>()
@@ -58,8 +65,9 @@ void editor::EditorModule::register_systems(flecs::world &world) {
                 ImGui::End();
             });
 
-    world.system<Window>("draw inspector window").with<Inspector>().kind<RenderEditor>().each([](Window &window) {
+    world.system<Window>("draw inspector window").with<Inspector>().kind<RenderEditor>().each([world](Window &window) {
         if (ImGui::Begin(window.name.c_str())) {
+            world.children(systems::draw_entities_inspector_system);
         }
         ImGui::End();
     });

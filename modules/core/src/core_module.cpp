@@ -21,10 +21,17 @@
 
 namespace core {
     void CoreModule::register_components(flecs::world &world) {
-        world.component<Position2D>();
-        world.component<Speed>();
-        world.component<Tag>();
-        world.component<DestroyAfterTime>();
+        world.component<Vector2>()
+            .member<float>("x")
+            .member<float>("y");
+        world.component<Position2D>()
+            .member<Vector2>("value");
+        world.component<Speed>()
+            .member<float>("value");
+        world.component<Tag>()
+            .member<std::string>("name");
+        world.component<DestroyAfterTime>()
+            .member<float>("time");
         world.component<DestroyAfterFrame>();
     }
 
@@ -83,7 +90,7 @@ namespace core {
 
         world.system(
                     "Remove empty tables to avoid fragmentation in collision (CHANGE TO DONTFRAGMENT WHEN FEATURE IS OUT)")
-                .interval(0.25f)
+                //.interval(0.25f)
                 .kind(flecs::PostFrame)
                 .run([world](flecs::iter &it) { systems::remove_empty_tables_system(world); });
     }

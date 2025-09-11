@@ -250,7 +250,7 @@ public:
 
         auto o1 = container.child()
                           .is_a<gui::ButtonPrefab>()
-                          .set_name("Option 1")
+                          .set_alias("Option 1")
                           .set<Rectangle>({-162.5, 5, 325, 40})
                           .set<gui::Anchor>({gui::CENTER, gui::TOP})
                           .set<gui::ButtonCallback>({[level_up_menu] {

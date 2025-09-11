@@ -67,27 +67,27 @@ namespace gui {
 
         world.observer<rendering::VirtualViewport>().event(flecs::OnSet).each(systems::set_gui_canvas_size_system);
 
-        // TODO: CRITICAL, need to only update when the screen reso changes, not every frame
-        // Observer is acting weird so I canged to system
-        world.system<const Rectangle>("parent rectangle changed enabled")
-                .term_at(0)
-                .up()
-                //.event(flecs::OnSet)
-                .each(systems::on_parent_rectangle_changed_observer);
+        // // TODO: CRITICAL, need to only update when the screen reso changes, not every frame
+        // // Observer is acting weird so I canged to system
+        // world.system<const Rectangle>("parent rectangle changed enabled")
+        //         .term_at(0)
+        //         .up()
+        //         //.event(flecs::OnSet)
+        //         .each(systems::on_parent_rectangle_changed_observer);
+        //
+        // // TODO: CRITICAL, need to only update when the screen reso changes, not every frame
+        // // Observer is acting weird so I canged to system
+        // world.system<const Rectangle>("parent rectangle changed disabled")
+        //         .term_at(0)
+        //         .parent()
+        //         //.event(flecs::OnSet)
+        //         .with(flecs::Disabled)
+        //         .filter()
+        //         .each(systems::on_parent_rectangle_changed_disabled_observer);
 
-        // TODO: CRITICAL, need to only update when the screen reso changes, not every frame
-        // Observer is acting weird so I canged to system
-        world.system<const Rectangle>("parent rectangle changed disabled")
-                .term_at(0)
-                .parent()
-                //.event(flecs::OnSet)
-                .with(flecs::Disabled)
-                .filter()
-                .each(systems::on_parent_rectangle_changed_disabled_observer);
-
-        world.observer().event(flecs::OnAdd).with(flecs::Disabled).each(systems::disable_children_on_disable_system);
-
-        world.observer().event(flecs::OnRemove).with(flecs::Disabled).each(systems::enable_children_on_enable_system);
+        // world.observer().event(flecs::OnAdd).with(flecs::Disabled).each(systems::disable_children_on_disable_system);
+        //
+        // world.observer().event(flecs::OnRemove).with(flecs::Disabled).each(systems::enable_children_on_enable_system);
 
 
         world.system<const Rectangle>().with<InteractableElementState>(Normal).kind<rendering::RenderGUI>().each(
@@ -113,31 +113,7 @@ namespace gui {
                             .with(flecs::ChildOf, e)
                             .build()
                             .each(systems::draw_element_heirarchy_system);
-                });
-
-        // world.system<const Panel, const Rectangle>("Draw Panel")
-        //         .kind<rendering::RenderGUI>()
-        //         .each(systems::draw_panel_system);
-        //
-        // world.system<const TexturedElement, const InteractableElement*, const Rectangle>("Draw textured
-        // interactable")
-        //         .with<InteractableElementState>(flecs::Wildcard)
-        //         .kind<rendering::RenderGUI>()
-        //         .each(systems::draw_interactable_textured_element_system);
-        //
-        // world.system<const Text, const Rectangle, const InteractableElement *, const FontAtlas>("Draw Text")
-        //         .kind<rendering::RenderGUI>()
-        //         .term_at(3)
-        //         .singleton()
-        //         .each(systems::draw_text_system);
-        //
-        // world.system<const Rectangle, const Outline>("Draw Outline")
-        //         .kind<rendering::RenderGUI>()
-        //         .each(systems::draw_outline_system);
-
-        // world.system<const Rectangle, ProgressBar>("Draw Progress bar")
-        //         .kind<rendering::RenderGUI>()
-        //         .each(systems::draw_progress_bar_system);
+                }).disable();
 
         world.system<MenuBar, Rectangle>("Draw Menu Bar")
                 .term_at(1)
@@ -180,10 +156,10 @@ namespace gui {
                 .set<TexturedElement>({ColorAlpha(BLACK, 0.8),
                                        panel_texture,
                                        {{0, 0, (float) panel_texture.width, (float) panel_texture.height},
-                                        16,
-                                        16,
-                                        16,
-                                        16,
+                                        24,
+                                        24,
+                                        24,
+                                        24,
                                         NPATCH_NINE_PATCH}});
 
         world.prefab<ButtonPrefab>()
@@ -205,7 +181,7 @@ namespace gui {
                 .set<GUIElement>({TEXT})
                 .set<Text>({"Hello World", FONT_SIZE_32, TEXT_ALIGN_CENTER, DARKGRAY})
                 .set<Anchor>({LEFT, TOP})
-                .set<Rectangle>({0, 0, 0, 0});
+                .set<Rectangle>({0, 0, 100, 40});
 
         world.prefab<ProgressBarPrefab>()
                 .set<GUIElement>({PROGRESS_BAR})

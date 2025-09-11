@@ -61,6 +61,8 @@ int main(int argc, char* argv[])
     // use the flecs explorer when not on browser
     world.import <flecs::stats>();
 	world.set<flecs::Rest>({});
+
+    //world.set_threads(4);
 #endif
 
 	world.import<core::CoreModule>();
@@ -93,11 +95,11 @@ int main(int argc, char* argv[])
 		.set<editor::Window>({"Game View"});
 
     // load whatever you need
-    auto game_scene = new GameScene();
-    game_scene->load(world);
+    GameScene game_scene;
+    game_scene.load(world);
 
 
-	world.entity().set<editor::Window>({"Inspector"}).add<editor::Inspector>();
+	world.entity().set<editor::Window>({"Hierarchy"}).add<editor::Inspector>();
 
     world.progress();
 

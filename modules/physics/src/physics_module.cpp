@@ -38,16 +38,8 @@ namespace physics {
     }
 
     void PhysicsModule::register_systems(flecs::world &world) {
-        m_physicsTick = world.timer().interval(PHYSICS_TICK_LENGTH);
-
-        world.system<Settings>().term_at(0).singleton().kind(flecs::OnStart).each([world] (flecs::iter &iter, size_t, Settings& settings) {
-            Vector2 min_bounds;
-            Vector2 max_bounds;
-
-                std::cout << "physics" << std::endl;
-
-        });
-
+        m_physicsTick = world.timer().interval(PHYSICS_TICK_LENGTH).set_name("physics tick");
+        cell_container = world.entity("cell_container");
 
         world.system<SpatialHashingGrid, Settings>("init grid")
                 .term_at(0).singleton()
