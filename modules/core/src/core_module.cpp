@@ -83,7 +83,7 @@ namespace core {
 
         world.system(
                     "Remove empty tables to avoid fragmentation in collision (CHANGE TO DONTFRAGMENT WHEN FEATURE IS OUT)")
-                //.interval(0.25f)
+                .interval(0.25f)
                 .kind(flecs::PostFrame)
                 .run([world](flecs::iter &it) { systems::remove_empty_tables_system(world); });
     }

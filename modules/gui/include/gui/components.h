@@ -19,6 +19,16 @@ namespace gui {
     const int FONT_SIZE_48 = 48;
     const int FONT_SIZE_64 = 64;
 
+    enum GUI_ELEMENT_TYPE {
+        TEXT,
+        OUTLINE,
+        TEXTURED_ELEMENT,
+        PROGRESS_BAR,
+    };
+    struct GUIElement {
+        GUI_ELEMENT_TYPE type;
+    };
+
     enum InteractableElementState {
         Normal,
         Hovered,
@@ -33,6 +43,7 @@ namespace gui {
     };
 
     struct TexturedElement {
+        Color tint;
         Texture2D texture;
         NPatchInfo info;
     };
@@ -57,15 +68,13 @@ namespace gui {
         Color border_color;
         Color fill_color;
     };
-
-
-
-    struct Panel {
-        Texture2D texture;
-        NPatchInfo info;
+    struct ProgressBar {
+        float min_val;
+        float max_val;
+        float current_val;
     };
 
-    struct MenuBar {
+    struct MenuBar{
         int item_width;
         int border_size;
         Color border_color;
@@ -118,11 +127,7 @@ namespace gui {
         };
     };
 
-    struct ProgressBar {
-        float min_val;
-        float max_val;
-        float current_val;
-    };
+
 
     struct WindowResizedEvent{};
 }

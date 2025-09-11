@@ -19,8 +19,7 @@ namespace gui {
 
 
         inline static flecs::entity gui_canvas;
-        inline static flecs::entity button_prefab;
-        inline static flecs::entity panel_prefab;
+
         inline static flecs::entity menu_bar;
 
         static Color font_color() { return LIGHTGRAY; }

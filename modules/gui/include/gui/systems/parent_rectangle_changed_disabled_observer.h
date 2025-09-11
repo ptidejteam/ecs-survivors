@@ -8,6 +8,8 @@
 #include <flecs.h>
 #include <raylib.h>
 
+#include "parent_rectangle_changed_observer.h"
+
 namespace gui::systems {
     inline void on_parent_rectangle_changed_disabled_observer(flecs::entity e, const Rectangle &rec) {
        // std::cout << e.parent().name() << std::endl;

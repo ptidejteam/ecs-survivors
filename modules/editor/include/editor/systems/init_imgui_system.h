@@ -77,7 +77,7 @@ namespace editor::systems {
         style.ScrollbarSize = 16.0f;
         ImGuiIO &io = ImGui::GetIO();
         io.Fonts->Clear();
-        io.Fonts->AddFontFromFileTTF("../../assets/Roboto-Regular.ttf", 18.0f);
+        io.Fonts->AddFontFromFileTTF("../../assets/Fontin-SmallCaps.ttf", 18.0f);
         rlImGuiEndInitImGui();
 
 #ifdef IMGUI_HAS_DOCK

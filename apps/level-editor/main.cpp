@@ -86,7 +86,8 @@ int main(int argc, char* argv[])
     world.set<core::Paused>({false});
     world.set<core::EnabledMenus>({0});
 
-	rendering::RenderingModule::main_viewport.remove<rendering::Viewport>();
+	rendering::RenderingModule::main_viewport
+        .remove<rendering::Viewport>();
 	rendering::RenderingModule::main_viewport
 		.set<rendering::VirtualViewport>({0,0, 1920, 1080})
 		.set<editor::Window>({"Game View"});
