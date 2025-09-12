@@ -8,7 +8,7 @@
 #include <flecs.h>
 #include "base/base_module.h"
 namespace rendering {
-    class RenderingModule: public BaseModule<RenderingModule> {
+    class RenderingModule: public base::BaseModule<RenderingModule> {
     public:
         RenderingModule(flecs::world world): BaseModule(world) {
         }

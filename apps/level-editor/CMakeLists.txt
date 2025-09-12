@@ -1,4 +1,4 @@
-add_executable(level-editor "main.cpp")
+add_executable(level-editor "main.cpp" "editor.cpp")
 
 add_dependencies(level-editor copy_to_build)
 

@@ -11,7 +11,7 @@
 #include "flecs.h"
 
 namespace gui {
-    class GUIModule : public BaseModule<GUIModule> {
+    class GUIModule : public base::BaseModule<GUIModule> {
     public:
         // do not add implementation to the constructor
         GUIModule(flecs::world &world): BaseModule(world) {
@@ -23,7 +23,6 @@ namespace gui {
         inline static flecs::entity menu_bar;
 
         static Color font_color() { return LIGHTGRAY; }
-
     private:
         void register_components(flecs::world &world);
 

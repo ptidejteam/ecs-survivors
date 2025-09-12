@@ -4,65 +4,63 @@
 
 // ReSharper disable CppMemberFunctionMayBeStatic
 // ReSharper disable CppHiddenFunction
-#ifndef MODULE_H
-#define MODULE_H
+#ifndef BASE_MODULE_H
+#define BASE_MODULE_H
 #include <format>
 #include <iostream>
-#include <ostream>
 
+#include "core/logger.h"
 #include "flecs.h"
 
-template<typename T>
-class BaseModule {
-public:
-    BaseModule(flecs::world &world): m_world(world) {
-        std::cout << "Creating Module " << typeid(T).name() << std::endl;
-        // Register the instance
-        world.module<T>();
-        static_cast<T *>(this)->register_components(world);
-        static_cast<T *>(this)->register_queries(world);
-        static_cast<T *>(this)->register_pipeline(world);
-        static_cast<T *>(this)->register_systems(world);
-        static_cast<T *>(this)->register_submodules(world);
-        static_cast<T *>(this)->register_entities(world);
-    }
 
-    ~BaseModule() = default;
+namespace base {
+    template<typename T>
+    class BaseModule {
+    public:
+        BaseModule(flecs::world &world) {
+            LOG_INFO( core::Base, "Creating Module " + std::string(typeid(T).name()));
+            // Register the instance
+            world.module<T>();
+            static_cast<T *>(this)->register_components(world);
+            static_cast<T *>(this)->register_queries(world);
+            static_cast<T *>(this)->register_pipeline(world);
+            static_cast<T *>(this)->register_systems(world);
+            static_cast<T *>(this)->register_submodules(world);
+            static_cast<T *>(this)->register_entities(world);
+        }
 
-    void print() {
-        std::cout << "Base" << std::endl;
-    }
-    virtual flecs::world get_world() const {return m_world;}
-protected:
-    flecs::world m_world;
-private:
-    BaseModule() = delete;
+        ~BaseModule() = default;
 
-    void register_components(flecs::world &world) {
-        std::cout << "Base class register component" << std::endl;
-        throw std::runtime_error("Undefined Component Registration: Module does not define \"register_components\"");
-    }
+    private:
+        BaseModule() = delete;
 
-    void register_systems(flecs::world &world) {
-        std::cout << "Base systems" << std::endl;
-        throw std::runtime_error("Undefined System Registration: Module does not define \"register_systems\"");
-    }
+        void register_components(flecs::world &world) {
+            LOG_ERROR(core::LogLocation::Base, "No component registration defined");
+            throw std::runtime_error("Undefined Component Registration: Module does not define \"register_components\"");
+        }
 
-    void register_queries(flecs::world &world) {
-        std::cout << "No query registration implemented" << std::endl;
-    }
+        void register_systems(flecs::world &world) {
+            LOG_ERROR(core::LogLocation::Base, "No system registration defined");
+            throw std::runtime_error("Undefined System Registration: Module does not define \"register_systems\"");
+        }
 
-    void register_pipeline(flecs::world &world) {
-        std::cout << "No pipeline registration implemented" << std::endl;
-    }
+        void register_queries(flecs::world &world) {
+            LOG_INFO(core::LogLocation::Base, "No query registration implemented");
+        }
 
-    void register_submodules(flecs::world &world) {
-        std::cout << "No sub module registration implemented" << std::endl;
-    }
+        void register_pipeline(flecs::world &world) {
+            LOG_INFO(core::LogLocation::Base, "No pipeline registration implemented");
+        }
 
-    void register_entities(flecs::world &world) {
-        std::cout << "No entity registration implemented" << std::endl;
-    }
-};
+        void register_submodules(flecs::world &world) {
+            LOG_INFO(core::LogLocation::Base, "No sub module registration implemented");
+        }
 
-#endif //MODULE_H
+        void register_entities(flecs::world &world) {
+            LOG_INFO(core::LogLocation::Base, "No entity registration implemented");
+        }
+    };
+
+
+}
+#endif //BASE_MODULE_H

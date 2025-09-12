@@ -1,5 +1,6 @@
 add_library(core
         src/core_module.cpp
+        src/logger.cpp
 )
 
 # Public headers (installed/consumed by others)

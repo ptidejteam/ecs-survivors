@@ -17,10 +17,11 @@
 #include "rendering/components.h"
 #include "tilemap/components.h"
 
+#include "../../../../core/include/core/logger.h"
 
 namespace tilemap::systems {
     inline void create_tilemap_system(flecs::entity e, const Tilemap &tilemap) {
-        std::cout << "tilemap" << std::endl;
+        LOG_INFO(core::Tilemap, "tilemap creation");
         if (tmx::Map map; map.load(tilemap.tmx_file_path)) {
             const auto &tilesets = map.getTilesets();
             std::vector<std::tuple<flecs::entity, tmx::Tileset, Texture> > tileset_first_gids;
@@ -214,7 +215,7 @@ namespace tilemap::systems {
                         .add<physics::StaticCollider>();
             }
         }
-        std::cout << "tilemap end" << std::endl;
+        LOG_INFO(core::Tilemap, "tilemap creation ended");
     }
 }
 #endif //CREATE_TILEMAP_SYSTEM_H

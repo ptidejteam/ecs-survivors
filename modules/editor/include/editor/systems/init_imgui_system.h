@@ -11,7 +11,7 @@
 
 namespace editor::systems {
     inline void init_imgui_system(flecs::iter &it) {
-        std::cout << "editor" << std::endl;
+        LOG_INFO(core::Editor, "Initializing Editor ImGui")
         rlImGuiBeginInitImGui();
         ImGuiStyle &style = ImGui::GetStyle();
         ImVec4 *colors = style.Colors;
@@ -83,7 +83,7 @@ namespace editor::systems {
 #ifdef IMGUI_HAS_DOCK
         ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 #endif
-        std::cout << "editor end" << std::endl;
+        LOG_INFO(core::Editor, "Finished Initializing Editor ImGui")
     }
 }
 #endif // ECS_SURVIVORS_SET_IMGUI_STYLE_H

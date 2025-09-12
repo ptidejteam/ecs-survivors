@@ -8,11 +8,10 @@
 #include "base/base_module.h"
 
 namespace ai {
-    class AIModule : public BaseModule<AIModule> {
+    class AIModule : public base::BaseModule<AIModule> {
     public:
         AIModule(flecs::world world): BaseModule(world) {
         };
-
     private:
         void register_components(flecs::world);
 

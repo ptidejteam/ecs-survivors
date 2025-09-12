@@ -18,6 +18,7 @@
 
 namespace physics {
     constexpr float PHYSICS_TICK_LENGTH = 0.016f;
+
     static CollisionFilter player_filter = static_cast<CollisionFilter>(enemy | environment);
     static CollisionFilter enemy_filter = static_cast<CollisionFilter>(player | enemy | environment);
     static CollisionFilter environment_filter = static_cast<CollisionFilter>(player | enemy);
@@ -27,7 +28,7 @@ namespace physics {
     inline flecs::system m_collision_detection_naive_system;
     inline static flecs::entity cell_container;
 
-    class PhysicsModule : public BaseModule<PhysicsModule> {
+    class PhysicsModule : public base::BaseModule<PhysicsModule> {
         friend class BaseModule<PhysicsModule>;
 
     public:
@@ -114,7 +115,6 @@ namespace physics {
         }
 
         flecs::entity m_physicsTick;
-
 
     private:
         void register_components(flecs::world &world);

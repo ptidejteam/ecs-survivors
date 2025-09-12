@@ -13,7 +13,7 @@
 
 namespace gui::systems {
     inline void set_gui_canvas_size_system(flecs::iter& it, size_t, rendering::Viewport& vp) {
-        std::cout << "world updated" << std::endl;
+        LOG_INFO(core::Gui, std::format("Canvas Resized ({} x {})", vp.rect.width, vp.rect.height))
         GUIModule::gui_canvas.set<Rectangle>({
             0, 0, vp.rect.width, vp.rect.height
         });

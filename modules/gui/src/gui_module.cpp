@@ -137,17 +137,17 @@ namespace gui {
     }
 
     void GUIModule::register_entities(flecs::world &world) {
-        auto panel_texture = LoadTexture("../../assets/panel-010.png");
-        auto button_texture = LoadTexture("../../assets/panel-009.png");
+        Texture panel_texture = LoadTexture("../../assets/panel-010.png");
+        Texture button_texture = LoadTexture("../../assets/panel-009.png");
         world.prefab<PanelPrefab>()
                 .set<GUIElement>({TEXTURED_ELEMENT})
                 .set<TexturedElement>({ColorAlpha(BLACK, 0.8),
                                        panel_texture,
                                        {{0, 0, (float) panel_texture.width, (float) panel_texture.height},
-                                        24,
-                                        24,
-                                        24,
-                                        24,
+                                        12,
+                                        12,
+                                        12,
+                                        12,
                                         NPATCH_NINE_PATCH}});
 
         world.prefab<ButtonPrefab>()

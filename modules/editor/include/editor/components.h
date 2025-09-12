@@ -15,7 +15,7 @@ namespace editor {
     struct Hierarchy {};
     struct Inspector {};
     struct Console {
-        std::vector<const char*> logs;
+        std::vector<std::string> logs;
     };
 }
 #endif // EDITOR_COMPONENTS_H

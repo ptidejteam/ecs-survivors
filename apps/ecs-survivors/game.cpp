@@ -27,21 +27,14 @@
 #include "rendering/rendering_module.h"
 #include "tilemap/tilemap_module.h"
 
-#include "gui/components.h"
 #include "gui/gui_module.h"
 
 #include "debugging/debug_module.h"
 
 #include "game_scene.h"
 
-Game::Game(const char *windowName, int windowWidth, int windowHeight) :
-    m_world(flecs::world()), m_window_name(windowName), m_window_width(windowWidth), m_window_height(windowHeight) {}
-
 void Game::init() {
-
-    SetConfigFlags(FLAG_WINDOW_RESIZABLE);
-    InitWindow(m_window_width, m_window_height, m_window_name.c_str());
-    SetExitKey(KEY_F4);
+    GraphicalApplication::init();
 
 #ifndef EMSCRIPTEN
     // use the flecs explorer when not on browser
@@ -74,8 +67,8 @@ void Game::init() {
     rendering::RenderingModule::main_viewport.remove<rendering::Viewport>();
     rendering::RenderingModule::main_viewport.set<rendering::ScreenViewport>({0,0, 1920, 1080});
     // load whatever you need
-    game_scene = new GameScene();
-    game_scene->load(m_world);
+    GameScene game_scene;
+    game_scene.load(m_world);
 
 }
 

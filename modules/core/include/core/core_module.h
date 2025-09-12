@@ -11,11 +11,13 @@
 
 namespace core {
 
-    class CoreModule : public BaseModule<CoreModule> {
+    class CoreModule : public base::BaseModule<CoreModule> {
         friend class BaseModule<CoreModule>;
     public:
         // do not add anything to the constructor, instead change the base class
-        CoreModule(flecs::world& world): BaseModule(world) {}
+        CoreModule(flecs::world& world): BaseModule(world) {
+
+        }
     private:
         void register_components(flecs::world &world);
 

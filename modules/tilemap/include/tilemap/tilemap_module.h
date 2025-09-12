@@ -9,11 +9,10 @@
 #include "base/base_module.h"
 
 namespace tilemap {
-    class TilemapModule : public BaseModule<TilemapModule> {
+    class TilemapModule : public base::BaseModule<TilemapModule> {
     public:
         TilemapModule(flecs::world &world): BaseModule(world) {
         }
-
     private:
         void register_components(flecs::world world);
 

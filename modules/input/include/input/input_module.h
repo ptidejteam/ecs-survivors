@@ -8,8 +8,7 @@
 #include "base/base_module.h"
 
 namespace input {
-
-class InputModule: public BaseModule<InputModule> {
+class InputModule: public base::BaseModule<InputModule> {
 public:
     InputModule(flecs::world& world): BaseModule(world) {}
 private:

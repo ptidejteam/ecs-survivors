@@ -8,11 +8,10 @@
 
 
 namespace debugging {
-    class DebugModule : public BaseModule<DebugModule> {
+    class DebugModule : public base::BaseModule<DebugModule> {
     public:
         DebugModule(flecs::world world): BaseModule(world) {
         };
-
     private:
         flecs::system debug_entity_ids;
         flecs::system debug_collider_bounds;

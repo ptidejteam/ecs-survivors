@@ -32,12 +32,11 @@ namespace gameplay {
     inline flecs::system remove_bounce_amt;
     inline flecs::system spawn_system;
 
-    class GameplayModule : public BaseModule<GameplayModule> {
+    class GameplayModule : public base::BaseModule<GameplayModule> {
     public:
         GameplayModule(flecs::world &world): BaseModule(world) {
         }
         static inline flecs::entity m_spawner_tick;
-
     private:
 
         void register_components(flecs::world);

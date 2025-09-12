@@ -7,7 +7,7 @@
 #include "base/base_module.h"
 
 namespace editor {
-    class EditorModule :public BaseModule<EditorModule> {
+    class EditorModule :public base::BaseModule<EditorModule> {
     public:
         EditorModule(flecs::world &world): BaseModule(world) {};
     private:

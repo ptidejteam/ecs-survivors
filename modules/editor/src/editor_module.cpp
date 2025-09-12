@@ -4,6 +4,8 @@
 
 #include "editor/editor_module.h"
 
+#include <sstream>
+
 #include "editor/components.h"
 #include "editor/pipeline_steps.h"
 #include "editor/systems/draw_entities_inspector_system.h"
@@ -36,6 +38,15 @@ void editor::EditorModule::register_systems(flecs::world &world) {
 #endif
     });
 
+    world.system<Console>("forward logs to editor console")
+    .kind(flecs::OnStart)
+    .each([] (Console& console) {
+       core::Logger::Instance().AddSink([&] (core::LogLevel level, core::LogLocation loc, std::string message) {
+           std::stringstream s;
+           s << core::Logger::Instance().get_level_string(level) << " " << core::Logger::Instance().get_location_string(loc) << " " << message << std::endl;
+           console.logs.push_back(s.str());
+       });
+    });
 
 
     world.system<rendering::VirtualViewport, Window>("draw viewport window")
@@ -53,8 +64,6 @@ void editor::EditorModule::register_systems(flecs::world &world) {
 
                     if (IsWindowResized() || viewport.render_target.texture.width != content_size.x ||
                         viewport.render_target.texture.height != content_size.y) {
-                        std::cout << viewport.render_target.texture.width << "," << content_size.x << std::endl;
-                        std::cout << viewport.render_target.texture.height << "," << content_size.y << std::endl;
                         UnloadRenderTexture(viewport.render_target);
                         viewport.render_target = LoadRenderTexture(content_size.x, content_size.y);
                         viewport.rect.width = content_size.x;
@@ -67,7 +76,10 @@ void editor::EditorModule::register_systems(flecs::world &world) {
 
     world.system<Window>("draw hierarchy window").with<Hierarchy>().kind<RenderEditor>().each([world](Window &window) {
         if (ImGui::Begin(window.name.c_str())) {
-            world.children(systems::draw_entities_inspector_system);
+            if (ImGui::TreeNode("world")) {
+                world.children(systems::draw_entities_inspector_system);
+                ImGui::TreePop();
+            }
         }
         ImGui::End();
     });
@@ -76,12 +88,12 @@ void editor::EditorModule::register_systems(flecs::world &world) {
        if (ImGui::Begin(window.name.c_str())) {
        }
        ImGui::End();
-   });
+    });
 
     world.system<Window, Console>("draw console window").kind<RenderEditor>().each([world](Window &window, Console &console) {
        if (ImGui::Begin(window.name.c_str())) {
            for (const auto &item: console.logs) {
-               ImGui::Text("%s", item);
+               ImGui::Text(item.c_str());
            }
        }
        ImGui::End();

@@ -7,29 +7,21 @@
 
 #include <string>
 
-#include "core/application.h"
-#include "core/scene.h"
+#include "core/graphical_application.h"
 #include "flecs.h"
-#include "game_scene.h"
 
-class Game : public core::Application {
+class Game : public core::GraphicalApplication {
 public:
-    Game(const char* window_name, int window_width, int window_height);
-    ~Game() override {delete game_scene;}
+    Game(const char* window_name, int window_width, int window_height) : GraphicalApplication(window_name, window_width, window_height){};
+    ~Game() override = default;
 
     void run() override;
-
-private:
-
     void init() override;
 
+private:
     void UpdateDrawFrameDesktop();
     static void UpdateDrawFrameWeb(void* world);
-    flecs::world m_world;
-    core::Scene* game_scene;
-    std::string m_window_name;
-    int m_window_width;
-    int m_window_height;
+
 };
 
 

@@ -8,10 +8,9 @@
 #include "base/base_module.h"
 
 namespace player {
-    class PlayerModule : public BaseModule<PlayerModule> {
+    class PlayerModule : public base::BaseModule<PlayerModule> {
     public:
         PlayerModule(flecs::world world) : BaseModule(world) {};
-
     private:
         void register_components(flecs::world world);
 
