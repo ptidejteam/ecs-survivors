@@ -11,37 +11,31 @@
 #include "gui/components.h"
 
 namespace gui::systems {
-    inline void on_parent_rectangle_changed_observer(flecs::entity e, const Rectangle &parent) {
-
-        if (!e.has<Anchor>()) return;
-        if (!e.has<Rectangle>()) return;
-
-        auto anchor = e.get<Anchor>();
-
-        Rectangle temp{e.get<Rectangle>()};
+    inline void on_parent_rectangle_changed_observer(flecs::entity e, const Rectangle &parent, Rectangle &rec, const Anchor& anchor) {
         switch (anchor.horizontal_anchor) {
             case CENTER:
-                temp.x = anchor.position.x + parent.x + parent.width / 2;
+                rec.x = anchor.position.x + parent.x + parent.width / 2;
                 break;
             case RIGHT:
-                temp.x = anchor.position.x + parent.x + parent.width;
+                rec.x = anchor.position.x + parent.x + parent.width;
                 break;
             default:
-                temp.x = anchor.position.x + parent.x;
+                rec.x = anchor.position.x + parent.x;
                 break;
         }
         switch (anchor.vertical_anchor) {
             case MIDDLE:
-                temp.y = anchor.position.y + parent.y + parent.height / 2;
+                rec.y = anchor.position.y + parent.y + parent.height / 2;
                 break;
             case BOTTOM:
-                temp.y = anchor.position.y + parent.y + parent.height;
+                rec.y = anchor.position.y + parent.y + parent.height;
                 break;
             default:
-                temp.y = anchor.position.y + parent.y;
+                rec.y = anchor.position.y + parent.y;
                 break;
         }
-        e.set<Rectangle>({temp});
+
+
     }
 }
 

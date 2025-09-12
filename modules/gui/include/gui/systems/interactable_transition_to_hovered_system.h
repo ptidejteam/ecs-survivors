@@ -13,7 +13,6 @@ namespace gui::systems {
     inline void interactable_transition_to_hovered_system(flecs::iter &it, size_t i, const Rectangle &rec) {
 
         if (CheckCollisionPointRec(GetMousePosition(), rec)) {
-            std::cout << it.entity(i).name() << std::endl;
             it.entity(i).add<InteractableElementState>(Hovered);
         }
     }

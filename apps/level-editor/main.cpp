@@ -99,7 +99,9 @@ int main(int argc, char* argv[])
     game_scene.load(world);
 
 
-	world.entity().set<editor::Window>({"Hierarchy"}).add<editor::Inspector>();
+	world.entity().set<editor::Window>({"Hierarchy"}).add<editor::Hierarchy>();
+	world.entity().set<editor::Window>({"Inspector"}).add<editor::Inspector>();
+	world.entity().set<editor::Window>({"Console"}).set<editor::Console>({{"my", "name", "a", "jeff","my", "name", "a", "jeff","my", "name", "a", "jeff","my", "name", "a", "jeff"}});
 
     world.progress();
 

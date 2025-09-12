@@ -65,12 +65,27 @@ void editor::EditorModule::register_systems(flecs::world &world) {
                 ImGui::End();
             });
 
-    world.system<Window>("draw inspector window").with<Inspector>().kind<RenderEditor>().each([world](Window &window) {
+    world.system<Window>("draw hierarchy window").with<Hierarchy>().kind<RenderEditor>().each([world](Window &window) {
         if (ImGui::Begin(window.name.c_str())) {
             world.children(systems::draw_entities_inspector_system);
         }
         ImGui::End();
     });
+
+    world.system<Window>("draw inspector window").with<Inspector>().kind<RenderEditor>().each([world](Window &window) {
+       if (ImGui::Begin(window.name.c_str())) {
+       }
+       ImGui::End();
+   });
+
+    world.system<Window, Console>("draw console window").kind<RenderEditor>().each([world](Window &window, Console &console) {
+       if (ImGui::Begin(window.name.c_str())) {
+           for (const auto &item: console.logs) {
+               ImGui::Text("%s", item);
+           }
+       }
+       ImGui::End();
+   });
 
     world.system("end frame editor").kind<EditorEnd>().run([](flecs::iter &it) { rlImGuiEnd(); });
 }

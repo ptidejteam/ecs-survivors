@@ -8,7 +8,6 @@
 #include <flecs.h>
 #include <imgui.h>
 
-#include "../../../../../cmake-build-web/_deps/imgui-src/imgui_internal.h"
 namespace editor::systems {
     inline void draw_entities_inspector_system(flecs::entity e) {
         const char* name = e.name() != "" ? e.name().c_str() : std::to_string(e.id()).c_str();

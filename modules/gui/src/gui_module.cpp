@@ -16,7 +16,6 @@
 #include "gui/systems/draw_menu_bar_tab_item_system.h"
 #include "gui/systems/draw_menu_bar_tab_system.h"
 #include "gui/systems/load_style_system.h"
-#include "gui/systems/parent_rectangle_changed_disabled_observer.h"
 #include "gui/systems/parent_rectangle_changed_observer.h"
 #include "gui/systems/set_anchored_position_system.h"
 #include "gui/systems/set_gui_canvas_size_system.h"
@@ -67,27 +66,16 @@ namespace gui {
 
         world.observer<rendering::VirtualViewport>().event(flecs::OnSet).each(systems::set_gui_canvas_size_system);
 
-        // // TODO: CRITICAL, need to only update when the screen reso changes, not every frame
-        // // Observer is acting weird so I canged to system
-        // world.system<const Rectangle>("parent rectangle changed enabled")
-        //         .term_at(0)
-        //         .up()
-        //         //.event(flecs::OnSet)
-        //         .each(systems::on_parent_rectangle_changed_observer);
-        //
-        // // TODO: CRITICAL, need to only update when the screen reso changes, not every frame
-        // // Observer is acting weird so I canged to system
-        // world.system<const Rectangle>("parent rectangle changed disabled")
-        //         .term_at(0)
-        //         .parent()
-        //         //.event(flecs::OnSet)
-        //         .with(flecs::Disabled)
-        //         .filter()
-        //         .each(systems::on_parent_rectangle_changed_disabled_observer);
+        // TODO: CRITICAL, need to only update when the screen reso changes, not every frame
+        // Observer is acting weird so I canged to system
+        world.system<const Rectangle, Rectangle, const Anchor>()
+                .term_at(0)
+                .parent()
+                .each(systems::on_parent_rectangle_changed_observer);
 
-        // world.observer().event(flecs::OnAdd).with(flecs::Disabled).each(systems::disable_children_on_disable_system);
-        //
-        // world.observer().event(flecs::OnRemove).with(flecs::Disabled).each(systems::enable_children_on_enable_system);
+        world.observer().event(flecs::OnAdd).with(flecs::Disabled).each(systems::disable_children_on_disable_system);
+
+        world.observer().event(flecs::OnRemove).with(flecs::Disabled).each(systems::enable_children_on_enable_system);
 
 
         world.system<const Rectangle>().with<InteractableElementState>(Normal).kind<rendering::RenderGUI>().each(
@@ -113,7 +101,7 @@ namespace gui {
                             .with(flecs::ChildOf, e)
                             .build()
                             .each(systems::draw_element_heirarchy_system);
-                }).disable();
+                });
 
         world.system<MenuBar, Rectangle>("Draw Menu Bar")
                 .term_at(1)
@@ -201,7 +189,6 @@ namespace gui {
                                    1,
                                    GetColor(GuiGetStyle(DEFAULT, LINE_COLOR)),
                                    GetColor(GuiGetStyle(BUTTON, BACKGROUND_COLOR)),
-                           })
-                           .disable();
+                           });
     }
 } // namespace gui
