@@ -10,7 +10,7 @@ namespace core {
     class Scene {
     public:
         virtual ~Scene() = default;
-        virtual void load(flecs::world& world) = 0;
+        virtual flecs::entity load(flecs::world& world) = 0;
     };
 } // namespace core
 #endif // CORE_SCENE_H

@@ -5,6 +5,8 @@
 #include "core/logger.h"
 
 #include <iostream>
+#include <ctime>
+#include <iomanip>
 
 namespace core {
 
@@ -13,7 +15,7 @@ namespace core {
         return instance;
     }
 
-    void Logger::Log(LogLevel level, LogLocation loc, const std::string &msg) {
+    void Logger::log(LogLevel level, LogLocation loc, const std::string &msg) {
         for (auto &sink: mSinks) {
             sink(level, loc, msg);
         }
@@ -31,7 +33,7 @@ namespace core {
         else if (msgType == 2)
             level = LogLevel::Debug;
 
-        Instance().Log(level, LogLocation::Raylib, buffer);
+        Instance().log(level, LogLocation::Raylib, buffer);
     }
     const char *Logger::get_level_string(LogLevel level) const {
         switch (level) {
@@ -72,6 +74,14 @@ namespace core {
             case LogLocation::Raylib:
                 return "[RAYLIB]";
         }
+    }
+
+    const char * Logger::get_time_stamp() const {
+        time_t timestamp;
+        time(&timestamp);
+        std::ostringstream oss;
+        oss << "[" << std::put_time(std::localtime(&timestamp), "%H:%M:%S") << "]";
+        return oss.str().c_str();
     }
 
     void Logger::AddSink(Sink sink) { mSinks.push_back(std::move(sink)); }

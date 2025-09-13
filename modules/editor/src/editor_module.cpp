@@ -92,8 +92,9 @@ void editor::EditorModule::register_systems(flecs::world &world) {
 
     world.system<Window, Console>("draw console window").kind<RenderEditor>().each([world](Window &window, Console &console) {
        if (ImGui::Begin(window.name.c_str())) {
-           for (const auto &item: console.logs) {
-               ImGui::Text(item.c_str());
+           const auto hist = core::Logger::Instance().get_log_history();
+           for (int i = hist.size() - 1; i > 0; i--) {
+               ImGui::Text("%s", hist[i].c_str());
            }
        }
        ImGui::End();

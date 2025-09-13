@@ -11,14 +11,24 @@
 
 #include "core/logger.h"
 #include "flecs.h"
+#include <source_location>
 
+// dont kwow how portable this is
+// https://www.reddit.com/r/cpp/comments/lfi6jt/finally_a_possibly_portable_way_to_convert_types/
+template<typename T>
+auto TypeToString() {
+    auto WrapperSignature = std::string_view{ std::source_location::current().function_name() };
+    auto StartPosition = WrapperSignature.find("with T =") + 9;
+    auto EndPosition = WrapperSignature.find_first_of("]", StartPosition);
+    return std::string(WrapperSignature.substr(StartPosition, EndPosition - StartPosition));
+}
 
 namespace base {
     template<typename T>
     class BaseModule {
     public:
         BaseModule(flecs::world &world) {
-            LOG_INFO( core::Base, "Creating Module " + std::string(typeid(T).name()));
+            LOG_INFO( core::Base, "Creating Module " + TypeToString<T>());
             // Register the instance
             world.module<T>();
             static_cast<T *>(this)->register_components(world);
@@ -36,28 +46,28 @@ namespace base {
 
         void register_components(flecs::world &world) {
             LOG_ERROR(core::LogLocation::Base, "No component registration defined");
-            throw std::runtime_error("Undefined Component Registration: Module does not define \"register_components\"");
+            throw std::runtime_error("Undefined Component Registration: Module " + TypeToString<T>() + " does not define \"register_components\"");
         }
 
         void register_systems(flecs::world &world) {
             LOG_ERROR(core::LogLocation::Base, "No system registration defined");
-            throw std::runtime_error("Undefined System Registration: Module does not define \"register_systems\"");
+            throw std::runtime_error("Undefined System Registration: Module " + TypeToString<T>() + " does not define \"register_systems\"");
         }
 
         void register_queries(flecs::world &world) {
-            LOG_INFO(core::LogLocation::Base, "No query registration implemented");
+            LOG_WARNING(core::LogLocation::Base, "No query registration implemented for module " + TypeToString<T>());
         }
 
         void register_pipeline(flecs::world &world) {
-            LOG_INFO(core::LogLocation::Base, "No pipeline registration implemented");
+            LOG_WARNING(core::LogLocation::Base, "No pipeline registration implemented for module " + TypeToString<T>());
         }
 
         void register_submodules(flecs::world &world) {
-            LOG_INFO(core::LogLocation::Base, "No sub module registration implemented");
+            LOG_WARNING(core::LogLocation::Base, "No sub module registration implemented for module " + TypeToString<T>());
         }
 
         void register_entities(flecs::world &world) {
-            LOG_INFO(core::LogLocation::Base, "No entity registration implemented");
+            LOG_WARNING(core::LogLocation::Base, "No entity registration implemented for module " + TypeToString<T>());
         }
     };
 
