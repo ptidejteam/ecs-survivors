@@ -8,7 +8,7 @@
 #include <flecs.h>
 #include "core/components.h"
 namespace core::systems {
-    inline void set_paused_on_entity_enabled_system(flecs::iter &it, size_t i, EnabledMenus &enabled) {
+    inline void set_paused_on_entity_enabled_system(flecs::iter &it, size_t i, PausesRequested &enabled) {
         enabled.count ++;
         it.world().set<Paused>({true});
     }

@@ -22,12 +22,13 @@
 
 namespace core {
     void CoreModule::register_components(flecs::world &world) {
-        world.component<Vector2>();//.member<float>("x").member<float>("y");
-        world.component<Position2D>();//.member<Vector2>("value");
-        world.component<Speed>();//.member<float>("value");
-        world.component<Tag>();//.member<std::string>("name");
-        world.component<DestroyAfterTime>();//.member<float>("time");
+        world.component<Vector2>().member<float>("x").member<float>("y");
+        world.component<Position2D>().member<Vector2>("value");
+        world.component<Speed>().member<float>("value");
+        world.component<Tag>().member<std::string>("name");
+        world.component<DestroyAfterTime>().member<float>("time");
         world.component<DestroyAfterFrame>();
+        world.component<PausesRequested>().member<int>("pauses_requested").add(flecs::Singleton);
     }
 
     void CoreModule::register_queries(flecs::world &world) {
@@ -36,26 +37,20 @@ namespace core {
 
     void CoreModule::register_systems(flecs::world &world) {
         std::cout << "Registering core systems" << std::endl;
-        world.system<EnabledMenus>()
+        world.system<PausesRequested>()
                 .kind(flecs::OnStart)
-                .term_at(0)
-                .singleton()
                 .each(systems::reset_enabled_menus_system);
 
         world.observer<const Paused>().event(flecs::OnSet).each(systems::set_time_scale_on_pause_system);
 
-        world.observer<EnabledMenus>()
-                .term_at(0)
-                .singleton()
+        world.observer<PausesRequested>()
                 .with<PauseOnEnabled>()
                 .filter()
                 .event(flecs::OnAdd)
                 .with(flecs::Disabled)
                 .each(systems::set_paused_on_entity_disable_system);
 
-        world.observer<EnabledMenus>()
-                .term_at(0)
-                .singleton()
+        world.observer<PausesRequested>()
                 .with<PauseOnEnabled>()
                 .filter()
                 .event(flecs::OnRemove)

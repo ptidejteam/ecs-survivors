@@ -50,12 +50,11 @@ void Editor::init() {
     // do not set the FLAG_WINDOW_HIGHDPI flag, that scales a low res framebuffer up to the native resolution.
     // use the native resolution and scale your geometry.
 
-    m_world.set<rendering::Settings>({m_window_name, m_window_width, m_window_height, m_window_width, m_window_height});
     m_world.set<physics::Settings>({(float) m_window_width, (float) m_window_height});
     m_world.add<physics::CollisionRecordList>();
     m_world.set<physics::SpatialHashingGrid>({48, {0, 0}});
     m_world.set<core::Paused>({false});
-    m_world.set<core::EnabledMenus>({0});
+    m_world.set<core::PausesRequested>({0});
 
     rendering::RenderingModule::main_viewport
         .remove<rendering::Viewport>();

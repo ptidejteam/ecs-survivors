@@ -63,7 +63,6 @@ namespace gameplay {
         // TODO: need to redo this logic since removing the global rendering settings
         spawn_system = world.system<const Spawner, const rendering::TrackingCamera>("Spawn Enemies")
                 .tick_source(m_spawner_tick)
-                .term_at(1).singleton()
                 .each(systems::spawn_enemies_around_screen_system);
 
         world.system<Cooldown>("Update Cooldown")
@@ -95,7 +94,6 @@ namespace gameplay {
                 .with<physics::CollidedWith>(flecs::Wildcard)
                 .with<Projectile>()
                 .kind<OnCollisionDetected>()
-                .term_at(0).singleton()
                 .immediate()
                 .each(systems::projectile_bounce_collided_system);
 

@@ -10,7 +10,7 @@
 
 
 namespace core::systems {
-    inline void set_paused_on_entity_disable_system(flecs::iter &it, size_t i, EnabledMenus &enabled) {
+    inline void set_paused_on_entity_disable_system(flecs::iter &it, size_t i, PausesRequested &enabled) {
         enabled.count --;
         if (enabled.count == 0) {
             it.world().set<Paused>({false});

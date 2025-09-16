@@ -31,7 +31,7 @@ namespace core {
     };
 
     struct PauseOnEnabled {};
-    struct EnabledMenus {int count;};
+    struct PausesRequested {int count;};
 
     struct Close {};
     struct Open {};

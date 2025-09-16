@@ -14,6 +14,11 @@ namespace editor {
 
     struct Hierarchy {};
     struct Inspector {};
+
+    struct SelectedEntity {
+        flecs::entity entity;
+    };
+
     struct Console {
         std::vector<std::string> logs;
     };

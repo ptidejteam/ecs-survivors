@@ -62,7 +62,7 @@ void Game::init() {
     m_world.add<physics::CollisionRecordList>();
     m_world.set<physics::SpatialHashingGrid>({48, {0, 0}});
     m_world.set<core::Paused>({false});
-    m_world.set<core::EnabledMenus>({0});
+    m_world.set<core::PausesRequested>({0});
 
     rendering::RenderingModule::main_viewport.remove<rendering::Viewport>();
     rendering::RenderingModule::main_viewport.set<rendering::ScreenViewport>({0,0, 1920, 1080});

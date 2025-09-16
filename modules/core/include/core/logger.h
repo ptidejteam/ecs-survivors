@@ -6,10 +6,10 @@
 #define CORE_LOGGER_H
 
 
-#include <vector>
-#include <string>
 #include <functional>
 #include <sstream>
+#include <string>
+#include <vector>
 
 namespace core {
 
@@ -38,19 +38,20 @@ namespace core {
 
     class Logger {
     public:
-        using Sink = std::function<void(LogLevel, LogLocation, const std::string&)>;
+        using Sink = std::function<void(LogLevel, LogLocation, const std::string &)>;
 
-        static Logger& Instance();
+        static Logger &Instance();
 
-        void log(LogLevel level, LogLocation location, const std::string& msg);
+        void log(LogLevel level, LogLocation location, const std::string &msg);
 
-        static void rlLog(int loglevel, const char* txt, va_list args);
+        static void rlLog(int loglevel, const char *txt, va_list args);
 
-        const std::vector<std::string> get_log_history() const{ return log_history; }
 
-        const char* get_level_string(LogLevel level) const;
-        const char* get_location_string(LogLocation loc) const;
-        const char* get_time_stamp() const;
+        const std::vector<std::string> get_log_history() const { return log_history; }
+
+        const char *get_level_string(LogLevel level) const;
+        const char *get_location_string(LogLocation loc) const;
+        const char *get_time_stamp() const;
 
         void AddSink(Sink sink);
 
@@ -59,20 +60,27 @@ namespace core {
             AddSink([&](LogLevel level, LogLocation loc, std::string message) {
                 std::stringstream s;
                 s << Instance().get_time_stamp() << " " << Instance().get_level_string(level) << " "
-                         << Instance().get_location_string(loc) << " " << message << std::endl;
+                  << Instance().get_location_string(loc) << " " << message << std::endl;
 
                 Instance().log_history.push_back(s.str());
-           });
+            });
         };
         std::vector<Sink> mSinks;
         std::vector<std::string> log_history;
     };
 
-} // namespace base
+} // namespace core
 
-#define LOG_INFO(loc, msg) core::Logger::Instance().log(core::LogLevel::Info,loc,msg);
-#define LOG_WARNING(loc, msg) core::Logger::Instance().log(core::LogLevel::Warning,loc,msg);
-#define LOG_ERROR(loc, msg) core::Logger::Instance().log(core::LogLevel::Error,loc,msg);
-#define LOG_DEBUG(loc, msg) core::Logger::Instance().log(core::LogLevel::Info,loc,msg);
+template<typename... Args>
+std::string concat_str(Args &&...args) {
+    std::ostringstream oss;
+    (oss << ... << args);
+    return oss.str();
+}
+
+#define LOG_INFO(loc, ...) core::Logger::Instance().log(core::LogLevel::Info,loc,concat_str(__VA_ARGS__));
+#define LOG_WARNING(loc, ...) core::Logger::Instance().log(core::LogLevel::Warning,loc,concat_str(__VA_ARGS__));
+#define LOG_ERROR(loc, ...) core::Logger::Instance().log(core::LogLevel::Error,loc,concat_str(__VA_ARGS__));
+#define LOG_DEBUG(loc, ...) core::Logger::Instance().log(core::LogLevel::Info,loc,concat_str(__VA_ARGS__));
 
 #endif // CORE_LOGGER_H

@@ -29,6 +29,9 @@ namespace physics {
         world.component<AccelerationSpeed>();
         world.component<CollidedWith>();
         world.component<ContainedIn>().add(flecs::Exclusive);
+        world.component<SpatialHashingGrid>().add(flecs::Singleton);
+        world.component<Settings>().add(flecs::Singleton);
+        world.component<CollisionRecordList>().add(flecs::Singleton);
     }
 
     void PhysicsModule::register_queries(flecs::world &world) {
@@ -42,25 +45,18 @@ namespace physics {
         cell_container = world.entity("cell_container");
 
         world.system<SpatialHashingGrid, Settings>("init grid")
-                .term_at(0).singleton()
-                .term_at(1).singleton()
                 .kind(flecs::OnStart)
                 .each(systems::init_spatial_hashing_grid_system);
 
         world.system<SpatialHashingGrid, Settings>("update grid on window resized")
-                .term_at(0).singleton()
-                .term_at(1).singleton()
                 .kind(flecs::OnUpdate)
                 .each(systems::update_grid_on_window_resized_system);
 
-        world.observer<SpatialHashingGrid, Settings>("update grid on grid set")
-                .term_at(1).singleton()
-                .event(flecs::OnSet)
-                .each(systems::reset_grid);
+        // world.observer<SpatialHashingGrid, Settings>("update grid on grid set")
+        //         .event(flecs::OnSet)
+        //         .each(systems::reset_grid);
 
         world.system<SpatialHashingGrid, Settings, GridCell>("update grid") // TODO change to follow a target, not the camera, physics does not know about cameras.
-                .term_at(0).singleton()
-                .term_at(1).singleton()
                 .kind(flecs::PreUpdate)
                 .each(systems::update_grid_system);
 
@@ -84,7 +80,6 @@ namespace physics {
                 .each(systems::update_position_system);
 
         world.system<SpatialHashingGrid, Collider, core::Position2D>("update entity cells")
-                .term_at(0).singleton()
                 .without<StaticCollider>()
                 .kind<UpdateBodies>()
                 .each(systems::update_cell_entities_system);
@@ -92,7 +87,6 @@ namespace physics {
 
         m_collision_detection_naive_system = world.system<CollisionRecordList, const core::Position2D, const Collider>(
                     "Detect Collisions ECS (Naive Record List) non-static")
-                .term_at(0).singleton()
                 .kind<Detection>()
                 .multi_threaded()
                 .tick_source(m_physicsTick)
@@ -102,17 +96,15 @@ namespace physics {
         // need a second pass to collide static colliders. Even when static objects are out of the screen we compute the collision
         world.system<CollisionRecordList, const core::Position2D, const Collider>(
                     "Detect Collisions ECS (Naive Record List) static")
-                .term_at(0).singleton()
                 .with<StaticCollider>()
                 .kind<Detection>()
                 .multi_threaded()
                 .tick_source(m_physicsTick)
                 .each(systems::collision_detection_static_system);
 
+        // TODO fix this
         m_collision_detection_spatial_hashing_system = world.system<CollisionRecordList, SpatialHashingGrid, GridCell>(
                     "Detect Collisions ECS non-static with spatial hashing")
-                .term_at(0).singleton()
-                .term_at(1).singleton()
                 .kind<Detection>()
                 .multi_threaded()
                 .tick_source(m_physicsTick)
@@ -121,8 +113,6 @@ namespace physics {
 
         m_collision_detection_spatial_ecs = world.system<CollisionRecordList, SpatialHashingGrid, GridCell>(
                     "test collision with relationship")
-                .term_at(0).singleton()
-                .term_at(1).singleton()
                 .kind<Detection>()
                 .multi_threaded()
                 .tick_source(m_physicsTick)
@@ -130,13 +120,11 @@ namespace physics {
         m_collision_detection_spatial_ecs.disable();
 
         world.system<CollisionRecordList>("Collision Resolution ECS (Naive Record List)")
-                .term_at(0).singleton()
                 .kind<Resolution>()
                 .tick_source(m_physicsTick)
                 .each(systems::collision_resolution_system);
 
         world.system<CollisionRecordList>("Add CollidedWith Component")
-                .term_at(0).singleton()
                 .kind<Resolution>()
                 .tick_source(m_physicsTick)
                 .each(systems::add_collided_with_system);
@@ -148,7 +136,6 @@ namespace physics {
                 .each(systems::collision_cleanup_system);
 
         world.system<CollisionRecordList>("Collision Cleanup List")
-                .term_at(0).singleton()
                 .kind<CollisionCleanup>()
                 .tick_source(m_physicsTick)
                 .each(systems::collision_cleanup_list_system);

@@ -8,7 +8,7 @@
 #include "core/components.h"
 
 namespace core::systems {
-    inline void reset_enabled_menus_system(EnabledMenus& menus) {
+    inline void reset_enabled_menus_system(PausesRequested& menus) {
         menus.count = 0;
 
     }

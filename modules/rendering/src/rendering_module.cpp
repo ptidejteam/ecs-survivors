@@ -26,6 +26,7 @@ void rendering::RenderingModule::register_components(flecs::world world) {
     auto vp = world.component<Viewport>();
     world.component<VirtualViewport>().is_a(vp);
     world.component<ScreenViewport>().is_a(vp);
+    world.component<TrackingCamera>().add(flecs::Singleton);
 }
 
 void rendering::RenderingModule::register_entities(flecs::world world) {
@@ -41,8 +42,6 @@ void rendering::RenderingModule::register_queries(flecs::world world) {
 void rendering::RenderingModule::register_systems(flecs::world world) {
 
     world.system<TrackingCamera, Viewport>("on start init camera")
-            .term_at(0)
-            .singleton()
             .kind(flecs::OnStart)
             .each(systems::create_camera_system);
 
@@ -61,8 +60,6 @@ void rendering::RenderingModule::register_systems(flecs::world world) {
 
     world.system<const core::Position2D, const Renderable, const TrackingCamera>(
                  "Determine Visible Entities")
-            .term_at(2)
-            .singleton()
             .write<Visible>()
             .kind<PreRender>()
             .multi_threaded()
@@ -75,8 +72,6 @@ void rendering::RenderingModule::register_systems(flecs::world world) {
         });
 
     world.system<TrackingCamera, Viewport>("begin camera mode")
-                .term_at(0)
-                .singleton()
                 .kind<RenderStart>()
                 .each(systems::update_and_begin_camera_mode_system);
 
