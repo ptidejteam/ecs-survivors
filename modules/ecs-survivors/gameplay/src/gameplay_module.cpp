@@ -161,11 +161,12 @@ namespace gameplay {
                 .kind<PostCollisionDetected>()
                 .each(systems::give_experience_system);
 
+        //auto player = world.lookup("player");
+
         add_multiproj = world.system("add multi proj")
                 .kind(0)
                 .with<Attack>()
                 .without<MultiProj>()
-                .with(flecs::ChildOf, "player")
                 .immediate()
                 .each(systems::add_multiproj_system);
 
@@ -173,7 +174,6 @@ namespace gameplay {
                 .kind(0)
                 .with<Attack>()
                 .with<MultiProj>()
-                .with(flecs::ChildOf, "player")
                 .immediate()
                 .each(systems::remove_multiproj_system);
 
@@ -240,13 +240,11 @@ namespace gameplay {
         add_proj = world.system<MultiProj>("+1 proj")
                 .kind(0)
                 .with<Attack>()
-                .with(flecs::ChildOf, "player")
                 .each(systems::increment_multiproj_system);
 
         remove_proj = world.system<MultiProj>("-1 proj")
                 .kind(0)
                 .with<Attack>()
-                .with(flecs::ChildOf, "player")
                 .each(systems::decrement_multiproj_system);
 
         add_pierce_amt = world.system<Pierce>("+1 Pierce")

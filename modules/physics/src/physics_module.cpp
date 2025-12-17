@@ -52,16 +52,6 @@ namespace physics {
                 .kind(flecs::PreUpdate)
                 .each(systems::update_grid_on_window_resized_system);
 
-        // world.observer<SpatialHashingGrid, Settings>("update grid on grid set")
-        //         .event(flecs::OnSet)
-        //         .each([world] (SpatialHashingGrid& hashing_grid, Settings& settings) {
-        //             for (auto cell: hashing_grid.cells) {
-        //                 cell.second.destruct();
-        //             }
-        //             hashing_grid.cells.clear();
-        //             systems::init_spatial_hashing_grid_system(world, hashing_grid, settings);
-        //         });
-
         world.system<SpatialHashingGrid, Settings, GridCell>("update grid") // TODO change to follow a target, not the camera, physics does not know about cameras.
                 .kind(flecs::PreUpdate)
                 .each(systems::update_grid_system);

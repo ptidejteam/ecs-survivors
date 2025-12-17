@@ -80,7 +80,6 @@ void Editor::init() {
     m_world.observer<rendering::VirtualViewport>()
         .event(flecs::OnSet)
         .each([this] (rendering::VirtualViewport vp){
-            LOG_INFO(core::Gui, std::format("Canvas Resized ({} x {})", vp.rect.width, vp.rect.height))
             m_world.set<physics::Settings>({vp.rect.width, vp.rect.height, true});
         });
 }

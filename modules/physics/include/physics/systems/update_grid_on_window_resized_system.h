@@ -24,7 +24,6 @@ namespace physics::systems {
     inline void update_grid_on_window_resized_system(flecs::iter &it, size_t i,
                                                      Settings &settings) {
         if (settings.dirty) {
-            LOG_INFO(core::LogLocation::Physics, std::format("resetting grid"))
             reset_grid(it, i, it.world().get_mut<SpatialHashingGrid>(), settings);
             settings.dirty = false;
         }
