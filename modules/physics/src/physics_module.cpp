@@ -11,7 +11,6 @@
 
 #include "physics/systems/add_collided_with_system.h"
 #include "physics/systems/collision_cleanup_system.h"
-#include "physics/systems/collision_detection_relationship_spatial_hashing_system.h"
 #include "physics/systems/collision_detection_spatial_hashing_system.h"
 #include "physics/systems/collision_detection_system.h"
 #include "physics/systems/collision_resolution_system.h"
@@ -48,13 +47,20 @@ namespace physics {
                 .kind(flecs::OnStart)
                 .each(systems::init_spatial_hashing_grid_system);
 
-        world.system<SpatialHashingGrid, Settings>("update grid on window resized")
-                .kind(flecs::OnUpdate)
+        world.system<Settings>("update grid on window resized")
+                .with<SpatialHashingGrid>()
+                .kind(flecs::PreUpdate)
                 .each(systems::update_grid_on_window_resized_system);
 
         // world.observer<SpatialHashingGrid, Settings>("update grid on grid set")
         //         .event(flecs::OnSet)
-        //         .each(systems::reset_grid);
+        //         .each([world] (SpatialHashingGrid& hashing_grid, Settings& settings) {
+        //             for (auto cell: hashing_grid.cells) {
+        //                 cell.second.destruct();
+        //             }
+        //             hashing_grid.cells.clear();
+        //             systems::init_spatial_hashing_grid_system(world, hashing_grid, settings);
+        //         });
 
         world.system<SpatialHashingGrid, Settings, GridCell>("update grid") // TODO change to follow a target, not the camera, physics does not know about cameras.
                 .kind(flecs::PreUpdate)
@@ -91,7 +97,7 @@ namespace physics {
                 .multi_threaded()
                 .tick_source(m_physicsTick)
                 .each(systems::collision_detection_non_static_system);
-        //m_collision_detection_naive_system.disable();
+        m_collision_detection_naive_system.disable();
 
         // need a second pass to collide static colliders. Even when static objects are out of the screen we compute the collision
         world.system<CollisionRecordList, const core::Position2D, const Collider>(
@@ -102,22 +108,13 @@ namespace physics {
                 .tick_source(m_physicsTick)
                 .each(systems::collision_detection_static_system);
 
-        // TODO fix this
         m_collision_detection_spatial_hashing_system = world.system<CollisionRecordList, SpatialHashingGrid, GridCell>(
                     "Detect Collisions ECS non-static with spatial hashing")
                 .kind<Detection>()
                 .multi_threaded()
                 .tick_source(m_physicsTick)
                 .each(systems::collision_detection_spatial_hashing_system);
-        m_collision_detection_spatial_hashing_system.disable();
-
-        m_collision_detection_spatial_ecs = world.system<CollisionRecordList, SpatialHashingGrid, GridCell>(
-                    "test collision with relationship")
-                .kind<Detection>()
-                .multi_threaded()
-                .tick_source(m_physicsTick)
-                .each(systems::collision_detection_relationship_spatial_hashing_system);
-        m_collision_detection_spatial_ecs.disable();
+        //m_collision_detection_spatial_hashing_system.disable();
 
         world.system<CollisionRecordList>("Collision Resolution ECS (Naive Record List)")
                 .kind<Resolution>()

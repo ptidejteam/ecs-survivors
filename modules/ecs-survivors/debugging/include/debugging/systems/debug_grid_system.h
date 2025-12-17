@@ -5,12 +5,11 @@
 #ifndef DEBUG_GRID_SYSTEM_H
 #define DEBUG_GRID_SYSTEM_H
 
-#include <flecs.h>
-#include <raylib.h>
+#include "physics/components.h"
 
 namespace debugging::systems {
-    inline void debug_grid_system(rendering::TrackingCamera &camera, physics::SpatialHashingGrid& grid, physics::GridCell& cell) {
-        DrawRectangleLines(grid.offset.x + cell.x * grid.cell_size, grid.offset.y +cell.y * grid.cell_size, grid.cell_size, grid.cell_size, ORANGE);
+    inline void debug_grid_system(physics::SpatialHashingGrid& grid, physics::GridCell& cell) {
+        DrawRectangleLines(grid.offset.x + cell.x * grid.cell_size, grid.offset.y + cell.y * grid.cell_size, grid.cell_size, grid.cell_size, ORANGE);
     }
 }
 #endif //DEBUG_GRID_SYSTEM_H

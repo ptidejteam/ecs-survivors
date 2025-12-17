@@ -17,7 +17,7 @@ namespace physics::systems {
         auto player = it.world().lookup("player");
         Vector2 pos = player != 0 ? player.get<core::Position2D>().value : Vector2(0.0f, 0.0f);
         grid.offset = pos - Vector2{
-            settings.world_bounds.x / 2.0f, settings.world_bounds.y / 2.0f
+            settings.world_bounds.x / 2.f, settings.world_bounds.y / 2.f
         };
 
         cell.entities.clear();

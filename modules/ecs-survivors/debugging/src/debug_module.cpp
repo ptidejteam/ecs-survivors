@@ -30,18 +30,18 @@ namespace debugging {
 
     void DebugModule::register_systems(flecs::world &world) {
         debug_entity_ids = world.system<const core::Position2D, const physics::Collider>("Show Collidable ID")
-                .kind<rendering::RenderGizmos>()
+                .kind<rendering::RenderObjects>()
                 .each(systems::debug_collidable_entities_system);
         debug_entity_ids.disable();
 
         debug_collider_bounds = world.system<const core::Position2D, const physics::Collider>("Debug collider bounds")
-                .kind<rendering::RenderGizmos>()
+                .kind<rendering::RenderObjects>()
                 .each(systems::debug_collider_bounds_system);
         debug_collider_bounds.disable();
 
         debug_circle_colliders = world.system<const physics::CircleCollider, const core::Position2D>(
                     "Debug circle colliders")
-                .kind<rendering::RenderGizmos>()
+                .kind<rendering::RenderObjects>()
                 .with<rendering::Visible>()
                 .group_by<rendering::Priority>()
                 .each(systems::debug_circle_colliders_system);
@@ -49,7 +49,7 @@ namespace debugging {
 
         debug_square_colliders = world.system<const core::Position2D, const physics::Collider>(
                     "Debug square colliders")
-                .kind<rendering::RenderGizmos>()
+                .kind<rendering::RenderObjects>()
                 .with<physics::BoxCollider>()
                 .group_by<rendering::Priority>()
                 .each(systems::debug_box_colliders_system);
@@ -70,13 +70,13 @@ namespace debugging {
                 .run(systems::debug_mouse_position_system);
         debug_mouse_pos.disable();
 
-        debug_grid = world.system<rendering::TrackingCamera, physics::SpatialHashingGrid, physics::GridCell>("Draw Grid")
-                .kind<rendering::RenderGizmos>()
+        debug_grid = world.system<physics::SpatialHashingGrid, physics::GridCell>("Draw Grid")
+                .kind<rendering::RenderObjects>()
                 .each(systems::debug_grid_system);
         debug_grid.disable();
 
         debug_closest_enemy = world.system("Draw Ray to closest target")
-                .kind<rendering::RenderGizmos>()
+                .kind<rendering::RenderObjects>()
                 .run(systems::debug_closest_enemy_to_player_system);
         debug_closest_enemy.disable();
 

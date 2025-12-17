@@ -15,8 +15,6 @@ namespace editor::systems {
         const char *name = e.name() != "" ? e.name().c_str() : std::to_string(e.id()).c_str();
         if (ImGui::TreeNode(name)) {
             if (ImGui::IsItemFocused()) {
-                // This node was clicked
-                // You can now update your selection state, e.g., store the node_id
                 e.world().get_mut<SelectedEntity>().entity = e;
             }
 

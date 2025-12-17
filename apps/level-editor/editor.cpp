@@ -52,7 +52,9 @@ void Editor::init() {
 
     m_world.set<physics::Settings>({(float) m_window_width, (float) m_window_height});
     m_world.add<physics::CollisionRecordList>();
-    m_world.set<physics::SpatialHashingGrid>({48, {0, 0}});
+    m_world.add<physics::SpatialHashingGrid>();
+    m_world.get_mut<physics::SpatialHashingGrid>().cell_size = 48;
+    m_world.get_mut<physics::SpatialHashingGrid>().offset = {0,0};
     m_world.set<core::Paused>({false});
     m_world.set<core::PausesRequested>({0});
 
@@ -62,14 +64,25 @@ void Editor::init() {
         .set<rendering::VirtualViewport>({0,0, 1920, 1080})
         .set<editor::Window>({"Game View"});
 
+
+
+
     // load whatever you need
     GameScene game_scene;
     game_scene.load(m_world);
 
 
+
     m_world.entity().set<editor::Window>({"Hierarchy"}).add<editor::Hierarchy>();
     m_world.entity().set<editor::Window>({"Inspector"}).add<editor::Inspector>();
     m_world.entity().set<editor::Window>({"Console"}).set<editor::Console>({});
+
+    m_world.observer<rendering::VirtualViewport>()
+        .event(flecs::OnSet)
+        .each([this] (rendering::VirtualViewport vp){
+            LOG_INFO(core::Gui, std::format("Canvas Resized ({} x {})", vp.rect.width, vp.rect.height))
+            m_world.set<physics::Settings>({vp.rect.width, vp.rect.height, true});
+        });
 }
 
 void Editor::run() {

@@ -25,7 +25,7 @@ namespace core {
         world.component<Vector2>().member<float>("x").member<float>("y");
         world.component<Position2D>().member<Vector2>("value");
         world.component<Speed>().member<float>("value");
-        world.component<Tag>().member<std::string>("name");
+        world.component<Tag>();
         world.component<DestroyAfterTime>().member<float>("time");
         world.component<DestroyAfterFrame>();
         world.component<PausesRequested>().member<int>("pauses_requested").add(flecs::Singleton);

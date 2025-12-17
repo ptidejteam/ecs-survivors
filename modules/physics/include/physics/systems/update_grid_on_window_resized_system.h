@@ -21,11 +21,14 @@ namespace physics::systems {
         init_spatial_hashing_grid_system(it, i, hashing_grid, settings);
     }
 
-    inline void update_grid_on_window_resized_system(flecs::iter &it, size_t i, SpatialHashingGrid &hashing_grid,
+    inline void update_grid_on_window_resized_system(flecs::iter &it, size_t i,
                                                      Settings &settings) {
-        if (IsWindowResized()) {
-            reset_grid(it, i, hashing_grid, settings);
+        if (settings.dirty) {
+            LOG_INFO(core::LogLocation::Physics, std::format("resetting grid"))
+            reset_grid(it, i, it.world().get_mut<SpatialHashingGrid>(), settings);
+            settings.dirty = false;
         }
+
     }
 }
 #endif //UPDATE_GRID_ON_WINDOW_RESIZED_SYSTEM_H

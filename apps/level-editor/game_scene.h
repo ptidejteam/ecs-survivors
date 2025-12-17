@@ -25,10 +25,8 @@ class GameScene : public core::Scene {
 public:
     ~GameScene() override = default;
     flecs::entity load(flecs::world &world) override {
-        auto scene = world.entity("scene");
-
-        flecs::entity player = world.entity("player").child_of(scene)
-                                       .child_of(rendering::RenderingModule::main_viewport)
+        flecs::entity scene = world.entity("scene.ecs-survivors");
+        flecs::entity player = world.entity("player")
                                        .set<core::Tag>({"player"})
                                        .set<core::Position2D>({2300.0f, 1300.0f})
                                        .set<core::Speed>({300})
@@ -51,7 +49,7 @@ public:
                                                                     WHITE})
                                        .set<gameplay::Health>({150, 150})
                                        .set<gameplay::RegenHealth>({1.0f})
-                                       .set<gameplay::Experience>({1, 0, 2});
+                                       .set<gameplay::Experience>({1, 0, 10});
 
         world.entity("dagger attack")
                 .child_of(player)
@@ -119,11 +117,11 @@ public:
                                                                    3.f,
                                                                    WHITE})
                                       .set<rendering::Priority>({0});
+
         auto spawner = world.entity("enemy_spawner")
-                               .child_of(rendering::RenderingModule::main_viewport)
                                .set<gameplay::Spawner>({enemy, 1});
 
-        world.entity("tilemap_1").child_of(scene).set<tilemap::Tilemap>({"../../assets/tiled/maps/sampleMap.tmx", 3.0f});
+        world.entity("tilemap_1").set<tilemap::Tilemap>({"../../assets/tiled/maps/sampleMap.tmx", 3.0f});
 
         world.set<rendering::TrackingCamera>({player, Camera2D{0}});
 
@@ -206,7 +204,7 @@ public:
         auto level_up_menu = world.entity("level_up_menu")
                                      .child_of(gui::GUIModule::gui_canvas)
                                      .is_a<gui::PanelPrefab>()
-                                     .set<Rectangle>({-300, -200, 600, 400})
+                                     .set<Rectangle>({-300, -200, 600, 300})
                                      .set<gui::Anchor>({gui::CENTER, gui::MIDDLE})
                                      .add<core::PauseOnEnabled>();
 
@@ -217,7 +215,8 @@ public:
                 .is_a<gui::TextPrefab>()
                 .set<Rectangle>({-150, 5, 300, 50})
                 .set<gui::Anchor>({gui::CENTER, gui::TOP})
-                .set<gui::Text>({"You Leveled Up, Pick an upgrade", gui::FONT_SIZE_32, TEXT_ALIGN_CENTER, LIGHTGRAY});
+                .set<gui::Text>({"You Leveled Up, Pick an upgrade", gui::FONT_SIZE_32, TEXT_ALIGN_CENTER,
+                                 gui::GUIModule::font_color()});
 
 
         level_up_menu.disable();
@@ -244,8 +243,8 @@ public:
         auto container = world.entity()
                                  .child_of(level_up_menu)
                                  .set_name("level up options container")
-                                 .set<Rectangle>({-175, -150, 350, 300})
-                                 .set<gui::Anchor>({gui::CENTER, gui::MIDDLE})
+                                 .set<Rectangle>({-175, -250, 350, 250})
+                                 .set<gui::Anchor>({gui::CENTER, gui::BOTTOM})
                                  .set<gui::Outline>({1, GRAY, Fade(WHITE, 0)});
 
         auto o1 = container.child()

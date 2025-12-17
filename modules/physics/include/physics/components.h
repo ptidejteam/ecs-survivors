@@ -26,7 +26,10 @@ namespace physics {
 
     struct Settings {
         Vector2 world_bounds;
+        bool dirty = false;
     };
+
+    struct WorldResizedEvent {};
 
     struct Velocity2D {
         Vector2 value;

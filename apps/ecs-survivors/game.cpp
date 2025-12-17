@@ -57,10 +57,11 @@ void Game::init() {
 
 
     //configure settings
-    m_world.set<rendering::Settings>({m_window_name, m_window_width, m_window_height, m_window_width, m_window_height});
     m_world.set<physics::Settings>({(float) m_window_width, (float) m_window_height});
     m_world.add<physics::CollisionRecordList>();
-    m_world.set<physics::SpatialHashingGrid>({48, {0, 0}});
+    m_world.add<physics::SpatialHashingGrid>();
+    m_world.get_mut<physics::SpatialHashingGrid>().cell_size = 48;
+    m_world.get_mut<physics::SpatialHashingGrid>().offset = {0,0};
     m_world.set<core::Paused>({false});
     m_world.set<core::PausesRequested>({0});
 
