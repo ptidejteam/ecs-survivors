@@ -76,15 +76,15 @@ target_include_directories(imgui PUBLIC
 
 target_link_libraries(imgui PUBLIC raylib)
 
-# Our Project
+
 add_library(raygui INTERFACE)
 
 target_include_directories(raygui
         INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/external/raygui/include
 )
 
-#add_subdirectory("src")
-add_subdirectory("modules")
+# Our Project
+add_subdirectory("src")
 
 set(TMXLITE_STATIC_LIB ON)
 add_subdirectory("external/tmxlite/tmxlite")
@@ -93,9 +93,6 @@ target_link_libraries(tilemap PRIVATE
 )
 
 add_subdirectory("external/rlImGui")
-
-
-#add_subdirectory("include")
 add_subdirectory("apps")
 
 
