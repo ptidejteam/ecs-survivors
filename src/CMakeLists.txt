@@ -1,22 +1,10 @@
-set(LIBRARY_SOURCES
-        "game.cpp")
-set(LIBRARY_HEADERS
-        "game.h"
-)
-set(LIBRARY_INCLUDES
-        "./")
+add_subdirectory("base")
+add_subdirectory("core")
+add_subdirectory("input")
+add_subdirectory("physics")
+add_subdirectory("rendering")
+add_subdirectory("gui")
+add_subdirectory("editor")
+add_subdirectory("tilemap")
 
-add_library(${LIBRARY_NAME} STATIC
-        ${LIBRARY_SOURCES}
-        ${LIBRARY_HEADERS})
-
-add_subdirectory("modules")
-
-target_include_directories(${LIBRARY_NAME} PUBLIC
-        ${LIBRARY_INCLUDES})
-
-target_link_libraries(${LIBRARY_NAME} PUBLIC
-        raylib
-        flecs::flecs_static
-        tmxlite)
-
+add_subdirectory("ecs-survivors")

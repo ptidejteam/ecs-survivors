@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.28)
-project(ECS_Survivors VERSION 1.0.0 LANGUAGES C CXX)
+project(ecs-survivors VERSION 1.0.0 LANGUAGES C CXX)
 
 set(EXECUTABLE_NAME Executable)
 set(LIBRARY_NAME Library)
@@ -13,7 +13,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 if (EMSCRIPTEN)
     set(CMAKE_EXE_LINKER_FLAGS "\
         ${CMAKE_EXE_LINKER_FLAGS} \
-        --embed-file resources \
+        --embed-file assets \
         --shell-file _deps/raylib-src/src/minshell.html \
         -s USE_GLFW=3 \
         -s ASSERTIONS=1 \
@@ -41,7 +41,7 @@ if (NOT raylib_FOUND) # If there's none, fetch and build raylib
     endif ()
 endif ()
 
-set(FLECS_VERSION 4.1.0)
+set(FLECS_VERSION 4.1.4)
 find_package(flecs ${FLECS_VERSION} QUIET) # QUIET or REQUIRED
 if (NOT flecs_FOUND) # If there's none, fetch and build flecs
     include(FetchContent)
@@ -57,19 +57,44 @@ if (NOT flecs_FOUND) # If there's none, fetch and build flecs
     endif ()
 endif ()
 
-# Our Project
+set(IMGUI_VERSION 1.92.2)
+FetchContent_Declare(
+        imgui
+        URL https://github.com/ocornut/imgui/archive/refs/tags/v${IMGUI_VERSION}-docking.tar.gz
+)
+FetchContent_MakeAvailable(imgui)
+add_library(imgui STATIC
+        ${imgui_SOURCE_DIR}/imgui.cpp
+        ${imgui_SOURCE_DIR}/imgui_demo.cpp
+        ${imgui_SOURCE_DIR}/imgui_draw.cpp
+        ${imgui_SOURCE_DIR}/imgui_tables.cpp
+        ${imgui_SOURCE_DIR}/imgui_widgets.cpp
+)
+target_include_directories(imgui PUBLIC
+        ${imgui_SOURCE_DIR}
+        ${imgui_SOURCE_DIR}/backends)
 
+target_link_libraries(imgui PUBLIC raylib)
+
+
+add_library(raygui INTERFACE)
+
+target_include_directories(raygui
+        INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/external/raygui/include
+)
+
+# Our Project
 add_subdirectory("src")
+
 set(TMXLITE_STATIC_LIB ON)
 add_subdirectory("external/tmxlite/tmxlite")
-add_subdirectory("include")
-add_subdirectory("app")
-
-
-target_link_libraries(${LIBRARY_NAME} PRIVATE
-        raylib
-        flecs::flecs_static
+target_link_libraries(tilemap PRIVATE
         tmxlite
 )
+
+add_subdirectory("external/rlImGui")
+add_subdirectory("apps")
+
+
 
 
