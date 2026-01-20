@@ -73,6 +73,10 @@ namespace core {
                 return "[AI]";
             case LogLocation::Raylib:
                 return "[RAYLIB]";
+            case LogLocation::App:
+                return "[APP]";
+            default:
+                return "[UNKNOWN]";
         }
     }
 

@@ -33,7 +33,8 @@ namespace core {
         Physics,
         Rendering,
         Tilemap,
-        Raylib
+        Raylib,
+        App,
     };
 
     class Logger {

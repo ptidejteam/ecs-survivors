@@ -15,7 +15,7 @@ namespace core {
         virtual ~Application() = default;
 
         virtual void init() {
-            Logger::Instance().AddSink([](LogLevel level, LogLocation loc, std::string message) {
+            Logger::Instance().AddSink([](LogLevel level, LogLocation loc, const std::string& message) {
                 std::cout << Logger::Instance().get_level_string(level) << " "
                           << Logger::Instance().get_location_string(loc) << " " << message << std::endl;
             });

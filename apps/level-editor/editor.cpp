@@ -29,7 +29,7 @@ void Editor::init() {
 
 #ifndef EMSCRIPTEN
     // use the flecs explorer when not on browser
-    m_world.import <flecs::stats>();
+    m_world.import<flecs::stats>();
     m_world.set<flecs::Rest>({});
 
 #endif
