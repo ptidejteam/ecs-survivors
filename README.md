@@ -19,12 +19,21 @@ You can also play the latest build on [Itch.io](https://laurent-voisard.itch.io/
 
 
 ## Gallery:
+![ECS-Survivors](assets/project-page/img.png) 
+*<center> The game </center>*
 
-![ECS-Survivors](assets/project-page/img.png)
 ![Level-Up](assets/project-page/level-up.png)
+*<center> Player progression </center>*
+
 ![Tilemap](assets/project-page/tilemap.png)
+*<center> Tiled integration using tmxlite </center>*
 
+## Tools & Assets Used
 
+- [flecs](https://github.com/SanderMertens/flecs) (MIT license)
+- [raylib](https://github.com/raysan5/raylib) (Zlib license)
+- [tmxlite](https://github.com/fallahn/tmxlite) (Zlib license)
+- [tilemap art](https://kenney.nl/assets/tiny-dungeon) (CCO license)
 
 # Building with CMake for Desktop
 
