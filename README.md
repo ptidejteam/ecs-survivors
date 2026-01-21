@@ -6,14 +6,25 @@ I am taking this opportunity to learn myself about game development with ECS, ta
 
 While developing this game, I will document most of the work through [blog-posts](https://blog.ptidej.net/). Every blog will be contained in separate branches, and the main one will have the most recent changes.
 
-[Part-I: Setup](https://blog.ptidej.net/ecs-survivors-part-i/)<br>
-[Part-II: Rendering Pipeline and GUI](https://blog.ptidej.net/ecs/)<br>
-[Part-III: Player and Enemy Movement](https://blog.ptidej.net/ecs-game/)<br>
-[Part-IV: Collisions](https://blog.ptidej.net/ecs-survivors-part-iv/)<br>
-[Part-V: Gameplay](https://blog.ptidej.net/ecs-survivors-part-v-gameplay/)<br>
-[Part-V: Code Refactor](https://blog.ptidej.net/ecs-survivors-part-vi-code-refactor/)<br>
+## Blog Entries:
+- [Part-I: Setup](https://blog.ptidej.net/ecs-survivors-part-i/)
+- [Part-II: Rendering Pipeline and GUI](https://blog.ptidej.net/ecs/)
+- [Part-III: Player and Enemy Movement](https://blog.ptidej.net/ecs-game/)<br>
+- [Part-IV: Collisions](https://blog.ptidej.net/ecs-survivors-part-iv/)<br>
+- [Part-V: Gameplay](https://blog.ptidej.net/ecs-survivors-part-v-gameplay/)<br>
+- [Part-VI: Code Refactor](https://blog.ptidej.net/ecs-survivors-part-vi-code-refactor/)<br>
+- Part-VII - X: Tilemaps - Accelerated Collisions - Levelling Up - Yet Another Code Refactor (Coming Soon)<br>
 
 You can also play the latest build on [Itch.io](https://laurent-voisard.itch.io/ecs-survivors)
+
+
+## Gallery:
+
+![ECS-Survivors](assets/project-page/img.png)
+![Level-Up](assets/project-page/level-up.png)
+![Tilemap](assets/project-page/tilemap.png)
+
+
 
 # Building with CMake for Desktop
 

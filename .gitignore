@@ -2,4 +2,6 @@ cmake*/
 .idea/
 out/
 .vs/
+.clang-format
+.gitattributes
 CMakeSettings.json

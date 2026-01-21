@@ -5,8 +5,8 @@
     },
     "activeFile": "maps/sampleMap.tmx",
     "expandedProjectPaths": [
-        "sheets",
         "maps",
+        "sheets",
         "."
     ],
     "file.lastUsedOpenFilter": "All Files (*)",
@@ -28,11 +28,11 @@
             "scaleInEditor": 3
         },
         "maps/sampleMap.tmx": {
-            "scale": 2,
-            "selectedLayer": 2,
+            "scale": 0.8873,
+            "selectedLayer": 0,
             "viewCenter": {
-                "x": 1024,
-                "y": 512
+                "x": 1037.4168826777866,
+                "y": 540.4034712047785
             }
         },
         "maps/sampleSheet.tsx": {
@@ -42,7 +42,7 @@
             "scale": 3,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 92.83333333333333,
+                "x": 80.16666666666666,
                 "y": 80
             }
         },
@@ -69,9 +69,9 @@
     "project": "ecs-survivors.tiled-project",
     "property.type": "bool",
     "recentFiles": [
-        "maps/sampleMap.tmx",
         "maps/test.tmx",
         "sheets/sampleSheet.tsx",
+        "maps/sampleMap.tmx",
         "C:/Users/Laurent/Downloads/kenney_tiny-dungeon/Tiled/sampleMap.tmx",
         "C:/Users/Laurent/Downloads/kenney_tiny-dungeon/Tiled/sampleSheet.tsx",
         "dungeon.tsx"
