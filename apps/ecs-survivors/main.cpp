@@ -2,8 +2,8 @@
 #include "game.h"
 
 int main() {
-    const int screenWidth = 1920;
-    const int screenHeight = 1080;
+    const int screenWidth = 800;
+    const int screenHeight = 600;
 
     auto ecs_survivors = Game("ECS-Survivors", screenWidth, screenHeight);
     ecs_survivors.init();
