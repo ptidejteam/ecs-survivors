@@ -17,7 +17,7 @@ target_link_libraries(editor PUBLIC
         base
         core
         rendering
-        raylib #only using the datatypes
+        raylib
         imgui
         rlimgui
         flecs::flecs_static
