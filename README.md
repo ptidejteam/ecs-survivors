@@ -13,7 +13,7 @@ While developing this game, I will document most of the work through [blog-posts
 - [Part-IV: Collisions](https://blog.ptidej.net/ecs-survivors-part-iv/)<br>
 - [Part-V: Gameplay](https://blog.ptidej.net/ecs-survivors-part-v-gameplay/)<br>
 - [Part-VI: Code Refactor](https://blog.ptidej.net/ecs-survivors-part-vi-code-refactor/)<br>
-- Part-VII - X: Tilemaps - Accelerated Collisions - Levelling Up - Yet Another Code Refactor (Coming Soon)<br>
+- [Part-VII - X: Tilemaps - Accelerated Collisions - Levelling Up - Yet Another Code Refactor](https://blog.ptidej.net/ecs-survivors-parts-vii-x/)<br>
 
 You can also play the latest build on [Itch.io](https://laurent-voisard.itch.io/ecs-survivors)
 
